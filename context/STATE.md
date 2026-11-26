@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-26 22:59 +0600
+**Last updated:** 2026-11-26 23:01 +0600
 
 ## Where the project stands
 
@@ -27,7 +27,7 @@
   timetable.
 - Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan), `62ea747` (late rule,
   health), `586630d` (Qibla maths), `0684bc1` (deed core). Pushed to
-  `github.com/senseix21/mumins-day` (`main`). The repository is public. Upstream clones for reading are in
+  `github.com/senseix21/mumins-day` (`main`). The repository is public. CI builds and tests every push on JDK 17. Upstream clones for reading are in
   `dev/upstream/`, outside this repository.
 
 ## Next

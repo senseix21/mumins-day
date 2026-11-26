@@ -120,7 +120,7 @@ them, and F4 is the answer to the Play "repetitive content" risk.
 |---|---|---|
 | G10 | Repository `LICENSE` and `NOTICE`. **Application id: closed 2026-11-26**, founder chose `com.senseix21.muminsday` (typed with a comma; read as a dot) | Needed before the first file of code; the id cannot change after Play release |
 | G18 | **Closed 2026-11-26: split, ADR-9.** Where the pure core is built. `dl.google.com` is blocked in the cloud container, so an Android module cannot build there; Maven Central and the Gradle plugin portal are reachable (KNOWN, `curl` on 2026-11-26). The spec says one Gradle module | Either split the pure core into a plain Kotlin module that builds anywhere, or do all building on the founder's machine |
-| G11 | **Remote: closed 2026-11-26** (`github.com/senseix21/mumins-day`, public). CI still open. A remote for this repository, and CI | The spec leans on CI for the build gates; none is chosen. This checkout lives in a temporary cloud container |
+| G11 | **Remote: closed 2026-11-26** (`github.com/senseix21/mumins-day`, public). **CI: closed 2026-11-26**, first run green. A remote for this repository, and CI | The spec leans on CI for the build gates; none is chosen. This checkout lives in a temporary cloud container |
 | G12 | UI design: screens, flows, Bengali copy | Upstream asks for a real redesign and Play checks for it; the spec lists screen names only |
 | G13 | A build machine and physical phones | Nothing was ever built (H8); every target in the spec is unmeasured |
 | G14 | Play developer account type and its date | Decides whether the 12-tester, 14-day closed test applies |

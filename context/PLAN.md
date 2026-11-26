@@ -55,7 +55,7 @@ Android SDK machine and phones (G13). The founder track below runs alongside eve
 These gate later phases. Starting them now is what keeps phases 3 to 8 from stalling.
 
 - [x] A remote for this repository: `github.com/senseix21/mumins-day`, `main` pushed. 2026-11-26
-- [ ] CI on the remote (G11).
+- [x] CI on the remote (G11). 2026-11-26
 - [ ] Git author name and email for commits.
 - [ ] A build machine with JDK 17 and Android SDK 37, or network access to Google's Maven host from the cloud environment (G13, G18). Gates phase 3.
 - [ ] Reference timetable for Bangladesh, a full year, eight divisional cities (Q2). Gates T-FIX-4.
@@ -90,7 +90,7 @@ These gate later phases. Starting them now is what keeps phases 3 to 8 from stal
 - [x] Application id `com.senseix21.muminsday` [G10]. 2026-11-26
 - [x] First commit `764dc7a`. 2026-11-26
 - [x] `LICENSE` (Apache-2.0) and `NOTICE` at the root, crediting upstream and pointing to the engine's notices. 2026-11-26
-- [ ] CI running `./gradlew build` on every push: workflow added at `.github/workflows/build.yml`; tick when a run is seen green.
+- [x] CI running `./gradlew build` on every push and pull request (`.github/workflows/build.yml`); first run green. 2026-11-26
 - [ ] Bump the Gradle wrapper to 8.14.4 or later (Kotlin 2.5 will require it).
 
 ## Phase 1 · Prayer-time core (F2)

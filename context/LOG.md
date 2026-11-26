@@ -241,3 +241,12 @@ workflow uses JDK 17, which has not been run here.
 
 **Not done / follow-up.** The copyright holder's name is taken from the founder's GitHub
 profile and needs the founder's confirmation. Result of the first CI run: see the next entry.
+
+## 2026-11-26 23:01 +0600 · First CI run is green
+
+**Verified.** GitHub Actions run 45863768896 for commit `670b4d8`: completed, success. Steps:
+checkout, setup-java (Temurin 17), `./gradlew build --no-daemon --console=plain`, all
+success; the failure-only artifact upload was skipped. This is also the first time the build
+has run on JDK 17 rather than 21.
+
+**Not done / follow-up.** Nothing.
