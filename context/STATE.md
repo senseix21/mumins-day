@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-26 23:15 +0600
+**Last updated:** 2026-11-26 23:29 +0600
 
 ## Where the project stands
 
@@ -34,9 +34,10 @@
 
 ## Next
 
-Nothing is left that this container can do alone. Everything open in `PLAN.md` needs a phone
-and Android SDK (phases 3, 4, 7), or a person: the reviewer, the native speaker, the
-timetable, the district list.
+Phase 3 can now start in the cloud environment: the `:app` module, manifest, build gates
+T-BUILD-1…3, storage and the alarm path can be written and compiled. What still cannot be
+done here is anything that must ring, sense or be killed by a phone maker: T-INST-*, M-*.
+Before writing `:app`, fetch the Android rules listed under phase 3 "Before code" (G6, G7).
 
 ## Waiting on the founder
 
@@ -45,5 +46,5 @@ timetable, the district list.
 | Reference timetable | The only real test of correctness, T-FIX-4 | Q2 |
 | Reviewer and native speaker, by name | Sehri/Fajr rulings below; all deed content | G9, Q3 |
 | Confirm: Sehri end ignores the user's Fajr offset; Sehri end and Fajr can show one minute apart; sunrise rounds down | Rulings taken in slice 1 on the safe side | G19, G20 |
-| Android SDK machine and phones | Slice 3 cannot be built or tested here | G13 |
+| A phone (or several) | The app can be built here, but not run or tested | G13 |
 | Adhan recording, district list | Slices 3 and 4 | Q5, Q4 |

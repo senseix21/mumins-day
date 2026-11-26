@@ -294,3 +294,29 @@ against change, but someone should compare it once at gradle.org/release-checksu
 
 **Not done / follow-up.** No real content. The phone-side parse is phase 5 work. The task
 has no declared outputs, so it runs on every build; that is intended for a gate.
+
+## 2026-11-26 23:29 +0600 · Android SDK set up in the cloud environment
+
+**Did.**
+- CI for `bb64986` and `9ef8c5b` confirmed green.
+- Created the personal cloud environment `mumins-day` (founder approved the prompt): limited
+  network plus `dl.google.com`, tied to `senseix21/mumins-day`. This session now uses it.
+- Installed the Android SDK at `/opt/android-sdk`: command-line tools 23.0 (zip SHA-1 checked
+  against Google's package index), platform-tools 37.0.3, `platforms;android-37.0`,
+  `build-tools;37.0.0` and `36.0.0` (Android Gradle plugin 9.3.1 asks for 36.0.0).
+- Saved a setup script and `ANDROID_HOME=/opt/android-sdk` on the environment (founder
+  approved). The script never fails a session: on error it prints and carries on.
+
+**Verified.**
+- Before: `curl https://dl.google.com/...` gave "CONNECT tunnel failed, response 403". After
+  the environment change: 200.
+- A throwaway app outside the repository (AGP 9.3.1, compileSdk 37, minSdk 26, Gradle 9.9.2
+  wrapper) ran `:app:assembleDebug` to an 872 KB `app-debug.apk`, and again with `--offline`.
+- Setup script: moved the SDK aside, ran the script from `/home/user/dev`, it reinstalled
+  everything and printed "Android SDK ready"; a second run was a no-op.
+
+**Not done / follow-up.**
+- The setup script and `ANDROID_HOME` are unproven in a fresh session; they take effect when
+  one starts on this environment.
+- No emulator was installed or tried; whether one can run in this container is UNKNOWN.
+- Nothing was added to the repository's build: `:app` is phase 3 work. Not committed.

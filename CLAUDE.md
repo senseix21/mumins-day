@@ -200,5 +200,7 @@ everywhere else. A settings screen does not need a type-level proof. The planner
 ```
 
 Gradle 9.9.2 wrapper (checksum pinned), Kotlin 2.4.10, JVM target 17. Repositories are Maven Central and the
-Gradle plugin portal only. There is no Android module yet, so no instrumented tests and only one
+Gradle plugin portal only. The Android SDK is at `/opt/android-sdk` (`ANDROID_HOME`) in the `mumins-day` cloud environment:
+platform 37, build tools 37 and 36, installed by the environment's setup script. A local
+checkout needs `sdk.dir` in `local.properties` instead. There is no Android module yet, so no instrumented tests and only one
 build gate (T-BUILD-4, the content gate); add the others in phase 3.

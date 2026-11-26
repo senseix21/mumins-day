@@ -45,8 +45,8 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 | 7 | Proof on the device matrix; size and speed measured | Phones | Not started |
 | 8 | On Google Play | Play Console | Not started |
 
-Phases 1, 2 and the pure parts of 5 and 6 need nothing but a JVM. Phase 3 onward needs an
-Android SDK machine and phones (G13). The founder track below runs alongside everything.
+Phases 1, 2 and the pure parts of 5 and 6 need nothing but a JVM. From phase 3 on, building
+needs the Android SDK (now in the cloud environment) and proof needs phones (G13). The founder track below runs alongside everything.
 
 ---
 
@@ -57,7 +57,9 @@ These gate later phases. Starting them now is what keeps phases 3 to 8 from stal
 - [x] A remote for this repository: `github.com/senseix21/mumins-day`, `main` pushed. 2026-11-26
 - [x] CI on the remote (G11). 2026-11-26
 - [ ] Git author name and email for commits.
-- [ ] A build machine with JDK 17 and Android SDK 37, or network access to Google's Maven host from the cloud environment (G13, G18). Gates phase 3.
+- [x] Android SDK in the cloud environment: environment `mumins-day` allows `dl.google.com`; SDK at `/opt/android-sdk` (platform 37, build tools 37 and 36); an empty probe app builds an APK. 2026-11-26
+- [ ] Confirm the saved setup script installs the SDK in a fresh session (unproven until one starts).
+- [ ] A physical phone, or an emulator that can run here, for anything that must ring or sense (G13). Gates the instrumented tests of phase 3.
 - [ ] Reference timetable for Bangladesh, a full year, eight divisional cities (Q2). Gates T-FIX-4.
 - [ ] Reviewer named, with an agreed way of signing content (G9, INV-C1). Gates phase 5 and three rulings in phase 1.
 - [ ] Native Bengali speaker for all copy (G9, INV-L1, INV-C4). Gates phase 4.
@@ -177,7 +179,7 @@ clock changes.
 
 **Exit.** T-INST-1…10 and T-BUILD-1…3 green; M-1 steps 1 to 4 pass on one phone.
 
-**Needs.** Android SDK machine and one phone (G13). Read first: G6, G7.
+**Needs.** One phone (G13); the SDK is available in the cloud environment, so the app can be built and its build gates run without one. Read first: G6, G7.
 
 Before code
 - [ ] Fetch and record the current Android rules for target SDK 37: foreground-service start from an exact alarm, `mediaPlayback` service type, notification-denied behaviour, direct boot [G6, G7, F1#4].
