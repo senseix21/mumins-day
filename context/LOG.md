@@ -226,3 +226,18 @@ repository as public, default branch `main`.
 **Not done / follow-up.** No CI workflow yet. Commits are authored under the container's
 default identity, not the founder's. This session cannot create repositories; it can only
 use ones that exist and are attached.
+
+## 2026-11-26 22:59 +0600 · CI workflow, LICENSE, NOTICE
+
+**Did.**
+- `.github/workflows/build.yml`: on push to `main` and on pull requests, JDK 17 (Temurin),
+  `./gradlew build`, test reports uploaded on failure. Read-only token.
+- `LICENSE`: the Apache-2.0 text, copied from upstream's `LICENSE` file (the standard text).
+- `NOTICE`: copyright line, the LGPL engine and its PrayTimes.js origin with pointers to the
+  licence files and `MODIFICATIONS.md`, and what has been taken from prayer-times-android.
+
+**Verified.** `./gradlew build --no-daemon --console=plain` exits 0 locally, on JDK 21. The
+workflow uses JDK 17, which has not been run here.
+
+**Not done / follow-up.** The copyright holder's name is taken from the founder's GitHub
+profile and needs the founder's confirmation. Result of the first CI run: see the next entry.

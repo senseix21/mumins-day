@@ -1,0 +1,45 @@
+Mu'mins DAY
+Copyright 2026 Mehedi Hasan
+
+Licensed under the Apache License, Version 2.0 (see LICENSE), except for
+the directory engine/calctimes/, which is under the GNU Lesser General
+Public License v3.0 (see below).
+
+------------------------------------------------------------------------
+engine/calctimes/  (LGPL-3.0)
+------------------------------------------------------------------------
+
+A copy of the "calctimes" module of open-prayer-times, with one change.
+
+  open-prayer-times
+  https://github.com/metinkale38/open-prayer-times
+  Commit a136f9b883c3becd5dc9c0b118b4aa2c51e8d2a2
+
+calctimes is a Kotlin port of PrayTimes.js 2.3:
+
+  PrayTimes.js: Prayer Times Calculator (ver 2.3)
+  Copyright (C) 2007-2011 PrayTimes.org
+  Developer: Hamid Zarrabi-Zadeh
+  License: GNU LGPL v3.0
+  http://praytimes.org/
+
+The licence texts are engine/calctimes/LICENSE (LGPL-3.0) and
+engine/calctimes/LICENSE.GPL-3.0. The upstream notice is
+engine/calctimes/NOTICE.txt. The change made here is described in
+engine/calctimes/MODIFICATIONS.md, and the modified source is that
+directory.
+
+------------------------------------------------------------------------
+prayer-times-android  (Apache-2.0)
+------------------------------------------------------------------------
+
+  https://github.com/metinkale38/prayer-times-android
+  Read at commit 0b2a8e70
+
+Mu'mins DAY is a new application, not a copy of prayer-times-android. It
+was written with that project as a reference. Taken from it so far:
+
+  - the way the calctimes engine is called for a calculated timetable;
+  - the coordinates used for the Kaaba (21.42247 N, 39.826198 E).
+
+Anything ported from it later is added to this list.

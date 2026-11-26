@@ -71,7 +71,7 @@ These gate later phases. Starting them now is what keeps phases 3 to 8 from stal
 - [ ] UI direction: screens, flows, visual style clearly unlike upstream (G12). Gates phase 4.
 - [ ] Play developer account; its type and creation date (G14). Gates phase 8.
 - [ ] Privacy policy host and a support email address (G15). Gates phase 8.
-- [ ] Repository `LICENSE` (Apache-2.0) and `NOTICE` approved (G10).
+- [ ] Repository `LICENSE` (Apache-2.0) and `NOTICE` approved (G10). Both are written; the founder should confirm the copyright line "Copyright 2026 Mehedi Hasan".
 
 ---
 
@@ -89,8 +89,8 @@ These gate later phases. Starting them now is what keeps phases 3 to 8 from stal
 - [x] Decision: plain Kotlin `:core` module [ADR-9, G18]. 2026-11-26
 - [x] Application id `com.senseix21.muminsday` [G10]. 2026-11-26
 - [x] First commit `764dc7a`. 2026-11-26
-- [ ] `LICENSE` and `NOTICE` at the root, crediting upstream and reproducing the engine's notices.
-- [ ] CI running `./gradlew build` on every push. The remote exists; a workflow file is all that is missing.
+- [x] `LICENSE` (Apache-2.0) and `NOTICE` at the root, crediting upstream and pointing to the engine's notices. 2026-11-26
+- [ ] CI running `./gradlew build` on every push: workflow added at `.github/workflows/build.yml`; tick when a run is seen green.
 - [ ] Bump the Gradle wrapper to 8.14.4 or later (Kotlin 2.5 will require it).
 
 ## Phase 1 · Prayer-time core (F2)
