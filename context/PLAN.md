@@ -37,7 +37,7 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 |---|---|---|---|
 | 0 | Repository, rules, context, decisions | Anywhere | Done |
 | 1 | Prayer times are computed correctly and safely | JVM | Done, except the timetable check |
-| 2 | The alarm plan is computed correctly; Bengali digits | JVM | Planner and digits done; late rule and health model open |
+| 2 | The alarm plan is computed correctly; Bengali digits | JVM | Done |
 | 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | Not started |
 | 4 | A Bengali user completes first run offline and trusts what they see | Phone | Not started |
 | 5 | One reviewed deed a day | JVM + phone | Not started |
@@ -161,10 +161,11 @@ Tests
 - [x] T-UNIT-9 (unit part): all ten digits; other characters untouched [INV-L2]. 2026-11-26
 - [x] Claude's review and an independent re-run of `./gradlew build`. 2026-11-26
 
-Still to design in this phase
-- [ ] Late rule as a pure function: `decide(plannedAt, deliveredAt) → Play | SilentNotification`, 10 minutes **(target)** [INV-S7, F1#17]. Belongs in `:core` so phase 3 only calls it.
-- [ ] Decide whether one uncomputable prayer should drop the whole day's alarms, as now, or only that prayer [G21]. No effect inside Bangladesh.
-- [ ] Health model as values: `Degraded` reasons as a sealed type, and the "late or missed in the last 7 days" rule over log rows [INV-S6, INV-S8]. Pure; phase 3 supplies the facts.
+Late rule and health model
+- [x] Late rule as a pure function: `decideDelivery(plannedAt, deliveredAt) → Ring | SilentNotification`, 10 minutes **(target)** [INV-S7, F1#17]. In `:core` so phase 3 only calls it. 2026-11-26
+- [x] Decided: one uncomputable prayer drops that day's alarms, as built. It cannot happen inside Bangladesh, and a finer result would complicate the clock's contract for no v1 user [G21]. 2026-11-26
+- [x] Health model as values: `assessHealth(now, facts) → Armed | Degraded(reasons)`, five reasons as a sealed type, and the "late or missed in the last 7 days" rule over log rows [INV-S6, INV-S8]. Pure; phase 3 supplies the facts. 2026-11-26
+- [x] Tests: late-rule boundaries; each fact gives exactly its reason; fixed order; log window and thresholds; property that Armed holds exactly when nothing is wrong. 2026-11-26
 
 ## Phase 3 · Android shell: the Adhan rings (F1)
 
@@ -199,7 +200,7 @@ Alarm path
 - [ ] Delivery: late rule, silent-mode choice, phone-call check, then play or post silently [F1#15, 16, 17].
 - [ ] Playback as a `mediaPlayback` foreground service; wake lock for the recording plus a margin; a Stop control.
 - [ ] One place builds notifications; channels defined once.
-- [ ] Log planned and delivered instants and the outcome [INV-S8].
+- [ ] Log planned and delivered instants and the outcome [INV-S8]. On replan, delete log rows for alarms that were planned but not yet due, or a reminder the user switched off will later read as missed.
 - [ ] "Test Adhan": a real alarm 30 seconds ahead through the same path.
 - [ ] Health checks: exact alarms, notifications, battery optimisation, late or missed alarms, manufacturer [INV-S6, F1#2, 3, 12].
 - [ ] A test tone bundled until the real recording is licensed. (real audio blocked: Q5)

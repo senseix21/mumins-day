@@ -1,11 +1,11 @@
 # State
 
-**Last updated:** 2026-11-26 18:31 +0600
+**Last updated:** 2026-11-26 18:43 +0600
 
 ## Where the project stands
 
-- **Phases 1 and 2 (code) are built and green on the JVM.** `./gradlew build --rerun-tasks`
-  passes: 38 tests in `:core`, 3 upstream tests in `:engine:calctimes`.
+- **Phases 1 and 2 are built and green on the JVM.** `./gradlew build` passes: 50 tests in
+  `:core`, 3 upstream tests in `:engine:calctimes`. Phase 1 still lacks the timetable check (Q2).
 - Three decisions are recorded: engine vendored with one change (ADR-2 amended), plain Kotlin
   `:core` module (ADR-9), application id `com.senseix21.muminsday`.
 - What exists in code:
@@ -16,20 +16,22 @@
   - `core/.../planner/`: `Planner.plan(now, settings)` gives every alarm for the next 48 hours
     with stable ids in a closed space of 64, one replan after local midnight, and gaps for
     days that cannot be computed.
+  - `core/.../planner/Delivery.kt`: the late rule, `decideDelivery` (10 minutes).
+  - `core/.../health/`: `assessHealth(now, facts)` gives `Armed` or `Degraded` with named reasons.
   - `core/.../l10n/`: `toBengaliDigits`.
 - **No Android module.** Nothing has run on a phone. Nothing is checked against a real
   timetable.
-- Slice 1 is committed (`764dc7a`). Phase 2 and `PLAN.md` are not committed yet. No remote. Upstream clones for reading are in
+- Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan). The late rule and health
+  model are not committed yet. No remote. Upstream clones for reading are in
   `dev/upstream/`, outside this repository.
 
 ## Next
 
 `PLAN.md` is the plan. What can be done here, without a phone, in order:
 
-1. Finish phase 2: the late rule and the health model as pure values.
-2. Pure parts of phase 6 (Qibla bearing) and phase 5 (deed rotation, once G4 and G5 are
+1. Pure parts of phase 6 (Qibla bearing) and phase 5 (deed rotation, once G4 and G5 are
    settled).
-3. Phase 0 leftovers: `LICENSE`, `NOTICE`, Gradle wrapper bump.
+2. Phase 0 leftovers: `LICENSE`, `NOTICE`, Gradle wrapper bump.
 
 Phase 3 (the Android shell) cannot start in this container: no Android SDK, and Google's
 Maven host is blocked.

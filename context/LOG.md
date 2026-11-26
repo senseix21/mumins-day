@@ -131,3 +131,21 @@ Commit author is the container default, not the founder.
 - Late rule and health model (phase 2, still open). Nothing on a device. Not committed.
 - "Replan at most 24 h 05 m ahead" is asserted for Dhaka only; it is 25 h 05 m on a
   fall-back day in zones with daylight saving, which is correct behaviour.
+
+## 2026-11-26 18:43 +0600 · Phase 2 finished: late rule and health model
+
+**Did.**
+- Committed the planner, digits and `PLAN.md` as `da2fd48` on the founder's word.
+- Wrote `core/.../planner/Delivery.kt` (`decideDelivery`, `LATE_LIMIT` 10 min) and
+  `core/.../health/Health.kt` (`assessHealth`, `HealthFacts`, `DegradedReason`, `Health`), with
+  `DeliveryTest` and `HealthTest`. Written by Claude directly, not a subagent: two small files.
+- Closed G21 (keep whole-day drop for v1). Ticked the rest of phase 2 in `PLAN.md`. Added a
+  phase 3 note about clearing not-yet-due log rows on replan.
+
+**Verified.** `./gradlew build`: success. From the result XML, `:core`: `CalcTimesClockTest`
+12, `PurityTest` 1, `PlannerTest` 22, `BengaliDigitsTest` 3, `DeliveryTest` 4, `HealthTest` 8;
+50 tests, no failures or errors.
+
+**Not done / follow-up.** The 10-minute and 2-minute thresholds are targets, not measured.
+Neither file has been used by a shell yet; phase 3 will show whether `HealthFacts` has the
+right fields. These two files are not committed.
