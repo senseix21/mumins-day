@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-26 18:56 +0600
+**Last updated:** 2026-11-26 22:40 +0600
 
 ## Where the project stands
 
@@ -26,7 +26,8 @@
 - **No Android module.** Nothing has run on a phone. Nothing is checked against a real
   timetable.
 - Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan), `62ea747` (late rule,
-  health), `586630d` (Qibla maths), and the deed core. No remote. Upstream clones for reading are in
+  health), `586630d` (Qibla maths), `0684bc1` (deed core). Pushed to
+  `github.com/senseix21/mumins-day` (`main`). The repository is public. Upstream clones for reading are in
   `dev/upstream/`, outside this repository.
 
 ## Next
@@ -43,7 +44,6 @@ the reviewer, the native speaker, the timetable, the district list.
 
 | What | Why it matters | Id |
 |---|---|---|
-| A remote to push to | The work lives in a temporary container | G11 |
 | Reference timetable | The only real test of correctness, T-FIX-4 | Q2 |
 | Reviewer and native speaker, by name | Sehri/Fajr rulings below; all deed content | G9, Q3 |
 | Confirm: Sehri end ignores the user's Fajr offset; Sehri end and Fajr can show one minute apart; sunrise rounds down | Rulings taken in slice 1 on the safe side | G19, G20 |

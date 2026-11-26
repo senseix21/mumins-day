@@ -213,3 +213,16 @@ any deed code is written.
   `PLAN.md` as a question for the reviewer.
 - `Provenance.kt` and `Model.kt` were skimmed through their tests and the subagent's report,
   not read line by line.
+
+## 2026-11-26 22:40 +0600 · Pushed to GitHub
+
+**Did.** The founder created `github.com/senseix21/mumins-day`. Attached it to the session,
+added it as `origin`, pushed `main`.
+
+**Verified.** `git ls-remote origin` showed no branches before the push and
+`refs/heads/main` at `0684bc1` after it, equal to local `HEAD`. The GitHub API reports the
+repository as public, default branch `main`.
+
+**Not done / follow-up.** No CI workflow yet. Commits are authored under the container's
+default identity, not the founder's. This session cannot create repositories; it can only
+use ones that exist and are attached.
