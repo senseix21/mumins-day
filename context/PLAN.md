@@ -41,7 +41,7 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 | 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | Not started |
 | 4 | A Bengali user completes first run offline and trusts what they see | Phone | Not started |
 | 5 | One reviewed deed a day | JVM + phone | Not started |
-| 6 | A Qibla compass that admits doubt | JVM + phone | Not started |
+| 6 | A Qibla compass that admits doubt | JVM + phone | Maths done; sensors and screen not started |
 | 7 | Proof on the device matrix; size and speed measured | Phones | Not started |
 | 8 | On Google Play | Play Console | Not started |
 
@@ -294,10 +294,13 @@ when the sensor cannot be trusted. First phase to move to v1.1 if time runs shor
 **Exit.** T-UNIT-10, T-INST-12, T-INST-13 green; M-3 passes on one phone.
 
 Pure, in `:core` (can start now)
-- [ ] Great-circle bearing from a place to the Kaaba (21.42247 N, 39.826198 E), typed in `Degrees` [INV-Q1].
-- [ ] T-UNIT-10: eight cities against independently computed bearings.
-- [ ] Bearing spread across one district, to justify using the stored district [F3#4].
-- [ ] Compass-point wording as a function of the bearing; Bengali wording from the native speaker.
+- [x] Great-circle bearing from a place to the Kaaba (21.42247 N, 39.826198 E), as a `Bearing` in [0, 360); `Everywhere` at the Kaaba and its antipode [INV-Q1]. 2026-11-26
+- [x] T-UNIT-10: eight cities within 0.05° of WGS84 geodesic azimuths from geographiclib; plus agreement with a vector derivation at 5,000 random points. 2026-11-26
+- [x] Bearing spread: at most 0.468° over 50 km anywhere in Bangladesh, so the stored district is good enough [F3#4]. 2026-11-26
+- [ ] Re-check the spread against real district extents once the district table exists; the largest districts are wider than 50 km. (blocked: Q4)
+- [x] Compass point as a structure (`Exactly(West)`, `Between(West, 8, North)`); Dhaka gives the spec's own "8° north of west". 2026-11-26
+- [x] `magneticBearing(trueBearing, declinationEast)`, so the app only has to supply the declination [F3#6]. 2026-11-26
+- [ ] Bengali wording for compass points, from the native speaker. (blocked: G9)
 
 App
 - [ ] Declination from the platform's geomagnetic model, offline; measure the size of the correction in Bangladesh [F3#6].

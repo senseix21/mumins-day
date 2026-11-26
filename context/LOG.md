@@ -149,3 +149,28 @@ Commit author is the container default, not the founder.
 **Not done / follow-up.** The 10-minute and 2-minute thresholds are targets, not measured.
 Neither file has been used by a shell yet; phase 3 will show whether `HealthFacts` has the
 right fields. These two files are not committed.
+
+## 2026-11-26 18:47 +0600 · Phase 6, pure part: Qibla bearing maths
+
+**Did.**
+- Committed the late rule and health model as `62ea747` on the founder's word.
+- Wrote `core/.../bearing/Qibla.kt`: `Bearing` (always in [0, 360)), `qiblaDirection`
+  (`Toward(bearing)` or `Everywhere`), `magneticBearing`, `Cardinal`, `CompassPoint`,
+  `compassPoint`; and `QiblaTest`. Written by Claude directly.
+- Ticked the pure items of phase 6 in `PLAN.md`; added two follow-ups (district extents,
+  Bengali compass wording). `spec/04` T-UNIT-10 marked.
+
+**Verified.**
+- Reference values: `pip install geographiclib`, then
+  `Geodesic.WGS84.Inverse(lat, lon, 21.42247, 39.826198)['azi1']` for eight cities. Dhaka
+  277.5870, Chattogram 279.2734, Khulna 278.2576, Rajshahi 276.5031, Sylhet 277.0384,
+  Barishal 278.6033, Rangpur 275.3735, Mymensingh 276.7123. The spherical formula differs
+  from these by at most 0.034 degrees.
+- `./gradlew build`: success. `:core` 59 tests (`QiblaTest` 9), no failures or errors.
+- Printed by the test: largest bearing change over 50 km in Bangladesh is 0.468 degrees.
+
+**Not done / follow-up.**
+- City coordinates in the test are approximate centres from general knowledge (ASSUMED), not
+  an official table (Q4). They are inputs to a maths check, so this does not weaken it.
+- Declination itself, sensors, the screen: all need a phone. Size of the declination
+  correction in Bangladesh is still UNKNOWN. Not committed.

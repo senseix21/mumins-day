@@ -36,7 +36,7 @@ This file defines what "done" means. A result other than **Not run** names where
 | Bengali digits | INV-L2 | T-UNIT-9 | All ten digits map; screenshot test finds no Latin digit | Digit mapping: pass on JVM, 2026-11-26. Screenshot part: not run |
 | Arabic in Bengali | INV-L3 | T-UI-3 | Screenshot review on the matrix | Not run |
 | Font scale | INV-L4 | T-UI-4 | Screenshots at 200 % | Not run |
-| F3 bearing | INV-Q1 | T-UNIT-10 | Bearing for eight cities against independently computed values | Not run |
+| F3 bearing | INV-Q1 | T-UNIT-10 | Bearing for eight cities against independently computed values | Pass on JVM, 2026-11-26 |
 | F3 low accuracy | INV-Q2 | T-INST-12 | Inject low accuracy; warning and prompt appear | Not run |
 | F3 no magnetometer | INV-Q3 | T-INST-13 | Emulator without the sensor; number shown, no needle | Not run |
 
