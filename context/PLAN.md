@@ -91,7 +91,8 @@ These gate later phases. Starting them now is what keeps phases 3 to 8 from stal
 - [x] First commit `764dc7a`. 2026-11-26
 - [x] `LICENSE` (Apache-2.0) and `NOTICE` at the root, crediting upstream and pointing to the engine's notices. 2026-11-26
 - [x] CI running `./gradlew build` on every push and pull request (`.github/workflows/build.yml`); first run green. 2026-11-26
-- [ ] Bump the Gradle wrapper to 8.14.4 or later (Kotlin 2.5 will require it).
+- [x] Gradle wrapper bumped to 9.9.2 with a pinned distribution checksum; clean build shows no deprecation warning. 2026-11-26
+- [ ] Compare the pinned wrapper checksum with the one Gradle publishes (the checksum host is blocked in the cloud container).
 
 ## Phase 1 · Prayer-time core (F2)
 

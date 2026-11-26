@@ -196,6 +196,6 @@ everywhere else. A settings screen does not need a type-level proof. The planner
 ./gradlew :engine:calctimes:test # upstream's own engine tests
 ```
 
-Gradle 8.14.3 wrapper, Kotlin 2.4.10, JVM target 17. Repositories are Maven Central and the
+Gradle 9.9.2 wrapper (checksum pinned), Kotlin 2.4.10, JVM target 17. Repositories are Maven Central and the
 Gradle plugin portal only. There is no Android module yet, so no instrumented tests and no
 build gates (`T-BUILD-*`); add their commands in slice 3.

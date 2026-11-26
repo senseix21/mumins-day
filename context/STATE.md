@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-26 23:01 +0600
+**Last updated:** 2026-11-26 23:10 +0600
 
 ## Where the project stands
 
@@ -34,8 +34,7 @@
 
 Almost nothing is left that this container can do alone:
 
-1. Phase 0 leftover: Gradle wrapper bump.
-2. The T-BUILD-4 build task (G24), which needs no phone but has no real content to check yet.
+1. The T-BUILD-4 build task (G24), which needs no phone but has no real content to check yet.
 
 Everything else in `PLAN.md` needs a phone and Android SDK (phases 3, 4, 7), or a person:
 the reviewer, the native speaker, the timetable, the district list.

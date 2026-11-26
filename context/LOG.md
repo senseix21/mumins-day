@@ -250,3 +250,23 @@ success; the failure-only artifact upload was skipped. This is also the first ti
 has run on JDK 17 rather than 21.
 
 **Not done / follow-up.** Nothing.
+
+## 2026-11-26 23:10 +0600 · Gradle wrapper 8.14.3 to 9.9.2
+
+**Did.** Ran `./gradlew wrapper --gradle-version 9.9.2 --gradle-distribution-sha256-sum …`
+twice (the second run regenerates the wrapper jar and scripts with the new version). Chose
+9.9.2, the current release, over the last 8.14 patch because phase 3 will need a 9.x Gradle
+for the Android plugin upstream uses (9.3.1 on Gradle 9.6.1), so this avoids a second bump.
+
+**Verified.**
+- `./gradlew --version`: Gradle 9.9.2.
+- `./gradlew build --rerun-tasks --no-daemon --warning-mode all`: success, 97 tests, none
+  failed, and the "Deprecated Gradle Version" warning from Kotlin 2.4.10 is gone. No other
+  deprecation warnings.
+- Second CI run (commit `d1b93b8`) was green before this change.
+
+**Not done / follow-up.** The pinned checksum
+`971fcd71…914c76b` is the SHA-256 of the file downloaded here from
+`services.gradle.org`, computed locally. It was NOT compared with Gradle's published
+checksum: `downloads.gradle.org` is blocked in this container. It protects later downloads
+against change, but someone should compare it once at gradle.org/release-checksums.
