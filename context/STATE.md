@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-26 23:46 +0600
+**Last updated:** 2026-11-26 23:58 +0600
 
 ## Where the project stands
 
@@ -34,6 +34,12 @@
   health), `586630d` (Qibla maths), `0684bc1` (deed core). Pushed to
   `github.com/senseix21/mumins-day` (`main`). The repository is public. CI builds and tests every push on JDK 17. Upstream clones for reading are in
   `dev/upstream/`, outside this repository.
+
+## The founder's Mac
+
+Attached to the session as `ABUs-MacBook-Pro-2`, folder `~/dev`. The clone there is at
+`cd502e7`. Its Claude Code sandbox blocks `adb` and the emulator, so nothing has run there.
+See `HANDOFF.md`, "Running it on the Mac".
 
 ## Next
 

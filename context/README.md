@@ -2,6 +2,7 @@
 
 Everything a person or an agent needs to pick this project up cold. Read in this order:
 
+0. `HANDOFF.md`: the one page to read first if you are new to the project.
 1. `STATE.md`: where things stand and what is next.
    `PLAN.md`: the phases and checklists the work follows.
 2. `GAPS.md` and `QUESTIONS.md`: what is undecided.

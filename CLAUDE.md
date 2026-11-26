@@ -28,6 +28,7 @@ yet. `context/STATE.md` has the current picture; `context/PLAN.md` has the phase
 
 | File | What it holds | How it changes |
 |---|---|---|
+| `context/HANDOFF.md` | One page for someone picking the project up cold | Rewritten when the project changes hands |
 | `context/PLAN.md` | The implementation plan: phases and checklists | Boxes ticked as work is verified; items added as we learn |
 | `context/STATE.md` | Where the project stands, what is next, what is blocked | Rewritten each task |
 | `context/LOG.md` | What was done, when, and what was verified | Append-only, newest last |
