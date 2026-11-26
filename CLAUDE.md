@@ -89,7 +89,7 @@ core/      plain Kotlin, no Android on the classpath; a test also bans clock and
   l10n/      Bengali digits, time and date text
   health/    facts about the phone -> Armed | Degraded(reasons)
 tools/content-gate/   build-only: fails the build if content/deeds.json is not fully reviewed (ADR-10)
-app/       Android only; arrives in slice 3
+app/       Android only. So far: manifest, build gates, a placeholder screen
   ui/        Compose: Home, Qibla, Deed, Settings, Onboarding
   alarm/     apply the plan, receivers, playback service
   sensors/   compass
@@ -197,10 +197,13 @@ everywhere else. A settings screen does not need a type-level proof. The planner
 ./gradlew :core:test             # the pure core's unit and property tests
 ./gradlew :engine:calctimes:test # upstream's own engine tests
 ./gradlew :tools:content-gate:checkDeedContent   # the review gate over content/deeds.json (part of build)
+./gradlew :app:assembleDebug     # the APK, in app/build/outputs/apk/debug/
+./gradlew :app:checkReleasePermissions :app:checkReleaseDependencies   # the allowlist gates (part of build)
 ```
 
 Gradle 9.9.2 wrapper (checksum pinned), Kotlin 2.4.10, JVM target 17. Repositories are Maven Central and the
 Gradle plugin portal only. The Android SDK is at `/opt/android-sdk` (`ANDROID_HOME`) in the `mumins-day` cloud environment:
 platform 37, build tools 37 and 36, installed by the environment's setup script. A local
-checkout needs `sdk.dir` in `local.properties` instead. There is no Android module yet, so no instrumented tests and only one
-build gate (T-BUILD-4, the content gate); add the others in phase 3.
+checkout needs `sdk.dir` in `local.properties` instead. `./gradlew build` also runs Android lint with warnings as errors and all four build gates
+(T-BUILD-1…4). The allowlists the gates enforce are `app/allowlist/permissions.txt` and
+`app/allowlist/dependencies.txt`; never edit either without an ADR. No instrumented tests yet.

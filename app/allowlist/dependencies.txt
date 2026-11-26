@@ -1,0 +1,16 @@
+# INV-P4: the libraries packaged into the app must be exactly these, transitive ones included.
+# One "group:name" per line, no versions. Changing this file needs an ADR and the founder's yes
+# (see context/spec/03-architecture.md, "Dependency policy").
+
+# The language.
+org.jetbrains.kotlin:kotlin-stdlib
+# Pulled in by kotlin-stdlib: annotation classes only.
+org.jetbrains:annotations
+
+# Required by the calctimes engine's API (ADR-2). Goes if the engine is replaced.
+org.jetbrains.kotlinx:kotlinx-datetime
+org.jetbrains.kotlinx:kotlinx-datetime-jvm
+
+# java.time on Android 8 and 9.
+com.android.tools:desugar_jdk_libs
+com.android.tools:desugar_jdk_libs_configuration

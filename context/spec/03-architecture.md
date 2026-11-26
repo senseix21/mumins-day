@@ -273,6 +273,7 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 - **Decision.** (a), with the Degraded state and grant flow built regardless, so (b) is a manifest edit away.
 - **Consequences.** Best reliability if accepted. A rejection costs one review cycle.
 - **Reverse.** Remove one manifest line; the grant flow already exists.
+- **Built 2026-11-26.** Both are declared; `SCHEDULE_EXACT_ALARM` carries `maxSdkVersion=32`, so Android 13 and later rely on `USE_EXACT_ALARM` alone (ASSUMED to be the recommended pairing; the alarms page read on 2026-11-26 does not state it). The machine-readable allowlists are `app/allowlist/permissions.txt` and `app/allowlist/dependencies.txt`; the tables in this file explain them, the files are what the build checks.
 
 ### ADR-5 · Platform storage only
 

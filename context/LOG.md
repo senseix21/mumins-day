@@ -320,3 +320,33 @@ has no declared outputs, so it runs on every build; that is intended for a gate.
   one starts on this environment.
 - No emulator was installed or tried; whether one can run in this container is UNKNOWN.
 - Nothing was added to the repository's build: `:app` is phase 3 work. Not committed.
+
+## 2026-11-26 23:46 +0600 · Phase 3 started: the app module and build gates T-BUILD-1…3
+
+**Did.**
+- A web-fetch subagent read Android's pages on background foreground-service starts, service
+  types, exact alarms, the notification permission and the Android 15 changes. Findings are
+  quoted under G6 and G7 in `GAPS.md`. New design rule: the boot receiver never starts playback.
+- New module `:app` (Android Gradle plugin 9.3.1, compileSdk and targetSdk 37, minSdk 26,
+  desugaring 2.1.5, lint with warnings as errors): `AndroidManifest.xml`, `MainActivity.kt`
+  (placeholder, platform `Activity`, no AndroidX), a placeholder icon, backup-exclusion rules.
+- Gates in `app/build.gradle.kts`, wired into `check` for every variant: `CheckPermissions`
+  (T-BUILD-1, T-BUILD-2) reads the merged manifest; `CheckDependencies` (T-BUILD-3) reads the
+  resolved runtime and desugaring classpaths. Allowlists in `app/allowlist/`.
+- `settings.gradle.kts` now also uses Google's Maven repository.
+
+**Verified.**
+- `./gradlew build`: success; lint "No issues found"; "permission gate: passed, 9 permissions,
+  no INTERNET"; "dependency gate: passed, 6 libraries"; content gate unchanged.
+- Gates seen failing, then the files restored: `INTERNET` added; `VIBRATE` swapped for
+  `CAMERA`; `maxSdkVersion` dropped; `androidx.core:core-ktx` added (the gate listed its
+  transitive libraries).
+- `aapt2 dump permissions` on `app-release-unsigned.apk`: the nine allowlisted permissions,
+  `SCHEDULE_EXACT_ALARM` with `maxSdkVersion='32'`, nothing else.
+- APK sizes: debug 1.28 MB, release (unsigned, not minified) 0.91 MB.
+
+**Not done / follow-up.**
+- The APK was never installed or run: no phone, no emulator.
+- `maxSdkVersion=32` on `SCHEDULE_EXACT_ALARM` is ASSUMED to be the recommended pairing.
+- G25 opened: the real transitive dependency list, and what Compose will do to it.
+- CI has not built the Android module yet; result follows the push.

@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-26 23:29 +0600
+**Last updated:** 2026-11-26 23:46 +0600
 
 ## Where the project stands
 
@@ -23,6 +23,9 @@
   - `core/.../deed/`: the review gate (`checkContent`), rotation (`deedFor`, `alternateFor`)
     and the day card (`cardFor`, `swap`, `markDone`, `weekDots`). Test records are fake; no
     deed content exists.
+  - `app/`: the Android module. Builds debug and release APKs. Manifest with the nine
+    allowlisted permissions, a placeholder screen and icon, backup off, and the gates
+    T-BUILD-1…3. It does nothing yet: no storage, no alarms, no real screens.
   - `tools/content-gate/`: the T-BUILD-4 build task. Passes with a notice until
     `content/deeds.json` exists.
 - **No Android module.** Nothing has run on a phone. Nothing is checked against a real
@@ -34,10 +37,14 @@
 
 ## Next
 
-Phase 3 can now start in the cloud environment: the `:app` module, manifest, build gates
-T-BUILD-1…3, storage and the alarm path can be written and compiled. What still cannot be
-done here is anything that must ring, sense or be killed by a phone maker: T-INST-*, M-*.
-Before writing `:app`, fetch the Android rules listed under phase 3 "Before code" (G6, G7).
+Phase 3 continues, in this order (`PLAN.md`):
+
+1. Store: settings in SharedPreferences, `alarm_log` and `deed_day` in SQLite, migrations.
+2. Alarm path: `apply(plan)`, the receivers, delivery, playback service, the log, "Test Adhan".
+3. Health checks feeding `assessHealth`.
+
+All of that can be written and compiled here. None of it can be run here: T-INST-* and M-*
+need a phone or an emulator.
 
 ## Waiting on the founder
 

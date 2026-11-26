@@ -92,12 +92,30 @@ no visible notification to carry a Stop action. The spec does not say how the us
 it (volume key, opening the app, a lock-screen surface). UNKNOWN what the platform shows for
 a foreground service in that state on Android 13+; test on D6.
 
+**Partly answered 2026-11-26 (KNOWN, developer.android.com/develop/ui/views/notifications/notification-permission).**
+"Apps don't need to request the POST_NOTIFICATIONS permission in order to launch a foreground
+service", and with the permission denied users "still see notices related to foreground
+services in the Task Manager but don't see them in the notification drawer". So playback can
+start. Whether the user can stop it from the Task Manager is not on that page (UNKNOWN; fetch
+the "handle-user-stopping" page). The app still needs its own stop control: still open.
+
 ### G7 · Starting playback from the background (F1)
 
 The design starts a `mediaPlayback` foreground service from an alarm. Android 12+ restricts
 foreground-service starts from the background and exempts exact alarms (ASSUMED from general
 knowledge; not fetched). The inexact fallback path, and silent/pre-reminder alarms, may not
 have the exemption. Fetch the current rules for target SDK 37 before writing `shell/alarm/`.
+
+**Answered 2026-11-26 (KNOWN, developer.android.com/develop/background-work/services/fgs/restrictions-bg-start
+and .../services/fgs/service-types).**
+- Background start is allowed when "Your app invokes an exact alarm to complete an action that
+  the user requests." The page does not say which exact-alarm methods qualify (UNKNOWN; test
+  `setAlarmClock` and `setExactAndAllowWhileIdle` on a device). An inexact alarm is not named,
+  so the inexact fallback cannot start playback: one more reason INV-S6 forbids it.
+- `mediaPlayback` needs `FOREGROUND_SERVICE_MEDIA_PLAYBACK` and has no runtime prerequisite.
+- "Apps that target Android 15 or higher are not allowed to launch a media playback
+  foreground service from a BOOT_COMPLETED broadcast receiver." **Design rule:** the boot
+  receiver only replans; it never starts playback.
 
 ### G8 · What happens after 24 hours with no trigger (F1)
 
@@ -133,3 +151,4 @@ them, and F4 is the answer to the Play "repetitive content" risk.
 | G22 | Alarm ids assume a 48-hour window touches at most four local dates. True for every one-hour daylight-saving change (tested in nine zones); false only where a zone skips a whole day, as Samoa did in 2011 | Out of scope for Bangladesh; note for the forward path |
 | G23 | The spec does not say whether `retired` or `draft` records may sit in `deeds.json`. Taken as: retired may stay (complete, with `retired_in`, never shown); draft fails the build. Written into INV-C1 | Founder or reviewer to object if wrong |
 | G24 | **Closed 2026-11-26: ADR-10.** Who parses `deeds.json` for the build gate. `:core` has no JSON parser and may not add one; the app uses the platform's. The gate (T-BUILD-4) needs a build-time parser: Gradle's bundled one in a build task is the likely answer | Decide when the gate task is written (phase 5) |
+| G25 | The dependency allowlist in the spec lists a handful of libraries, but it is checked transitively. Today six ship (the spec's four plus `org.jetbrains:annotations` and the desugaring configuration). Compose and Material 3 will add dozens, and AndroidX core adds its own permission to the merged manifest | Before phase 4: an ADR that accepts the real transitive list, or a decision to build the UI with platform Views |

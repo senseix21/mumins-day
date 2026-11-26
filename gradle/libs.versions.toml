@@ -2,10 +2,14 @@
 kotlin = "2.4.10"
 kotlinx-datetime = "0.7.1"
 kotest = "5.9.1"
+android-gradle-plugin = "9.3.1"
+desugar = "2.1.5"
 
 [libraries]
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

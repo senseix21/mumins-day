@@ -38,7 +38,7 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 | 0 | Repository, rules, context, decisions | Anywhere | Done |
 | 1 | Prayer times are computed correctly and safely | JVM | Done, except the timetable check |
 | 2 | The alarm plan is computed correctly; Bengali digits | JVM | Done |
-| 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | Not started |
+| 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | App module and build gates done; storage and alarm path not started |
 | 4 | A Bengali user completes first run offline and trusts what they see | Phone | Not started |
 | 5 | One reviewed deed a day | JVM + phone | Pure part done; build gate, content and screen not started |
 | 6 | A Qibla compass that admits doubt | JVM + phone | Maths done; sensors and screen not started |
@@ -182,16 +182,20 @@ clock changes.
 **Needs.** One phone (G13); the SDK is available in the cloud environment, so the app can be built and its build gates run without one. Read first: G6, G7.
 
 Before code
-- [ ] Fetch and record the current Android rules for target SDK 37: foreground-service start from an exact alarm, `mediaPlayback` service type, notification-denied behaviour, direct boot [G6, G7, F1#4].
+- [x] Fetched and recorded Android's rules: foreground-service start from an exact alarm, `mediaPlayback` type, notification-denied behaviour (in `GAPS.md` G6, G7). 2026-11-26
+- [ ] Still to fetch: whether the user can stop a foreground service from the Task Manager (the "handle-user-stopping" page), and direct boot [G6, F1#10].
 - [ ] Decide how the user stops the Adhan when notifications are blocked [G6].
-- [ ] Decide `SCHEDULE_EXACT_ALARM` `maxSdkVersion` and the grant flow [ADR-4].
+- [x] `SCHEDULE_EXACT_ALARM` carries `maxSdkVersion=32`; Android 13+ relies on `USE_EXACT_ALARM` [ADR-4]. 2026-11-26
+- [ ] The grant flow for Android 12 (API 31, 32), where the user must allow exact alarms [ADR-4, F1#3].
 
 Build
-- [ ] `:app` module: application id, minSdk 26, target and compile 37, one build, no flavours, desugaring for `java.time`.
-- [ ] Manifest with exactly the nine allowlisted permissions, no `INTERNET`.
-- [ ] T-BUILD-1: fail on `INTERNET` in the merged manifest [INV-P1].
-- [ ] T-BUILD-2: fail if merged permissions differ from the allowlist [INV-P3].
-- [ ] T-BUILD-3: fail if resolved dependencies differ from the allowlist [INV-P4].
+- [x] `:app` module: application id, minSdk 26, target and compile 37, one build, no flavours, desugaring for `java.time`; lint with warnings as errors; a placeholder screen and icon. 2026-11-26
+- [x] Manifest with exactly the nine allowlisted permissions, no `INTERNET`; confirmed inside the built APK with `aapt2`. 2026-11-26
+- [x] T-BUILD-1: fail on `INTERNET` in the merged manifest [INV-P1]; seen failing. 2026-11-26
+- [x] T-BUILD-2: fail if merged permissions differ from `app/allowlist/permissions.txt`, either way, including `maxSdkVersion` [INV-P3]; seen failing three ways. 2026-11-26
+- [x] T-BUILD-3: fail if packaged libraries differ from `app/allowlist/dependencies.txt`, transitive ones included [INV-P4]; seen failing. 2026-11-26
+- [ ] Backup is switched off for now (nothing is stored). Phase 4 writes the real rules.
+- [ ] Before phase 4: Compose and Material 3 bring dozens of transitive AndroidX libraries, and `androidx.core` adds a permission of its own to the merged manifest. Both allowlists will need an ADR-backed update then [G25].
 
 Store
 - [ ] Settings in one SharedPreferences file with versioned keys, parsed once into typed values [ADR-5].

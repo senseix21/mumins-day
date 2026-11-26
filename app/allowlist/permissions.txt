@@ -1,0 +1,13 @@
+# INV-P3: the merged manifest must request exactly these permissions, no more and no fewer.
+# One per line. "maxSdkVersion=N" after a name must match the manifest too.
+# Changing this file needs an ADR and the founder's yes (see context/spec/03-architecture.md, "Privacy architecture").
+# android.permission.INTERNET may never appear here (INV-P1).
+android.permission.USE_EXACT_ALARM
+android.permission.SCHEDULE_EXACT_ALARM maxSdkVersion=32
+android.permission.RECEIVE_BOOT_COMPLETED
+android.permission.POST_NOTIFICATIONS
+android.permission.FOREGROUND_SERVICE
+android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+android.permission.WAKE_LOCK
+android.permission.VIBRATE
+android.permission.ACCESS_COARSE_LOCATION

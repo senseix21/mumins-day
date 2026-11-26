@@ -25,10 +25,10 @@ This file defines what "done" means. A result other than **Not run** names where
 | F1 late rule | INV-S7 | T-INST-9 | Deliver 5 and 15 min late; Adhan then silent | Not run |
 | F1 health log | INV-S8 | T-INST-10 | Log rows written with planned and actual times | Not run |
 | F1 honest warnings | INV-S6 | T-UI-1 | Each Degraded reason shows its message and fix | Not run |
-| Privacy: no network | INV-P1 | T-BUILD-1 | Merged manifest lacks `INTERNET` | Not run |
+| Privacy: no network | INV-P1 | T-BUILD-1 | Merged manifest lacks `INTERNET` | Pass, 2026-11-26: release and debug manifests have no `INTERNET`; adding it fails the build |
 | Privacy: location | INV-P2 | T-INST-11 | No location request while backgrounded | Not run |
-| Privacy: permissions | INV-P3 | T-BUILD-2 | Merged manifest equals allowlist | Not run |
-| Dependencies | INV-P4 | T-BUILD-3 | Resolved dependency list equals allowlist | Not run |
+| Privacy: permissions | INV-P3 | T-BUILD-2 | Merged manifest equals allowlist | Pass, 2026-11-26: nine permissions match; an extra, a missing one and a dropped `maxSdkVersion` each fail the build |
+| Dependencies | INV-P4 | T-BUILD-3 | Resolved dependency list equals allowlist | Pass, 2026-11-26: six libraries match; adding one fails the build |
 | F4 review gate | INV-C1, C3 | T-BUILD-4 | Build fails on any deed not approved or missing a field | Pass with fake records, 2026-11-26: the build fails on a draft, a missing reviewer, or fewer than 30 approved. Real content: none yet |
 | F4 rotation | INV-C2 | T-PROP-8 | Same date gives same deed; every deed appears once per cycle | Pass on JVM, 2026-11-26 |
 | F4 tone | INV-C4 | T-UI-2 | Manual review of every string and screen by the reviewer and a native speaker | Not run |
