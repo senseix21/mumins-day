@@ -1,11 +1,11 @@
 # State
 
-**Last updated:** 2026-11-26 18:47 +0600
+**Last updated:** 2026-11-26 18:56 +0600
 
 ## Where the project stands
 
-- **Phases 1 and 2, and the maths of phase 6, are built and green on the JVM.**
-  `./gradlew build` passes: 59 tests in `:core`, 3 upstream tests in `:engine:calctimes`. Phase 1 still lacks the timetable check (Q2).
+- **Everything that can be built without a phone is built and green on the JVM:** phases 1
+  and 2, and the pure parts of phases 5 and 6. `./gradlew build` passes: 94 tests in `:core`, 3 upstream tests in `:engine:calctimes`. Phase 1 still lacks the timetable check (Q2).
 - Three decisions are recorded: engine vendored with one change (ADR-2 amended), plain Kotlin
   `:core` module (ADR-9), application id `com.senseix21.muminsday`.
 - What exists in code:
@@ -20,21 +20,24 @@
   - `core/.../health/`: `assessHealth(now, facts)` gives `Armed` or `Degraded` with named reasons.
   - `core/.../l10n/`: `toBengaliDigits`.
   - `core/.../bearing/`: `qiblaDirection`, `magneticBearing`, `compassPoint`.
+  - `core/.../deed/`: the review gate (`checkContent`), rotation (`deedFor`, `alternateFor`)
+    and the day card (`cardFor`, `swap`, `markDone`, `weekDots`). Test records are fake; no
+    deed content exists.
 - **No Android module.** Nothing has run on a phone. Nothing is checked against a real
   timetable.
 - Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan), `62ea747` (late rule,
-  health). The Qibla maths is not committed yet. No remote. Upstream clones for reading are in
+  health), `586630d` (Qibla maths), and the deed core. No remote. Upstream clones for reading are in
   `dev/upstream/`, outside this repository.
 
 ## Next
 
-`PLAN.md` is the plan. What can be done here, without a phone, in order:
+Almost nothing is left that this container can do alone:
 
-1. Pure part of phase 5: deed record, rotation and review gate, once G4 and G5 are settled.
-2. Phase 0 leftovers: `LICENSE`, `NOTICE`, Gradle wrapper bump.
+1. Phase 0 leftovers: `LICENSE`, `NOTICE`, Gradle wrapper bump.
+2. The T-BUILD-4 build task (G24), which needs no phone but has no real content to check yet.
 
-Phase 3 (the Android shell) cannot start in this container: no Android SDK, and Google's
-Maven host is blocked.
+Everything else in `PLAN.md` needs a phone and Android SDK (phases 3, 4, 7), or a person:
+the reviewer, the native speaker, the timetable, the district list.
 
 ## Waiting on the founder
 

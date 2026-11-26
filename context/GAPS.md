@@ -51,6 +51,15 @@ The rotation is `index = daysSinceEpoch mod N` and "another" is `index + 1`. Tom
 is also `index + 1`. A user who swaps today sees the same deed again tomorrow, which breaks
 failure mode 6 ("every deed once before any repeats").
 
+**Closed 2026-11-26: founder accepted.** "Another" shows the deed half a cycle away:
+`(index + N / 2) mod N`. One swap a day. No stored sequence state, and every phone still
+agrees. The skipped deed simply returns on its next turn. Cost: the alternate is a deed last
+shown about N/2 days ago and due again in about N/2 days, so F4 failure mode 6 becomes "the
+daily deed never repeats within a cycle; an alternate, shown only on request, is the deed
+farthest from today". Needs N ≥ 4. Rejected: exchanging with tomorrow (strictly no repeats,
+but the deed the user just declined comes back the next morning, and again if declined again);
+a per-phone skip counter (phones drift apart for good, against INV-C2).
+
 ### G5 · A content update can change today's card (F4)
 
 The spec says a change to N "never changes today's card once shown", but the card is a pure
@@ -58,6 +67,23 @@ function of date and content version (INV-C2) and nothing records which deed was
 app update at noon changes N and so the card. Also, changing N shifts the modulo for every
 future day, so "once before any repeats" does not survive a content update. Either persist
 "shown today" or define the rotation over a stable ordering that an update extends.
+
+**Closed 2026-11-26: founder accepted.**
+1. Record the card the first time it is shown each day: one row per local date holding the
+   deed id, the content version, whether it was swapped, and when it was marked done. This
+   replaces `deed_done`. Today's card is the row if there is one, otherwise computed and stored.
+   An update at noon cannot change it. One exception: if an update retires that deed, today's
+   card is recomputed, because retired text must stop showing at once (failure mode 5).
+2. Scope the promise honestly: "every approved deed once before any repeats" holds within one
+   content version. When an update changes N, the position in the cycle jumps once; a few deeds
+   come round early or late that cycle. Content updates ride on app updates, so this is rare.
+   INV-C2 becomes: the deed first computed for a date is a pure function of the date and the
+   content version; once shown it stays.
+3. Rejected: carrying a per-phone position across updates (phones that update on different
+   days would never agree again); an anchor date per content version (still only approximate,
+   since phones update on different days, for more moving parts).
+4. Opens Q9: how many deeds at launch. The build gate should refuse fewer than a stated
+   minimum; 4 is the mathematical floor, 30 would give a month without a repeat.
 
 ### G6 · Stopping the Adhan when notifications are blocked (F1)
 
@@ -105,3 +131,5 @@ them, and F4 is the answer to the Play "repetitive content" risk.
 | G20 | Sunrise rounding is not stated in INV-T5. Slice 1 rounds it down, as the end of the Fajr window | Reviewer to confirm with Q3 |
 | G21 | **Closed 2026-11-26: keep as built for v1.** The clock reports only the first prayer it cannot compute, so the planner drops every alarm for that day, including prayers that were computable. Follows INV-T7 as written; never happens inside Bangladesh | Decide before any use outside Bangladesh; the app must show the gap's date |
 | G22 | Alarm ids assume a 48-hour window touches at most four local dates. True for every one-hour daylight-saving change (tested in nine zones); false only where a zone skips a whole day, as Samoa did in 2011 | Out of scope for Bangladesh; note for the forward path |
+| G23 | The spec does not say whether `retired` or `draft` records may sit in `deeds.json`. Taken as: retired may stay (complete, with `retired_in`, never shown); draft fails the build. Written into INV-C1 | Founder or reviewer to object if wrong |
+| G24 | Who parses `deeds.json` for the build gate. `:core` has no JSON parser and may not add one; the app uses the platform's. The gate (T-BUILD-4) needs a build-time parser: Gradle's bundled one in a build task is the likely answer | Decide when the gate task is written (phase 5) |

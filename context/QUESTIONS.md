@@ -14,6 +14,7 @@ spec**. Replace it with the original text if that file exists.
 | Q6 | Written legal opinion on shipping an LGPL-3.0 library inside a Play-distributed app | Lawyer | ADR-2; any paid tier | `03`, `04` | Open |
 | Q7 | Not referenced anywhere in the five documents. Unknown what it was | Founder | Unknown | none | Open |
 | Q8 | Bangladesh device facts: brand and Android-version shares, the minimum device, and the exact models for the test matrix | Founder | Device matrix, minSdk | `01`, `04` | Open |
+| Q9 | How many approved deeds at launch, and the minimum the build should accept (floor is 4; 30 gives a month without a repeat). Opened 2026-11-26 with the G4/G5 proposal | Founder, reviewer | Phase 5 build gate | `GAPS.md` G5 | **Closed 2026-11-26.** Founder: 30 deeds at launch; the build refuses fewer than 30 approved |
 
-New questions continue from Q9. A closed question keeps its row, with the answer, who gave it
+New questions continue from Q10. A closed question keeps its row, with the answer, who gave it
 and the date.

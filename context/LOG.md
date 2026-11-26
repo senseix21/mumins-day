@@ -174,3 +174,42 @@ right fields. These two files are not committed.
   an official table (Q4). They are inputs to a maths check, so this does not weaken it.
 - Declination itself, sensors, the screen: all need a phone. Size of the declination
   correction in Bangladesh is still UNKNOWN. Not committed.
+
+## 2026-11-26 18:50 +0600 · Qibla maths committed; proposals for G4 and G5
+
+**Did.** Committed the Qibla maths on the founder's word. Wrote proposed answers under G4 and
+G5 in `GAPS.md` (not closed; they are proposals). Opened Q9 (number of deeds at launch).
+
+**Verified.** `git log` shows the commit. Nothing was built for the proposals.
+
+**Not done / follow-up.** Waiting for the founder to accept or change the proposals before
+any deed code is written.
+
+## 2026-11-26 18:56 +0600 · Phase 5, pure part: deed gate, rotation, day card
+
+**Did.**
+- Founder accepted the G4 and G5 proposals and set 30 deeds (Q9). INV-C1, INV-C2, F4 failure
+  modes 3 and 6, the rotation rule and the table (`deed_day`) are amended; G4, G5, Q9 closed;
+  G23 and G24 opened.
+- A Sonnet subagent, from a written design, built `core/.../deed/` (`Model.kt`,
+  `Provenance.kt`, `Gate.kt`, `Rotation.kt`, `DayCard.kt`) and its tests.
+- Claude read the rotation, day-card and gate code. One fix: the subagent reported that a card
+  kept across a content update could hold the deed that is the alternate, so a swap would
+  show the same deed. `swap` now steps to the next deed in that case; a test covers every
+  deed a stored card could hold, for five sizes and forty days.
+
+**Verified.**
+- `./gradlew build`: success. From the result XML: `GateTest` 15, `RotationTest` 6,
+  `DayCardTest` 14, and the earlier classes unchanged; `:core` 94 tests, engine 3, no failures
+  or errors.
+- No religious text: `grep -P '[^\x00-\x7F]'` over the deed sources and tests finds one
+  emoji used for a code-point test; a keyword grep finds only a code comment naming content
+  kinds. Fixtures are `TEST DEED n BN/EN`, `TEST-n`, `TEST EDITION`, `TEST GRADING`,
+  `TEST REVIEWER`.
+
+**Not done / follow-up.**
+- No `content/deeds.json`, no build task (T-BUILD-4, G24), no screen, no storage.
+- The gate accepts a review date in the future and any non-blank source number; added to
+  `PLAN.md` as a question for the reviewer.
+- `Provenance.kt` and `Model.kt` were skimmed through their tests and the subagent's report,
+  not read line by line.

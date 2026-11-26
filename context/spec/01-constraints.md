@@ -44,8 +44,8 @@ Each one is written so a test can fail it. Test ids refer to `04-verification.md
 
 | Id | Invariant | Test |
 |---|---|---|
-| INV-C1 | No religious text ships unless its record has `status = approved`, a named reviewer and a review date. The build fails otherwise. | T-BUILD-4 |
-| INV-C2 | The deed shown for a given calendar date is a pure function of that date and the content version. Same date, same deed, offline, on every phone. | T-PROP-8 |
+| INV-C1 | No religious text ships unless its record has `status = approved`, a named reviewer and a review date. The build fails otherwise. The build also fails with fewer than 30 approved deeds (founder, 2026-11-26, Q9). A `retired` record may stay in the file for the audit trail; it is complete, carries `retired_in`, and is never shown. A `draft` record fails the build. | T-BUILD-4 |
+| INV-C2 | The deed first computed for a calendar date is a pure function of that date and the content version: same date, same deed, offline, on every phone. Once a card has been shown it stays for that day, whatever updates arrive, unless its deed is retired. Within one content version the daily deed never repeats inside a cycle. "Show me another" gives the deed half a cycle away. (Reworded 2026-11-26: founder accepted the G4 and G5 proposals.) | T-PROP-8 |
 | INV-C3 | Every deed shows its source book and number. No reward, grading or quotation appears that is not in the reviewed record. | T-BUILD-4 |
 | INV-C4 | No screen, notification or widget ever shows a missed-day count, a broken streak, or wording that blames the user. | T-UI-2 (manual review) |
 

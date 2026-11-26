@@ -29,8 +29,8 @@ This file defines what "done" means. A result other than **Not run** names where
 | Privacy: location | INV-P2 | T-INST-11 | No location request while backgrounded | Not run |
 | Privacy: permissions | INV-P3 | T-BUILD-2 | Merged manifest equals allowlist | Not run |
 | Dependencies | INV-P4 | T-BUILD-3 | Resolved dependency list equals allowlist | Not run |
-| F4 review gate | INV-C1, C3 | T-BUILD-4 | Build fails on any deed not approved or missing a field | Not run |
-| F4 rotation | INV-C2 | T-PROP-8 | Same date gives same deed; every deed appears once per cycle | Not run |
+| F4 review gate | INV-C1, C3 | T-BUILD-4 | Build fails on any deed not approved or missing a field | Gate logic: pass on JVM with fake records, 2026-11-26. Build task and real content: not run |
+| F4 rotation | INV-C2 | T-PROP-8 | Same date gives same deed; every deed appears once per cycle | Pass on JVM, 2026-11-26 |
 | F4 tone | INV-C4 | T-UI-2 | Manual review of every string and screen by the reviewer and a native speaker | Not run |
 | Bengali complete | INV-L1 | T-BUILD-5 | Build fails on a missing key | Not run |
 | Bengali digits | INV-L2 | T-UNIT-9 | All ten digits map; screenshot test finds no Latin digit | Digit mapping: pass on JVM, 2026-11-26. Screenshot part: not run |

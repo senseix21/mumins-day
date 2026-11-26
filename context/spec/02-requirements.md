@@ -132,10 +132,10 @@ Each feature starts with the case for cutting it. It stays only if that case fai
 |---|---|---|
 | 1 | A deed with a wrong or weak source ships | Impossible by construction: build fails without `approved` status, reviewer and date (INV-C1) |
 | 2 | The user misses days | Nothing happens. No count of missed days, no "streak lost". Today's card is simply today's card (INV-C4) |
-| 3 | A deed is impossible for this user today (no money, housebound, no one nearby) | "Show me another" swaps once per day to the next deed in the sequence. No penalty |
+| 3 | A deed is impossible for this user today (no money, housebound, no one nearby) | "Show me another" swaps once per day to the deed half a cycle away (amended 2026-11-26, G4; was "the next deed", which is tomorrow's). No penalty |
 | 4 | Clock change or travel | The deed follows the local calendar date. Moving the clock back does not un-complete a day |
 | 5 | A deed is later found to be wrong | It can be retired in a content update without a code change. Past completions remain; the text is no longer shown |
-| 6 | The same deed keeps appearing | Rotation guarantees every approved deed appears once before any repeats (INV-C2) |
+| 6 | The same deed keeps appearing | Within one content version the daily deed appears once per cycle. A requested alternate is the deed farthest from today, so it was last seen about half a cycle ago. A content update that changes the count moves the position once (amended 2026-11-26, G4, G5) |
 | 7 | Translation copyright | Deed text is original wording written for the app in Bengali and English. Hadith are cited by book and number, not quoted from a copyrighted translation |
 | 8 | Reward-chasing design | No points, badges, leaderboards or sharing of counts |
 
@@ -154,7 +154,7 @@ Each feature starts with the case for cutting it. It stays only if that case fai
 | `status` | draft · approved · retired | Only `approved` ships and shows |
 | `added_in`, `retired_in` | content version | For audit |
 
-**Rotation rule.** `index = daysSinceEpoch(localDate) mod N` over the approved deeds in a fixed order for that content version, where N is the count. "Show me another" uses `index + 1`. Deterministic, offline, identical on all phones (INV-C2). A content update that changes N changes the sequence from the next day, never today's card once shown.
+**Rotation rule.** `index = daysSinceEpoch(localDate) mod N` over the approved deeds in file order for that content version, where N is the count (at least 30). "Show me another" uses `(index + N/2) mod N`. Deterministic, offline, identical on all phones (INV-C2). The card is recorded the first time it is shown each day, so an update cannot change it; the one exception is a card whose deed the update retired, which is recomputed. (Amended 2026-11-26, G4, G5.)
 
 **Review gate.**
 

@@ -150,7 +150,7 @@ stateDiagram-v2
 | Districts | `content/districts.json` asset: id, names (bn, en), latitude, longitude, elevation | 64 rows |
 | Adhan audio | One file in `res/raw` | License: Q5 |
 
-**Schema.** `alarm_log(id, prayer, kind, planned_utc, delivered_utc NULL, outcome)`; `deed_done(local_date PRIMARY KEY, deed_id, content_version)`. **Migrations.** Numbered SQL files applied in order; a test opens each historical schema and migrates to current.
+**Schema.** `alarm_log(id, prayer, kind, planned_utc, delivered_utc NULL, outcome)`; `deed_day(local_date PRIMARY KEY, deed_id, content_version, swapped, done_at NULL)` (was `deed_done`; one row per day the card was shown, amended 2026-11-26, G5). **Migrations.** Numbered SQL files applied in order; a test opens each historical schema and migrates to current.
 
 **Backup.** Settings and deed completions may be included in Android's backup; the alarm log is excluded. After a restore the health check runs (failure mode 12). Exact backup-rule syntax: UNKNOWN here, take from Android docs.
 

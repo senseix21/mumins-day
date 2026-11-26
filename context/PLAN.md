@@ -40,7 +40,7 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 | 2 | The alarm plan is computed correctly; Bengali digits | JVM | Done |
 | 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | Not started |
 | 4 | A Bengali user completes first run offline and trusts what they see | Phone | Not started |
-| 5 | One reviewed deed a day | JVM + phone | Not started |
+| 5 | One reviewed deed a day | JVM + phone | Pure part done; build gate, content and screen not started |
 | 6 | A Qibla compass that admits doubt | JVM + phone | Maths done; sensors and screen not started |
 | 7 | Proof on the device matrix; size and speed measured | Phones | Not started |
 | 8 | On Google Play | Play Console | Not started |
@@ -267,22 +267,26 @@ Tests
 **Needs.** Reviewer (G9). Claude writes no deed text, ever; fixtures say `TEST DEED n`.
 
 Before code
-- [ ] Settle "show me another" colliding with tomorrow's deed [G4].
-- [ ] Settle what a content update does to today's card and to the rotation [G5].
+- [x] Settled: the alternate is the deed half a cycle away [G4]. 2026-11-26
+- [x] Settled: the card is recorded when first shown; the no-repeat promise is per content version; 30 deeds minimum [G5, Q9]. 2026-11-26
 
 Pure, in `:core` (can start now)
-- [ ] Deed record type with every field in `spec/02`; `status` as an enum; parsed and validated at the edge.
-- [ ] Rotation: date and content version to deed; every approved deed once before a repeat [INV-C2].
-- [ ] Review gate as a function over records, so duas and hadith can reuse it later.
-- [ ] T-PROP-8 rotation properties.
+- [x] Deed record type with every field in `spec/02`; `RawDeed` at the edge, `Deed` only out of the gate. 2026-11-26
+- [x] Rotation: `deedFor` and `alternateFor` (half a cycle away) [INV-C2, G4]. 2026-11-26
+- [x] Review gate: `checkContent` collects every problem; the provenance check knows nothing about deed text, so duas and hadith can reuse it [INV-C1, INV-C3]. 2026-11-26
+- [x] Day card: `cardFor`, `swap`, `markDone`, `weekDots` [G5, INV-C4]. A swap always changes the deed, including for a card kept across an update. 2026-11-26
+- [x] Gate tests: every required field, draft, bad values, duplicates, fewer than 30, text length in code points. 2026-11-26
+- [x] T-PROP-8 rotation properties. 2026-11-26
+- [x] Fixtures checked by Claude: fake values only, no religious text. 2026-11-26
+- [ ] Review-date sanity (a date in the future is accepted today) and source-number format: ask the reviewer whether the gate should check them.
 
 Build and app
-- [ ] T-BUILD-4: build fails on a record that is not approved, lacks a field, a reviewer or a date [INV-C1, INV-C3].
+- [ ] T-BUILD-4: a build task parses `content/deeds.json` and runs the core gate; build fails on a draft, a missing field, reviewer or date, or fewer than 30 approved [INV-C1, INV-C3, G24].
 - [ ] `content/deeds.json` and the reviewer's signed note, both from the reviewer. (blocked: G9)
 - [ ] Card: text, source book and number, Bengali digits; one tap marks done; quiet done state.
 - [ ] Week view: seven dots, no numbers [INV-C4].
 - [ ] Optional daily nudge, off by default, at most one a day, built by the one notification builder.
-- [ ] `deed_done` keyed by local date; moving the clock back does not undo a day [F4#4].
+- [ ] `deed_day` table keyed by local date, one row per card shown; moving the clock back does not undo a day [F4#4].
 - [ ] Retiring a deed is a content change only [F4#5].
 - [ ] T-UI-2: tone review of every string and screen by the reviewer and the native speaker.
 
