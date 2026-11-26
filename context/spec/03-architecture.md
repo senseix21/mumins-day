@@ -314,3 +314,12 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 - **Decision.** (b).
 - **Consequences.** The "no `android.*` in pure code" rule is now enforced by the compiler, since `:core` has no Android on its classpath; the text check stays as a second guard against clock and locale reads. Core tests run in seconds on any machine. Three modules instead of one. "One Gradle module" in the summary now reads "one app module".
 - **Reverse.** Move `core/src` into the app module; packages do not change.
+
+### ADR-10 · The content gate is a build tool that parses with Gradle's own JSON reader
+
+- **Date.** 2026-11-26. Founder asked for the T-BUILD-4 task; closes gap G24.
+- **Context.** INV-C1 needs the build to fail on unreviewed content. `:core` holds the gate's rules but has no JSON parser and may not add one; the app will use the platform's. The build needs some parser.
+- **Options.** (a) A JSON library as a dependency. (b) A hand-written parser. (c) `tools/content-gate`, a small module that is never shipped, reading the file with the Groovy JSON reader that comes inside Gradle (`localGroovy()`), then calling the core gate.
+- **Decision.** (c).
+- **Consequences.** Nothing is downloaded and nothing is added to the app, so the dependency allowlist (INV-P4), which governs what ships, is unchanged. The tool only reads the file's shape (types, unknown keys); every judgement about a record is `checkContent` in `:core`, the same function the app will call. Two parsers will read the same file, Gradle's at build time and the platform's on the phone; a file both accept could in principle be read differently, so the tool refuses anything but plain strings and whole numbers. The task passes with a notice while `content/deeds.json` does not exist; `-PdeedsRequired=true` makes absence a failure, and the app module must set it.
+- **Reverse.** Replace the reader behind `runGate`; the rules do not move.

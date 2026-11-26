@@ -283,7 +283,9 @@ Pure, in `:core` (can start now)
 - [ ] Review-date sanity (a date in the future is accepted today) and source-number format: ask the reviewer whether the gate should check them.
 
 Build and app
-- [ ] T-BUILD-4: a build task parses `content/deeds.json` and runs the core gate; build fails on a draft, a missing field, reviewer or date, or fewer than 30 approved [INV-C1, INV-C3, G24].
+- [x] T-BUILD-4: `tools/content-gate` parses `content/deeds.json` and runs the core gate as part of `./gradlew build`; fails on a draft, a missing field, reviewer or date, or fewer than 30 approved; lists every problem [INV-C1, INV-C3, ADR-10]. 2026-11-26
+- [ ] When the app module packages the deeds file, set `deedsRequired=true` so a missing file fails the build.
+- [ ] On the phone: parse the same file with the platform parser into `RawDeed` and call `checkContent`; refuse to show a card if it is rejected.
 - [ ] `content/deeds.json` and the reviewer's signed note, both from the reviewer. (blocked: G9)
 - [ ] Card: text, source book and number, Bengali digits; one tap marks done; quiet done state.
 - [ ] Week view: seven dots, no numbers [INV-C4].

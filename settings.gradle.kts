@@ -15,3 +15,4 @@ rootProject.name = "mumins-day"
 
 include(":engine:calctimes")
 include(":core")
+include(":tools:content-gate")

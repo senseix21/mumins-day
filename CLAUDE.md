@@ -87,6 +87,8 @@ core/      plain Kotlin, no Android on the classpath; a test also bans clock and
   deed/      date + content -> Deed
   bearing/   place -> Qibla bearing
   l10n/      Bengali digits, time and date text
+  health/    facts about the phone -> Armed | Degraded(reasons)
+tools/content-gate/   build-only: fails the build if content/deeds.json is not fully reviewed (ADR-10)
 app/       Android only; arrives in slice 3
   ui/        Compose: Home, Qibla, Deed, Settings, Onboarding
   alarm/     apply the plan, receivers, playback service
@@ -194,8 +196,9 @@ everywhere else. A settings screen does not need a type-level proof. The planner
 ./gradlew build                  # compile everything, run every test
 ./gradlew :core:test             # the pure core's unit and property tests
 ./gradlew :engine:calctimes:test # upstream's own engine tests
+./gradlew :tools:content-gate:checkDeedContent   # the review gate over content/deeds.json (part of build)
 ```
 
 Gradle 9.9.2 wrapper (checksum pinned), Kotlin 2.4.10, JVM target 17. Repositories are Maven Central and the
-Gradle plugin portal only. There is no Android module yet, so no instrumented tests and no
-build gates (`T-BUILD-*`); add their commands in slice 3.
+Gradle plugin portal only. There is no Android module yet, so no instrumented tests and only one
+build gate (T-BUILD-4, the content gate); add the others in phase 3.
