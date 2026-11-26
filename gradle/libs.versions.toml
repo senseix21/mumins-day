@@ -1,0 +1,11 @@
+[versions]
+kotlin = "2.4.10"
+kotlinx-datetime = "0.7.1"
+kotest = "5.9.1"
+
+[libraries]
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
