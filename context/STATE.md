@@ -1,11 +1,11 @@
 # State
 
-**Last updated:** 2026-11-26 23:10 +0600
+**Last updated:** 2026-11-26 23:15 +0600
 
 ## Where the project stands
 
 - **Everything that can be built without a phone is built and green on the JVM:** phases 1
-  and 2, and the pure parts of phases 5 and 6. `./gradlew build` passes: 94 tests in `:core`, 3 upstream tests in `:engine:calctimes`. Phase 1 still lacks the timetable check (Q2).
+  and 2, and the pure parts of phases 5 and 6. `./gradlew build` passes: 94 tests in `:core`, 12 in `:tools:content-gate`, 3 upstream tests in `:engine:calctimes`. Phase 1 still lacks the timetable check (Q2).
 - Three decisions are recorded: engine vendored with one change (ADR-2 amended), plain Kotlin
   `:core` module (ADR-9), application id `com.senseix21.muminsday`.
 - What exists in code:
@@ -23,6 +23,8 @@
   - `core/.../deed/`: the review gate (`checkContent`), rotation (`deedFor`, `alternateFor`)
     and the day card (`cardFor`, `swap`, `markDone`, `weekDots`). Test records are fake; no
     deed content exists.
+  - `tools/content-gate/`: the T-BUILD-4 build task. Passes with a notice until
+    `content/deeds.json` exists.
 - **No Android module.** Nothing has run on a phone. Nothing is checked against a real
   timetable.
 - Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan), `62ea747` (late rule,
@@ -32,12 +34,9 @@
 
 ## Next
 
-Almost nothing is left that this container can do alone:
-
-1. The T-BUILD-4 build task (G24), which needs no phone but has no real content to check yet.
-
-Everything else in `PLAN.md` needs a phone and Android SDK (phases 3, 4, 7), or a person:
-the reviewer, the native speaker, the timetable, the district list.
+Nothing is left that this container can do alone. Everything open in `PLAN.md` needs a phone
+and Android SDK (phases 3, 4, 7), or a person: the reviewer, the native speaker, the
+timetable, the district list.
 
 ## Waiting on the founder
 
