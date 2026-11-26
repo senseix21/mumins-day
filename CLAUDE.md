@@ -5,13 +5,16 @@ Adhan (F1), Bangladesh-correct prayer times (F2), an honest Qibla compass (F3), 
 deed a day (F4). Bengali first, English second. No network, no ads, no analytics, no account.
 
 **Status: slice 1 of 6 is built** (the prayer-time core, JVM only). There is no Android app
-yet. `context/STATE.md` has the current picture; `context/spec/05-slices.md` has the order.
+yet. `context/STATE.md` has the current picture; `context/PLAN.md` has the phases and checklists.
 
 ## Start and end of every task
 
-1. **Start.** Read `context/STATE.md`, then whichever of `context/spec/*` the task touches.
+1. **Start.** Read `context/STATE.md`, find the task's items in `context/PLAN.md`, then read
+   whichever of `context/spec/*` the task touches.
    Do not work from memory of the spec; it is the source of truth and it is short.
 2. **End.** Before reporting the task as done, update the context folder (or run `/checkpoint`):
+   - Tick the finished items in `context/PLAN.md` with the date, only if they are verified;
+     add any item the work uncovered.
    - Rewrite `context/STATE.md` so it describes the project as it is now.
    - Append one entry to `context/LOG.md`.
    - Update `context/QUESTIONS.md` and `context/GAPS.md` if the task answered, opened or
@@ -25,6 +28,7 @@ yet. `context/STATE.md` has the current picture; `context/spec/05-slices.md` has
 
 | File | What it holds | How it changes |
 |---|---|---|
+| `context/PLAN.md` | The implementation plan: phases and checklists | Boxes ticked as work is verified; items added as we learn |
 | `context/STATE.md` | Where the project stands, what is next, what is blocked | Rewritten each task |
 | `context/LOG.md` | What was done, when, and what was verified | Append-only, newest last |
 | `context/QUESTIONS.md` | Open questions Q1…Qn for the founder, reviewer or a lawyer | Edited; closed ones keep their answer and date |
@@ -34,7 +38,6 @@ yet. `context/STATE.md` has the current picture; `context/spec/05-slices.md` has
 | `context/spec/02-requirements.md` | F1 to F4, failure modes, stubs for later features | Living spec |
 | `context/spec/03-architecture.md` | Components, scheduler, data, ADR-1…8 | Living spec; new ADRs continue the numbering |
 | `context/spec/04-verification.md` | Traceability table, device matrix, manual tests, release checklist | Living spec; the Result column is filled from real runs only |
-| `context/spec/05-slices.md` | The order of work and what each slice needs | Living spec |
 
 ## Evidence labels
 

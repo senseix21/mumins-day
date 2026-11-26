@@ -1,11 +1,11 @@
 # State
 
-**Last updated:** 2026-11-26 18:24 +0600
+**Last updated:** 2026-11-26 18:31 +0600
 
 ## Where the project stands
 
-- **Slice 1 is built and green on the JVM.** `./gradlew build` passes: 13 tests in `:core`,
-  3 upstream tests in `:engine:calctimes`.
+- **Phases 1 and 2 (code) are built and green on the JVM.** `./gradlew build --rerun-tasks`
+  passes: 38 tests in `:core`, 3 upstream tests in `:engine:calctimes`.
 - Three decisions are recorded: engine vendored with one change (ADR-2 amended), plain Kotlin
   `:core` module (ADR-9), application id `com.senseix21.muminsday`.
 - What exists in code:
@@ -13,16 +13,26 @@
     recorded in `MODIFICATIONS.md`.
   - `core/.../clock/`: `PrayerClock` seam, `CalcTimesClock` (Karachi, Hanafi default, safe-side
     rounding, explicit `NotComputable`, correct local-day attribution in any zone).
+  - `core/.../planner/`: `Planner.plan(now, settings)` gives every alarm for the next 48 hours
+    with stable ids in a closed space of 64, one replan after local midnight, and gaps for
+    days that cannot be computed.
+  - `core/.../l10n/`: `toBengaliDigits`.
 - **No Android module.** Nothing has run on a phone. Nothing is checked against a real
   timetable.
-- Nothing is committed and there is no remote. Upstream clones for reading are in
+- Slice 1 is committed (`764dc7a`). Phase 2 and `PLAN.md` are not committed yet. No remote. Upstream clones for reading are in
   `dev/upstream/`, outside this repository.
 
 ## Next
 
-Slice 2 (`spec/05-slices.md`): the alarm planner and Bengali digits, both in `:core`.
-Before it starts, settle G8 (24 or 48-hour window) and G16 (past prayers, near-simultaneous
-alarms).
+`PLAN.md` is the plan. What can be done here, without a phone, in order:
+
+1. Finish phase 2: the late rule and the health model as pure values.
+2. Pure parts of phase 6 (Qibla bearing) and phase 5 (deed rotation, once G4 and G5 are
+   settled).
+3. Phase 0 leftovers: `LICENSE`, `NOTICE`, Gradle wrapper bump.
+
+Phase 3 (the Android shell) cannot start in this container: no Android SDK, and Google's
+Maven host is blocked.
 
 ## Waiting on the founder
 

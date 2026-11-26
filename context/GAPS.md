@@ -29,7 +29,7 @@ A closed gap keeps its row with the resolution and date.
 
 - **Open questions.** Q1 to Q8 are cited 29 times and defined nowhere; Q7 is never cited.
   `QUESTIONS.md` holds a reconstruction.
-- **Slice plan: closed 2026-11-26**, see `spec/05-slices.md`. ADR-1 has a fallback "if slice 1 takes more than two weeks" and `00` §9 says
+- **Slice plan: closed 2026-11-26**, see `PLAN.md`. ADR-1 has a fallback "if slice 1 takes more than two weeks" and `00` §9 says
   "after the first slice builds". No document says what the slices are.
 - **The Sheet.** `02` cites "Sheet #n" findings from a project Sheet that is not in the
   repository. The user evidence for every feature lives there.
@@ -80,6 +80,8 @@ INV-S1 holds a 24-hour window, refilled on each trigger. If every trigger is los
 does, one day later. The spec should say this plainly and decide whether the midnight replan
 alarm is enough or the window should be 48 hours (the constant in ADR-3).
 
+**Closed 2026-11-26.** Founder chose 48 hours. ADR-3 amended, INV-S1 reworded.
+
 ### G9 · Reviewer and native speaker are roles without names
 
 INV-C1, INV-C4, Q3 and the release checklist all depend on "the reviewer" and "a native
@@ -97,7 +99,9 @@ them, and F4 is the answer to the Play "repetitive content" risk.
 | G13 | A build machine and physical phones | Nothing was ever built (H8); every target in the spec is unmeasured |
 | G14 | Play developer account type and its date | Decides whether the 12-tester, 14-day closed test applies |
 | G15 | Privacy policy text and a support email | Play listing needs both; "Send a report" needs the address |
-| G16 | Rule for a prayer that is already past when the user enables reminders, and for two alarms within a minute of each other (pre-reminder vs Adhan) | Planner edge cases not stated |
+| G16 | **Closed 2026-11-26: skip silently; see ADR-3 amendment.** Rule for a prayer that is already past when the user enables reminders, and for two alarms within a minute of each other (pre-reminder vs Adhan) | Planner edge cases not stated |
 | G17 | Numbering slips: `INV-T7` sits before `INV-T6` in `01`; test ids skip (no T-PROP-2, 4, 5; no T-UNIT-1, 3, 4, 6, 7, 8) | Harmless, but ids are the traceability key; fix or note as intentional |
 | G19 | INV-T2 and INV-T6 pull against each other. T2 says `sehriEnd == fajr − margin`; T6 says an offset moves one prayer and nothing else. A Fajr offset would have to move Sehri end too, or break T2. Slice 1 takes the safe reading: Sehri end follows the *calculated* Fajr and has its own offset; the user's Fajr offset does not move it. Also, with Sehri end rounded down and Fajr rounded up (INV-T5) the two can show one minute apart at margin 0 | Reviewer to confirm with Q3 |
 | G20 | Sunrise rounding is not stated in INV-T5. Slice 1 rounds it down, as the end of the Fajr window | Reviewer to confirm with Q3 |
+| G21 | The clock reports only the first prayer it cannot compute, so the planner drops every alarm for that day, including prayers that were computable. Follows INV-T7 as written; never happens inside Bangladesh | Decide before any use outside Bangladesh; the app must show the gap's date |
+| G22 | Alarm ids assume a 48-hour window touches at most four local dates. True for every one-hour daylight-saving change (tested in nine zones); false only where a zone skips a whole day, as Samoa did in 2011 | Out of scope for Bangladesh; note for the forward path |

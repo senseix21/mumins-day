@@ -22,7 +22,7 @@ Each one is written so a test can fail it. Test ids refer to `04-verification.md
 
 | Id | Invariant | Test |
 |---|---|---|
-| INV-S1 | At any moment when reminders are enabled, the system alarm queue holds an alarm for **every** enabled prayer in the next 24 hours (not only the next one). Fixes S1. | T-INST-1 |
+| INV-S1 | At any moment when reminders are enabled, the system alarm queue holds an alarm for **every** enabled prayer in the next 48 hours (not only the next one). Fixes S1. (Was 24 hours; founder decision 2026-11-26, ADR-3 amendment.) | T-INST-1 |
 | INV-S2 | Each registered alarm's trigger instant equals the engine's time for that prayer, interpreted in the **city's** time zone, to the minute. Fixes S3. | T-PROP-7 |
 | INV-S3 | After reboot, time-zone change, manual clock change, app update, or the exact-alarm permission being granted, INV-S1 holds again within 60 s **(target)** with no user action. | T-INST-2…6 |
 | INV-S4 | Scheduling is idempotent: running it any number of times leaves exactly the same set of alarms. | T-INST-7 |

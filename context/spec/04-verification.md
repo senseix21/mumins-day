@@ -14,7 +14,7 @@ This file defines what "done" means. A result other than **Not run** names where
 | F2 offsets | INV-T6 | T-PROP-6 | Offset N moves one prayer by N | Pass on JVM, 2026-11-26 |
 | F2 no invented time | INV-T7 | T-UNIT-11 | Forced NaN yields "not computable", no alarm | Pass on JVM, 2026-11-26 |
 | F1 24-hour window | INV-S1 | T-INST-1 | After scheduling, `dumpsys alarm` lists every enabled prayer in the next 24 h | Not run |
-| F1 right instant | INV-S2 | T-PROP-7 | Planner output equals engine time in the place's zone under any device zone | Not run |
+| F1 right instant | INV-S2 | T-PROP-7 | Planner output equals engine time in the place's zone under any device zone | Pass on JVM, 2026-11-26 |
 | F1 reboot | INV-S3 | T-INST-2 | Reboot emulator; window restored within 60 s | Not run |
 | F1 zone change | INV-S3 | T-INST-3 | Change device zone; instants unchanged | Not run |
 | F1 clock change | INV-S3 | T-INST-4 | Set clock ±3 h; window correct | Not run |
@@ -33,7 +33,7 @@ This file defines what "done" means. A result other than **Not run** names where
 | F4 rotation | INV-C2 | T-PROP-8 | Same date gives same deed; every deed appears once per cycle | Not run |
 | F4 tone | INV-C4 | T-UI-2 | Manual review of every string and screen by the reviewer and a native speaker | Not run |
 | Bengali complete | INV-L1 | T-BUILD-5 | Build fails on a missing key | Not run |
-| Bengali digits | INV-L2 | T-UNIT-9 | All ten digits map; screenshot test finds no Latin digit | Not run |
+| Bengali digits | INV-L2 | T-UNIT-9 | All ten digits map; screenshot test finds no Latin digit | Digit mapping: pass on JVM, 2026-11-26. Screenshot part: not run |
 | Arabic in Bengali | INV-L3 | T-UI-3 | Screenshot review on the matrix | Not run |
 | Font scale | INV-L4 | T-UI-4 | Screenshots at 200 % | Not run |
 | F3 bearing | INV-Q1 | T-UNIT-10 | Bearing for eight cities against independently computed values | Not run |

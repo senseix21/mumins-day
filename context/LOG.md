@@ -88,3 +88,46 @@ for `dl.google.com`. No Android SDK is present. No build was run.
   Kotlin 2.5.0. Bump the wrapper when convenient.
 - Engine notes: its solar position is the low-precision PrayTimes algorithm; only T-FIX-4 can
   say whether that is close enough. Nothing committed.
+
+## 2026-11-26 18:31 +0600 · Implementation plan written; slice 1 committed; phase 2 decisions
+
+**Did.**
+- Committed slice 1 and the context folder as `764dc7a` on the founder's word.
+- Founder decided: 48-hour window (G8), skip passed prayers (G16). ADR-3 amended, INV-S1
+  reworded.
+- Wrote `context/PLAN.md`: nine phases with checklists, a founder track, and the working
+  standard. It replaces `spec/05-slices.md`, which is removed. `CLAUDE.md`, `/checkpoint` and
+  `README.md` now make ticking the plan part of ending a task.
+- Started phase 2 with a Sonnet subagent, from a written design.
+
+**Verified.** `git log` shows `764dc7a`; the tree was clean after it. Phase 0 and 1 ticks in
+`PLAN.md` correspond to earlier entries in this log. Phase 2 boxes are deliberately unticked.
+
+**Not done / follow-up.** Phase 2 code is being written and has not been reviewed or re-run.
+Commit author is the container default, not the founder.
+
+## 2026-11-26 18:31 +0600 · Phase 2: alarm planner and Bengali digits
+
+**Did.**
+- A Sonnet subagent, from a written design, built `core/.../planner/` (`Reminders.kt`,
+  `AlarmId.kt`, `Plan.kt`, `Planner.kt`) and `core/.../l10n/BengaliDigits.kt` with tests.
+- Claude read the planner, id and digits code line by line. No changes needed.
+- Two things the subagent changed from the design, both accepted: the planner looks 120
+  minutes past the window end so a pre-reminder inside the window is not lost when its prayer
+  is just outside; the replan is "00:05 local today if still ahead, else tomorrow's".
+- Ticked phase 2 code and test items in `PLAN.md`; updated `spec/04`; opened G21 and G22.
+
+**Verified.**
+- `./gradlew build --rerun-tasks`: success. From the result XML: `CalcTimesClockTest` 12,
+  `PurityTest` 1, `BengaliDigitsTest` 3, `PlannerTest` 22, engine 3. No failures, errors or
+  skips.
+- Subagent's mutation checks (its report, not re-run by Claude): `now < at` changed to
+  `now <= at` is caught; dropping the 120-minute look-ahead is caught by a test added for it.
+- Example plan, Dhaka, now = 2026-11-26 12:00 local, five Adhans, Fajr pre-reminder 15 min
+  (subagent's run): 13 alarms, first is Asr 15:35 on the 26th, replan at 00:05 on the 27th,
+  last is Dhuhr 11:47 on the 28th.
+
+**Not done / follow-up.**
+- Late rule and health model (phase 2, still open). Nothing on a device. Not committed.
+- "Replan at most 24 h 05 m ahead" is asserted for Dhaka only; it is 25 h 05 m on a
+  fall-back day in zones with daylight saving, which is correct behaviour.
