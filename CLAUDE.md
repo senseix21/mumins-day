@@ -4,8 +4,7 @@ An offline, private Android app for Muslims in Bangladesh. Four features in v1: 
 Adhan (F1), Bangladesh-correct prayer times (F2), an honest Qibla compass (F3), and one good
 deed a day (F4). Bengali first, English second. No network, no ads, no analytics, no account.
 
-**Status: slice 1 of 6 is built** (the prayer-time core, JVM only). There is no Android app
-yet. `context/STATE.md` has the current picture; `context/PLAN.md` has the phases and checklists.
+**Status: all six slices are built as far as possible without phones and without the founder's content** (prayer times, planner and alarm path, screens in platform Views, deed card on fake records, Qibla). Proven on an emulator only; nothing has run on a phone. Real deeds, districts, Adhan audio and reviewed Bengali are missing. `context/STATE.md` has the current picture; `context/PLAN.md` has the phases and checklists.
 
 ## Start and end of every task
 
@@ -38,6 +37,8 @@ yet. `context/STATE.md` has the current picture; `context/PLAN.md` has the phase
 | `context/spec/02-requirements.md` | F1 to F4, failure modes, stubs for later features | Living spec |
 | `context/spec/03-architecture.md` | Components, scheduler, data, ADR-1…8 | Living spec; new ADRs continue the numbering |
 | `context/spec/04-verification.md` | Traceability table, device matrix, manual tests, release checklist | Living spec; the Result column is filled from real runs only |
+| `context/spec/05-licences.md` | Shipped libraries and their licences, LGPL obligations | Regenerate when the dependency list changes |
+| `context/spec/06-release-drafts.md` | Privacy page, Play form answers, open release unknowns | Drafts; every claim labelled |
 
 ## Evidence labels
 

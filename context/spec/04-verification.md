@@ -13,22 +13,22 @@ This file defines what "done" means. A result other than **Not run** names where
 | F2 rounding | INV-T5 | T-UNIT-5 | Sehri end rounds down; Fajr start and all later times round up | Pass on JVM, 2026-11-26 |
 | F2 offsets | INV-T6 | T-PROP-6 | Offset N moves one prayer by N | Pass on JVM, 2026-11-26 |
 | F2 no invented time | INV-T7 | T-UNIT-11 | Forced NaN yields "not computable", no alarm | Pass on JVM, 2026-11-26 |
-| F1 24-hour window | INV-S1 | T-INST-1 | After scheduling, `dumpsys alarm` lists every enabled prayer in the next 24 h | Not run |
+| F1 24-hour window | INV-S1 | T-INST-1 | After scheduling, `dumpsys alarm` lists every enabled prayer in the next 24 h | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 right instant | INV-S2 | T-PROP-7 | Planner output equals engine time in the place's zone under any device zone | Pass on JVM, 2026-11-26 |
-| F1 reboot | INV-S3 | T-INST-2 | Reboot emulator; window restored within 60 s | Not run |
-| F1 zone change | INV-S3 | T-INST-3 | Change device zone; instants unchanged | Not run |
-| F1 clock change | INV-S3 | T-INST-4 | Set clock ±3 h; window correct | Not run |
-| F1 app update | INV-S3 | T-INST-5 | `adb install -r`; window present | Not run |
+| F1 reboot | INV-S3 | T-INST-2 | Reboot emulator; window restored within 60 s | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
+| F1 zone change | INV-S3 | T-INST-3 | Change device zone; instants unchanged | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
+| F1 clock change | INV-S3 | T-INST-4 | Set clock ±3 h; window correct | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
+| F1 app update | INV-S3 | T-INST-5 | `adb install -r`; window present | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 permission regrant | INV-S3 | T-INST-6 | Revoke then grant exact alarms; window restored, warning cleared | Not run |
-| F1 idempotence | INV-S4 | T-INST-7 | Schedule 100 times; alarm set unchanged | Not run |
-| F1 no double Adhan | INV-S5 | T-INST-8 | Fire replan during playback; one playback only | Not run |
-| F1 late rule | INV-S7 | T-INST-9 | Deliver 5 and 15 min late; Adhan then silent | Not run |
-| F1 health log | INV-S8 | T-INST-10 | Log rows written with planned and actual times | Not run |
+| F1 idempotence | INV-S4 | T-INST-7 | Schedule 100 times; alarm set unchanged | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
+| F1 no double Adhan | INV-S5 | T-INST-8 | Fire replan during playback; one playback only | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
+| F1 late rule | INV-S7 | T-INST-9 | Deliver 5 and 15 min late; Adhan then silent | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
+| F1 health log | INV-S8 | T-INST-10 | Log rows written with planned and actual times | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 honest warnings | INV-S6 | T-UI-1 | Each Degraded reason shows its message and fix | Not run |
 | Privacy: no network | INV-P1 | T-BUILD-1 | Merged manifest lacks `INTERNET` | Pass, 2026-11-26: release and debug manifests have no `INTERNET`; adding it fails the build |
 | Privacy: location | INV-P2 | T-INST-11 | No location request while backgrounded | Not run |
-| Privacy: permissions | INV-P3 | T-BUILD-2 | Merged manifest equals allowlist | Pass, 2026-11-26: nine permissions match; an extra, a missing one and a dropped `maxSdkVersion` each fail the build |
-| Dependencies | INV-P4 | T-BUILD-3 | Resolved dependency list equals allowlist | Pass, 2026-11-26: six libraries match; adding one fails the build |
+| Privacy: permissions | INV-P3 | T-BUILD-2 | Merged manifest equals allowlist | Pass, 2026-11-27: seven permissions match (nine on 2026-11-26, before ADR-12); an extra, a missing one and a dropped `maxSdkVersion` each fail the build |
+| Dependencies | INV-P4 | T-BUILD-3 | Resolved dependency list equals allowlist | Pass, 2026-11-27: four libraries match (six on 2026-11-26, before ADR-14); adding one fails the build |
 | F4 review gate | INV-C1, C3 | T-BUILD-4 | Build fails on any deed not approved or missing a field | Pass with fake records, 2026-11-26: the build fails on a draft, a missing reviewer, or fewer than 30 approved. Real content: none yet |
 | F4 rotation | INV-C2 | T-PROP-8 | Same date gives same deed; every deed appears once per cycle | Pass on JVM, 2026-11-26 |
 | F4 tone | INV-C4 | T-UI-2 | Manual review of every string and screen by the reviewer and a native speaker | Not run |
@@ -37,8 +37,8 @@ This file defines what "done" means. A result other than **Not run** names where
 | Arabic in Bengali | INV-L3 | T-UI-3 | Screenshot review on the matrix | Not run |
 | Font scale | INV-L4 | T-UI-4 | Screenshots at 200 % | Not run |
 | F3 bearing | INV-Q1 | T-UNIT-10 | Bearing for eight cities against independently computed values | Pass on JVM, 2026-11-26 |
-| F3 low accuracy | INV-Q2 | T-INST-12 | Inject low accuracy; warning and prompt appear | Not run |
-| F3 no magnetometer | INV-Q3 | T-INST-13 | Emulator without the sensor; number shown, no needle | Not run |
+| F3 low accuracy | INV-Q2 | T-INST-12 | Inject low accuracy; warning and prompt appear | Partly: field-strength half Pass 2026-11-27 on the emulator (`tests/inst/qibla.sh field`); low-accuracy half Not run on a device (the emulator reports high accuracy); JVM tests cover all lower levels |
+| F3 no magnetometer | INV-Q3 | T-INST-13 | Emulator without the sensor; number shown, no needle | Pass 2026-11-27, AVD `streambert_nomag` (`ANDROID_SERIAL=emulator-5556 tests/inst/qibla.sh nomag`) |
 
 ## Device matrix
 

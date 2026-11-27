@@ -1,5 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
+        Bengali is the default language: this file is what every device without an English locale shows, and
+        values-en/strings.xml holds the English. Every key here must exist there and the other way round; a Bengali
+        value must hold no Latin digit (INV-L1, INV-L2). Both are checked by the checkStrings task (T-BUILD-5).
+
+        NATIVE REVIEW: Claude drafted every Bengali value below. Each key is listed in app/l10n-review.txt until a
+        native speaker has read it and the key is removed from that file. None of this is shippable as it stands.
+    -->
+
     <!-- The product name is not translated. -->
     <string name="app_name" translatable="false">Mu\'mins DAY</string>
+    <!-- Each language is named in itself, so someone who cannot read the current language can still pick theirs. -->
+    <string name="language_name_bn" translatable="false">বাংলা</string>
+    <string name="language_name_en" translatable="false">English</string>
+
+    <string name="channel_playback">প্লেব্যাক</string>
+    <string name="channel_notice">অনুস্মারক</string>
+    <string name="notification_playing">চলছে</string>
+    <string name="notification_reminder">অনুস্মারক</string>
+    <string name="notification_late">অনুস্মারক (দেরিতে)</string>
+    <string name="action_stop">থামান</string>
+
+    <!-- Parts of the day, for 12-hour time. Where each begins is a rule in core/l10n/TimeText.kt (dayPartOf). -->
+    <string name="day_part_dawn">ভোর</string>
+    <string name="day_part_morning">সকাল</string>
+    <string name="day_part_noon">দুপুর</string>
+    <string name="day_part_afternoon">বিকাল</string>
+    <string name="day_part_evening">সন্ধ্যা</string>
+    <string name="day_part_night">রাত</string>
+
+    <!-- Unused by Bengali time text; present so both languages hold the same keys. -->
+    <string name="time_am">পূর্বাহ্ণ</string>
+    <string name="time_pm">অপরাহ্ণ</string>
+
+    <!-- January to December, Gregorian. Exactly 12 items. -->
+    <string-array name="months">
+        <item>জানুয়ারি</item>
+        <item>ফেব্রুয়ারি</item>
+        <item>মার্চ</item>
+        <item>এপ্রিল</item>
+        <item>মে</item>
+        <item>জুন</item>
+        <item>জুলাই</item>
+        <item>আগস্ট</item>
+        <item>সেপ্টেম্বর</item>
+        <item>অক্টোবর</item>
+        <item>নভেম্বর</item>
+        <item>ডিসেম্বর</item>
+    </string-array>
+
+    <!-- Monday to Sunday. Exactly 7 items. -->
+    <string-array name="weekdays">
+        <item>সোমবার</item>
+        <item>মঙ্গলবার</item>
+        <item>বুধবার</item>
+        <item>বৃহস্পতিবার</item>
+        <item>শুক্রবার</item>
+        <item>শনিবার</item>
+        <item>রবিবার</item>
+    </string-array>
+
+    <!-- ===== Phase 4 screens. Every value below is a Claude draft for native review (app/l10n-review.txt). ===== -->
+
+    <string name="action_continue">এগিয়ে যান</string>
+    <string name="action_finish">শেষ করুন</string>
+
+    <string name="prayer_fajr">ফজর</string>
+    <string name="prayer_dhuhr">যোহর</string>
+    <string name="prayer_asr">আসর</string>
+    <string name="prayer_maghrib">মাগরিব</string>
+    <string name="prayer_isha">এশা</string>
+
+    <string name="mode_adhan">আযান</string>
+    <string name="mode_tone">ছোট সুর</string>
+    <string name="mode_silent">শব্দহীন বিজ্ঞপ্তি</string>
+    <string name="mode_off">বন্ধ</string>
+    <string name="kind_pre_reminder">আগাম অনুস্মারক</string>
+
+    <plurals name="minutes_count">
+        <item quantity="one">%1$s মিনিট</item>
+        <item quantity="other">%1$s মিনিট</item>
+    </plurals>
+    <plurals name="hours_count">
+        <item quantity="one">%1$s ঘণ্টা</item>
+        <item quantity="other">%1$s ঘণ্টা</item>
+    </plurals>
+
+    <string name="onb_language_title">ভাষা বাছাই করুন</string>
+    <string name="onb_district_title">আপনার জেলা বাছাই করুন</string>
+    <string name="onb_district_help">জেলা দেখে নামাজের সময় হিসাব করা হয়। এর জন্য ইন্টারনেট বা লোকেশন লাগে না।</string>
+    <string name="districts_unavailable">জেলার তালিকা পাওয়া যায়নি, তাই নামাজের সময় দেখানো যাচ্ছে না।</string>
+    <string name="districts_invalid">জেলার তালিকায় ভুল আছে, তাই নামাজের সময় দেখানো যাচ্ছে না।</string>
+    <string name="onb_reminders_title">অনুস্মারক কেমন হবে?</string>
+    <string name="onb_reminders_help">এটি পাঁচ ওয়াক্তের সবগুলোর জন্য। পরে সেটিংসে প্রতিটি আলাদা করা যাবে।</string>
+    <string name="onb_silent_title">ফোন সাইলেন্টে থাকলে</string>
+    <string name="silent_respect">সাইলেন্ট বা ভাইব্রেট মোডে আযান বাজবে না, শুধু বিজ্ঞপ্তি আসবে (প্রস্তাবিত)</string>
+    <string name="silent_always">সাইলেন্ট থাকলেও আযান বাজবে</string>
+    <string name="onb_allow_title">অনুমতি</string>
+    <string name="perm_notifications_why">অনুস্মারক ও থামানোর বোতাম বিজ্ঞপ্তি হিসেবে দেখানো হয়। অনুমতি না দিলে সেগুলো দেখা যাবে না।</string>
+    <string name="perm_notifications_button">বিজ্ঞপ্তির অনুমতি দিন</string>
+    <string name="perm_exact_why">আযান ঠিক সময়ে বাজাতে অ্যালার্ম সেট করার অনুমতি লাগে।</string>
+    <string name="perm_exact_button">অ্যালার্মের অনুমতি দিন</string>
+    <string name="perm_granted">অনুমতি দেওয়া আছে।</string>
+    <string name="perm_none_needed">এই ফোনে আলাদা করে কোনো অনুমতি চাওয়ার দরকার নেই।</string>
+    <string name="onb_force_stop">মনে রাখবেন: সেটিংস থেকে অ্যাপটি ফোর্স স্টপ করলে আবার না খোলা পর্যন্ত কোনো অনুস্মারক বাজবে না।</string>
+    <string name="onb_brand_title">আপনার ফোনের জন্য বাড়তি ধাপ</string>
+
+    <string name="brand_title">ব্যাকগ্রাউন্ডে চালু রাখার ধাপ</string>
+    <string name="brand_intro">ফোনের মডেল ও সংস্করণ অনুযায়ী মেনুর নাম একটু আলাদা হতে পারে। এই ধাপগুলো একটি কমিউনিটির সাইট থেকে নেওয়া, এখনো কোনো ফোনে যাচাই করা হয়নি।</string>
+    <string-array name="brand_xiaomi_steps">
+        <item>সাম্প্রতিক অ্যাপের তালিকায় Mu\'mins DAY লক করে রাখুন।</item>
+        <item>Settings > Apps > Mu\'mins DAY > App permissions খুলে \"Background autostart\" চালু করুন। (সংস্করণ ভেদে নাম আলাদা হতে পারে।)</item>
+        <item>Security > Battery > App Battery Saver > Mu\'mins DAY খুলে \"No restriction\" বাছাই করুন।</item>
+    </string-array>
+    <string-array name="brand_realme_steps">
+        <item>Settings > Apps > Mu\'mins DAY (App info) খুলে \"Allow Auto Start-up\" চালু করুন।</item>
+        <item>App info > Battery usage এ গিয়ে ব্যাকগ্রাউন্ডে চলতে দিন।</item>
+        <item>Battery > Power saving settings > App battery management খুলে এই অ্যাপের জন্য অটো-লঞ্চ, ফোরগ্রাউন্ড ও ব্যাকগ্রাউন্ড চলতে দিন এবং ব্যাটারি অপটিমাইজ বন্ধ রাখুন।</item>
+        <item>Apps > Special access এ গিয়ে অ্যালার্ম অ্যাপের জন্য \"Display pop-up windows of applications running in the background\" চালু করুন।</item>
+        <item>ফোনের পাওয়ার-সেভিং মোড এড়িয়ে চলুন।</item>
+    </string-array>
+    <string-array name="brand_infinix_steps">
+        <item>সাম্প্রতিক অ্যাপের তালিকায় Mu\'mins DAY লক করে রাখুন।</item>
+        <item>Settings > Battery Lab > Battery Saving Settings এ গিয়ে অ্যাপগুলোর জন্য পাওয়ার-সেভিং ম্যানেজমেন্ট বন্ধ করুন।</item>
+        <item>Phone Master > Toolbox > Auto-start management এ গিয়ে এই অ্যাপের অটো-স্টার্ট চালু করুন।</item>
+    </string-array>
+    <string name="brand_infinix_note">এগুলো টেকনো ফোনের জন্য প্রকাশিত ধাপ। ইনফিনিক্সের নিজস্ব ধাপ নিশ্চিত করা যায়নি।</string>
+    <string name="brand_open_settings">এই অ্যাপের সেটিংস খুলুন</string>
+    <string name="brand_confirm">আমি ধাপগুলো করেছি</string>
+    <string name="brand_confirm_note">অ্যাপ এটি যাচাই করতে পারে না, তাই আপনার কথাই ধরে নেয়।</string>
+
+    <string name="home_next">পরবর্তী: %1$s</string>
+    <string name="home_in">%1$s বাকি</string>
+    <string name="home_next_unknown">পরবর্তী নামাজের সময় জানা যাচ্ছে না।</string>
+    <string name="times_unavailable">আজকের সময় হিসাব করা যায়নি।</string>
+    <string name="home_all_good">কোনো সমস্যা পাওয়া যায়নি।</string>
+    <string name="home_reminders_off">অনুস্মারক বন্ধ আছে। আযান শুনতে সেটিংসে চালু করুন।</string>
+    <string name="home_settings">সেটিংস</string>
+    <string name="home_licences">ওপেন-সোর্স লাইসেন্স</string>
+    <string name="test_adhan">আযান পরীক্ষা করুন</string>
+    <string name="test_adhan_set">%1$s সেকেন্ড পরে আযান বাজবে। চাইলে পর্দা বন্ধ করে রাখুন।</string>
+    <string name="test_adhan_blocked">অ্যালার্মের অনুমতি নেই, তাই পরীক্ষা সেট করা গেল না।</string>
+
+    <string name="health_exact_alarms">অ্যালার্ম ঠিক সময়ে বাজানোর অনুমতি বন্ধ আছে, তাই আযান নির্ধারিত সময়ে বাজবে না।</string>
+    <string name="fix_exact_alarms">অনুমতি দিন</string>
+    <string name="health_notifications">বিজ্ঞপ্তি বন্ধ আছে, তাই অনুস্মারক ও থামানোর বোতাম দেখা যাবে না।</string>
+    <string name="fix_notifications">বিজ্ঞপ্তি চালু করুন</string>
+    <string name="health_battery">এই অ্যাপের ওপর ব্যাটারির সীমাবদ্ধতা আছে। ফোন অ্যাপটি বন্ধ করে দিলে আযান বাজবে না।</string>
+    <string name="fix_battery">ব্যাটারির সেটিংস খুলুন</string>
+    <string name="health_brand">আপনার ফোনের কোম্পানি ব্যাকগ্রাউন্ডে অ্যাপ বন্ধ করে দিতে পারে। আযান ঠিকমতো বাজতে কয়েকটি সেটিং বদলাতে হবে।</string>
+    <string name="fix_brand">ধাপগুলো দেখুন</string>
+    <plurals name="health_recent">
+        <item quantity="one">গত সাত দিনে %1$s টি অনুস্মারক ঠিক সময়ে আসেনি।</item>
+        <item quantity="other">গত সাত দিনে %1$s টি অনুস্মারক ঠিক সময়ে আসেনি।</item>
+    </plurals>
+    <string name="fix_recent">বিস্তারিত দেখুন</string>
+
+    <string name="health_log_title">অনুস্মারকের অবস্থা</string>
+    <string name="health_log_help">গত সাত দিনে প্রতিটি অনুস্মারক কখন বাজার কথা ছিল আর কখন এসেছে।</string>
+    <string name="health_log_empty">এখনো কোনো অনুস্মারকের তথ্য নেই।</string>
+    <string name="log_planned_actual">নির্ধারিত %1$s, এসেছে %2$s</string>
+    <string name="log_planned_only">নির্ধারিত %1$s</string>
+    <string name="status_on_time">ঠিক সময়ে</string>
+    <string name="status_late">%1$s দেরিতে</string>
+    <string name="status_not_arrived">আসেনি</string>
+    <string name="status_pending">অপেক্ষায়</string>
+    <string name="status_notice">শব্দহীন বিজ্ঞপ্তি হিসেবে এসেছে</string>
+    <string name="status_ring_failed">বাজানো যায়নি, বিজ্ঞপ্তি দেওয়া হয়েছে</string>
+
+    <string name="settings_title">সেটিংস</string>
+    <string name="settings_language">ভাষা</string>
+    <string name="settings_silent">সাইলেন্ট মোড</string>
+    <string name="settings_district">জেলা</string>
+    <string name="settings_district_change">জেলা বদলান</string>
+    <string name="settings_prayers">প্রতিটি ওয়াক্ত</string>
+    <string name="settings_mode">অনুস্মারকের ধরন</string>
+    <string name="settings_pre">আগাম অনুস্মারক</string>
+    <string name="pre_none">নেই</string>
+    <string name="settings_offset_title">আমার মসজিদের সাথে মেলান</string>
+    <string name="settings_offset_help">আপনার মসজিদের সময় কয়েক মিনিট আলাদা হলে এখানে মিলিয়ে নিন। শুধু ওই ওয়াক্তের সময় ও অনুস্মারক সরবে।</string>
+    <string name="offset_earlier">%1$s: এক মিনিট আগে করুন</string>
+    <string name="offset_later">%1$s: এক মিনিট পরে করুন</string>
+    <string name="settings_advanced">উন্নত</string>
+    <string name="settings_asr">আসরের হিসাব</string>
+    <string name="asr_hanafi">হানাফি (ডিফল্ট)</string>
+    <string name="asr_shafi">শাফেয়ি</string>
+    <string name="settings_report">সমস্যার রিপোর্ট পাঠান</string>
+    <string name="report_help">আপনার ইমেইল অ্যাপে একটি খসড়া খুলবে। তাতে ফোনের মডেল, সংস্করণ আর গত সাত দিনের অনুস্মারকের তথ্য থাকবে; কোনো নাম বা পরিচয় থাকবে না। পাঠানোর আগে পড়ে নিতে পারবেন।</string>
+    <string name="report_no_email">কোনো ইমেইল অ্যাপ পাওয়া যায়নি।</string>
+
+    <string name="licences_title">ওপেন-সোর্স লাইসেন্স</string>
+    <string name="licences_intro">এই অ্যাপ ওপেন-সোর্স সফটওয়্যারের ওপর তৈরি। লাইসেন্সের পূর্ণ লেখা নিচে নাম দেওয়া ফাইলগুলোতে আছে।</string>
+
+    <string name="deed_title">আজকের একটি ভালো কাজ</string>
+    <string name="deed_mark_done">আমি করেছি</string>
+    <string name="deed_done">আজকের জন্য করা হয়েছে।</string>
+    <string name="deed_another">আরেকটি দেখান</string>
+    <string name="deed_source">সূত্র: %1$s %2$s (%3$s)</string>
+    <string name="deed_book_bukhari">বুখারি</string>
+    <string name="deed_book_muslim">মুসলিম</string>
+    <string name="deed_week">গত সাত দিন</string>
+    <string name="deed_week_done">%1$s: করা হয়েছে</string>
+    <string name="deed_unavailable">এই সংস্করণে আজকের ভালো কাজ দেখানো যাচ্ছে না।</string>
+    <string name="deed_rejected">ভালো কাজের তালিকায় ত্রুটি আছে, তাই কোনো কাজ দেখানো হচ্ছে না।</string>
+
+    <!-- Qibla (F3). Compass-point words are drafts for the native speaker: cardinal_*_toward is the locative form used after a degree count. -->
+    <string name="qibla_title">কিবলা</string>
+    <string name="qibla_bearing">কিবলার দিক: %1$s°</string>
+    <string name="qibla_bearing_spoken">কিবলার দিক: %1$s ডিগ্রি</string>
+    <string name="qibla_true_note">সত্য উত্তর থেকে মাপা, ঘড়ির কাঁটার দিকে।</string>
+    <string name="qibla_magnetic">চুম্বকীয় কম্পাসে দেখাবে: %1$s°</string>
+    <string name="qibla_everywhere">এই জায়গা থেকে সব দিকই কিবলা।</string>
+    <string name="cardinal_north">উত্তর</string>
+    <string name="cardinal_east">পূর্ব</string>
+    <string name="cardinal_south">দক্ষিণ</string>
+    <string name="cardinal_west">পশ্চিম</string>
+    <string name="cardinal_north_toward">উত্তরে</string>
+    <string name="cardinal_east_toward">পূর্বে</string>
+    <string name="cardinal_south_toward">দক্ষিণে</string>
+    <string name="cardinal_west_toward">পশ্চিমে</string>
+    <string name="compass_between">%1$s থেকে %2$s° %3$s</string>
+    <string name="qibla_ok">কম্পাস ভালো আছে।</string>
+    <string name="qibla_warn_title">কম্পাস ঠিক নেই</string>
+    <string name="qibla_warn_unsure">নির্দেশকটি ধূসর, তাই এর ওপর ভরসা করবেন না।</string>
+    <string name="qibla_reason_no_reading">কম্পাস এখনো কোনো মাপ পায়নি।</string>
+    <string name="qibla_reason_low_accuracy">কম্পাসের মাপ নির্ভরযোগ্য নয়।</string>
+    <string name="qibla_reason_field_strong">কাছে চুম্বক বা ধাতব জিনিস আছে বলে মনে হচ্ছে। ফোনটি সেখান থেকে সরান।</string>
+    <string name="qibla_reason_field_weak">চারপাশের চুম্বকক্ষেত্র অস্বাভাবিক দুর্বল। ফোনটি ধাতব জিনিস থেকে দূরে নিন।</string>
+    <string name="qibla_reason_no_declination">এই জায়গার চুম্বকীয় সংশোধন জানা যাচ্ছে না, তাই নির্দেশক দেখানো হচ্ছে না।</string>
+    <string name="qibla_calibrate">কম্পাস ঠিক করতে ফোনটি হাতে নিয়ে বাতাসে আট-এর আকারে কয়েকবার ঘোরান।</string>
+    <string name="qibla_lay_flat">ফোনটি সমতলে রাখুন।</string>
+    <string name="qibla_no_sensor">এই ফোনে কম্পাস সেন্সর নেই, তাই নির্দেশক দেখানো যাচ্ছে না।</string>
+    <string name="qibla_no_sensor_hint">ওপরের সংখ্যাটি অন্য কোনো কম্পাসে মিলিয়ে নিন, অথবা এমন কোনো জায়গার দিক ধরুন যার কিবলা আপনার জানা আছে।</string>
+    <string name="qibla_needle_desc">কিবলার নির্দেশক: ফোনের মাথা থেকে ঘড়ির কাঁটার দিকে %1$s ডিগ্রি ঘুরলে কিবলা</string>
+    <string name="qibla_needle_desc_unsure">কিবলার নির্দেশক, নির্ভরযোগ্য নয়: ফোনের মাথা থেকে ঘড়ির কাঁটার দিকে %1$s ডিগ্রি</string>
 </resources>

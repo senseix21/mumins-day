@@ -1,6 +1,13 @@
 # State
 
-**Last updated:** 2026-11-26 23:46 +0600
+**Last updated:** 2026-11-27 22:10 +0600  
+
+**Where it runs.** The Mac (`ABUs-MacBook-Pro-2`) now builds and runs the app: JDK 21 from
+Homebrew, `local.properties` with `sdk.dir` (git-ignored), platform 37 and build tools 37
+installed. `./gradlew build --rerun-tasks` is green there (KNOWN, 2026-11-27): 142 tests in `:core`, 52 in `:app`, 12 in the content gate; the adb suite passes 9 of 10 T-INST ids (6 not run) and `tests/inst/ui.sh` passes. The `streambert`
+emulator boots (20 s) and runs the debug APK. This answers the emulator half of G13; a physical
+phone is still needed for the reliability claim. Claude Code's sandbox blocks writes to the SDK
+folder and adb/emulator sockets, so those commands run with the sandbox off.
 
 ## Where the project stands
 
@@ -23,13 +30,15 @@
   - `core/.../deed/`: the review gate (`checkContent`), rotation (`deedFor`, `alternateFor`)
     and the day card (`cardFor`, `swap`, `markDone`, `weekDots`). Test records are fake; no
     deed content exists.
-  - `app/`: the Android module. Builds debug and release APKs. Manifest with the nine
-    allowlisted permissions, a placeholder screen and icon, backup off, and the gates
-    T-BUILD-1…3. It does nothing yet: no storage, no alarms, no real screens.
+  - `app/`: the Android module. Manifest with the seven allowlisted permissions (ADR-12: location and vibration removed), backup on for `settings.xml` and `deed-days.db` only (G41), gates
+    T-BUILD-1…3. `store/` (settings, SQLite log and deed tables, migrations), `alarm/`
+    (`apply(plan)`, receivers, delivery, `mediaPlayback` service with Stop, notifications, health,
+    Test Adhan), a debug-only adb receiver, and `tests/inst/run.sh` (the T-INST suite over adb).
+    Still no real screens: the home screen is a placeholder.
   - `tools/content-gate/`: the T-BUILD-4 build task. Passes with a notice until
     `content/deeds.json` exists.
-- **No Android module.** Nothing has run on a phone. Nothing is checked against a real
-  timetable.
+- The placeholder app has run on an emulator, nothing more. Nothing has run on a phone.
+  Nothing is checked against a real timetable.
 - Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan), `62ea747` (late rule,
   health), `586630d` (Qibla maths), `0684bc1` (deed core). Pushed to
   `github.com/senseix21/mumins-day` (`main`). The repository is public. CI builds and tests every push on JDK 17. Upstream clones for reading are in
@@ -37,14 +46,14 @@
 
 ## Next
 
-Phase 3 continues, in this order (`PLAN.md`):
+All six slices are built as far as they can be without the founder's inputs and without phones. Release APK 1,055,071 bytes, R8 on (ADR-15), desugaring gone (ADR-14), LGPL texts shipped in assets (ADR-13), 4 libraries, 7 permissions. Seen on an emulator only: alarms, store, screens, deed card (fake records), Qibla. Measured: APK 1,034,164 bytes, 142 tests in `:core`, 52 in `:app`, 12 in the content gate.
 
-1. Store: settings in SharedPreferences, `alarm_log` and `deed_day` in SQLite, migrations.
-2. Alarm path: `apply(plan)`, the receivers, delivery, playback service, the log, "Test Adhan".
-3. Health checks feeding `assessHealth`.
-
-All of that can be written and compiled here. None of it can be run here: T-INST-* and M-*
-need a phone or an emulator.
+What blocks the rest, in order of leverage:
+1. **Decisions** (no work for anyone else): G38, G41, G42, G44, G45, G35, G33, default language (INV-L1), test-only dependencies, G26 and G30.
+2. **Content and data:** reviewer and `content/deeds.json` (G9); district list (Q4); Adhan recording (Q5); native Bengali speaker for 152 draft keys (G9); support email, developer name, privacy URL (G15).
+3. **Phones** (Q8, G13): M-1 to M-4, T-INST-6 (API 31 or 32), the accuracy half of T-INST-12, audible Adhan, brand steps, backup and restore.
+4. **A commit and a push** so CI runs the app (G46).
+5. Reference timetable for the prayer times (Q2). Lawyer on LGPL (Q6).
 
 ## Waiting on the founder
 

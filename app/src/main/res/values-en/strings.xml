@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- English. Same keys as values/strings.xml, which holds the Bengali (INV-L1). -->
+
+    <string name="channel_playback">Playback</string>
+    <string name="channel_notice">Reminders</string>
+    <string name="notification_playing">Playing</string>
+    <string name="notification_reminder">Reminder</string>
+    <string name="notification_late">Reminder (late)</string>
+    <string name="action_stop">Stop</string>
+
+    <!-- Unused by English time text; present so both languages hold the same keys. -->
+    <string name="day_part_dawn">dawn</string>
+    <string name="day_part_morning">morning</string>
+    <string name="day_part_noon">noon</string>
+    <string name="day_part_afternoon">afternoon</string>
+    <string name="day_part_evening">evening</string>
+    <string name="day_part_night">night</string>
+
+    <string name="time_am">am</string>
+    <string name="time_pm">pm</string>
+
+    <!-- January to December. Exactly 12 items. -->
+    <string-array name="months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <!-- Monday to Sunday. Exactly 7 items. -->
+    <string-array name="weekdays">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+
+    <!-- Phase 4 screens. -->
+
+    <string name="action_continue">Continue</string>
+    <string name="action_finish">Finish</string>
+
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isha</string>
+
+    <string name="mode_adhan">Adhan</string>
+    <string name="mode_tone">Short tone</string>
+    <string name="mode_silent">Silent notification</string>
+    <string name="mode_off">Off</string>
+    <string name="kind_pre_reminder">Reminder before</string>
+
+    <plurals name="minutes_count">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
+    <plurals name="hours_count">
+        <item quantity="one">%1$s hour</item>
+        <item quantity="other">%1$s hours</item>
+    </plurals>
+
+    <string name="onb_language_title">Choose your language</string>
+    <string name="onb_district_title">Choose your district</string>
+    <string name="onb_district_help">Prayer times are worked out from your district. No internet or location is needed.</string>
+    <string name="districts_unavailable">The district list could not be found, so prayer times cannot be shown.</string>
+    <string name="districts_invalid">The district list has an error, so prayer times cannot be shown.</string>
+    <string name="onb_reminders_title">How should the app remind you?</string>
+    <string name="onb_reminders_help">This applies to all five prayers. You can change each one later in Settings.</string>
+    <string name="onb_silent_title">When the phone is on silent</string>
+    <string name="silent_respect">Do not sound the Adhan on silent or vibrate; show a notification instead (recommended)</string>
+    <string name="silent_always">Sound the Adhan even on silent or vibrate</string>
+    <string name="onb_allow_title">Permissions</string>
+    <string name="perm_notifications_why">Reminders and the Stop button appear as notifications. Without permission you will not see them.</string>
+    <string name="perm_notifications_button">Allow notifications</string>
+    <string name="perm_exact_why">To ring the Adhan at the exact time, the app needs permission to set exact alarms.</string>
+    <string name="perm_exact_button">Allow exact alarms</string>
+    <string name="perm_granted">Allowed.</string>
+    <string name="perm_none_needed">This phone does not need any extra permission to be asked for.</string>
+    <string name="onb_force_stop">Please note: if you force-stop the app from Settings, no reminder can ring until you open it again.</string>
+    <string name="onb_brand_title">Extra steps for your phone</string>
+
+    <string name="brand_title">Keep the app running in the background</string>
+    <string name="brand_intro">Menu names can differ a little by model and version. These steps come from a community-maintained site and have not yet been checked on a phone.</string>
+    <string-array name="brand_xiaomi_steps">
+        <item>Lock Mu\'mins DAY in the list of recent apps.</item>
+        <item>Open Settings > Apps > Mu\'mins DAY > App permissions and switch on \"Background autostart\". (The name may differ by version.)</item>
+        <item>Open Security > Battery > App Battery Saver > Mu\'mins DAY and choose \"No restriction\".</item>
+    </string-array>
+    <string-array name="brand_realme_steps">
+        <item>Open Settings > Apps > Mu\'mins DAY (App info) and switch on \"Allow Auto Start-up\".</item>
+        <item>In App info > Battery usage, allow the app to run in the background.</item>
+        <item>Open Battery > Power saving settings > App battery management, allow auto-launch, foreground and background activity for this app, and keep battery optimisation off.</item>
+        <item>Open Apps > Special access and switch on \"Display pop-up windows of applications running in the background\" for alarm apps.</item>
+        <item>Avoid the phone\'s power-saving modes.</item>
+    </string-array>
+    <string-array name="brand_infinix_steps">
+        <item>Lock Mu\'mins DAY in the list of recent apps.</item>
+        <item>Open Settings > Battery Lab > Battery Saving Settings and disable power saving management for apps.</item>
+        <item>Open Phone Master > Toolbox > Auto-start management and switch auto-start on for this app.</item>
+    </string-array>
+    <string name="brand_infinix_note">These are the steps published for Tecno phones. Infinix\'s own steps could not be confirmed.</string>
+    <string name="brand_open_settings">Open this app\'s settings</string>
+    <string name="brand_confirm">I have done these steps</string>
+    <string name="brand_confirm_note">The app cannot check this, so it takes your word.</string>
+
+    <string name="home_next">Next: %1$s</string>
+    <string name="home_in">%1$s left</string>
+    <string name="home_next_unknown">The next prayer time is not known.</string>
+    <string name="times_unavailable">Today\'s times could not be worked out.</string>
+    <string name="home_all_good">No problems found.</string>
+    <string name="home_reminders_off">Reminders are off. Turn them on in Settings to hear the Adhan.</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_licences">Open-source licences</string>
+    <string name="test_adhan">Test Adhan</string>
+    <string name="test_adhan_set">The Adhan will ring in %1$s seconds. You can lock the screen.</string>
+    <string name="test_adhan_blocked">Exact alarms are not allowed, so the test could not be set.</string>
+
+    <string name="health_exact_alarms">Permission to ring alarms at the exact time is off, so the Adhan will not ring on time.</string>
+    <string name="fix_exact_alarms">Allow</string>
+    <string name="health_notifications">Notifications are off, so you will not see reminders or the Stop button.</string>
+    <string name="fix_notifications">Turn notifications on</string>
+    <string name="health_battery">Battery restrictions apply to this app. If the phone stops the app, the Adhan will not ring.</string>
+    <string name="fix_battery">Open battery settings</string>
+    <string name="health_brand">Your phone\'s maker may stop apps in the background. A few settings must be changed for the Adhan to ring reliably.</string>
+    <string name="fix_brand">Show the steps</string>
+    <plurals name="health_recent">
+        <item quantity="one">In the last seven days %1$s reminder did not arrive on time.</item>
+        <item quantity="other">In the last seven days %1$s reminders did not arrive on time.</item>
+    </plurals>
+    <string name="fix_recent">See details</string>
+
+    <string name="health_log_title">Reminder health</string>
+    <string name="health_log_help">When each reminder was planned to ring in the last seven days, and when it arrived.</string>
+    <string name="health_log_empty">There is no reminder history yet.</string>
+    <string name="log_planned_actual">Planned %1$s, arrived %2$s</string>
+    <string name="log_planned_only">Planned %1$s</string>
+    <string name="status_on_time">On time</string>
+    <string name="status_late">%1$s late</string>
+    <string name="status_not_arrived">Did not arrive</string>
+    <string name="status_pending">Waiting</string>
+    <string name="status_notice">Arrived as a silent notification</string>
+    <string name="status_ring_failed">Could not ring; a notification was shown</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_silent">Silent mode</string>
+    <string name="settings_district">District</string>
+    <string name="settings_district_change">Change district</string>
+    <string name="settings_prayers">Each prayer</string>
+    <string name="settings_mode">Reminder type</string>
+    <string name="settings_pre">Reminder before the prayer</string>
+    <string name="pre_none">None</string>
+    <string name="settings_offset_title">Match my mosque</string>
+    <string name="settings_offset_help">If your mosque\'s time differs by a few minutes, adjust it here. Only that prayer\'s time and reminder move.</string>
+    <string name="offset_earlier">%1$s: one minute earlier</string>
+    <string name="offset_later">%1$s: one minute later</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="settings_asr">Asr calculation</string>
+    <string name="asr_hanafi">Hanafi (default)</string>
+    <string name="asr_shafi">Shafi\'i</string>
+    <string name="settings_report">Send a report</string>
+    <string name="report_help">A draft opens in your email app with the phone model, versions and the last seven days of reminders. It holds no name or identifier, and you can read it before sending.</string>
+    <string name="report_no_email">No email app was found.</string>
+
+    <string name="licences_title">Open-source licences</string>
+    <string name="licences_intro">This app is built on open-source software. The full licence texts are in the files named below.</string>
+
+    <string name="deed_title">Today\'s good deed</string>
+    <string name="deed_mark_done">I did it</string>
+    <string name="deed_done">Done for today.</string>
+    <string name="deed_another">Show me another</string>
+    <string name="deed_source">Source: %1$s %2$s (%3$s)</string>
+    <string name="deed_book_bukhari">Bukhari</string>
+    <string name="deed_book_muslim">Muslim</string>
+    <string name="deed_week">Last seven days</string>
+    <string name="deed_week_done">%1$s: done</string>
+    <string name="deed_unavailable">Today\'s good deed is not available in this version of the app.</string>
+    <string name="deed_rejected">The good deed list has an error, so no deed is shown.</string>
+
+    <!-- Qibla (F3) -->
+    <string name="qibla_title">Qibla</string>
+    <string name="qibla_bearing">Qibla direction: %1$s°</string>
+    <string name="qibla_bearing_spoken">Qibla direction: %1$s degrees</string>
+    <string name="qibla_true_note">Measured from true north, clockwise.</string>
+    <string name="qibla_magnetic">A magnetic compass will read: %1$s°</string>
+    <string name="qibla_everywhere">From this place every direction is the Qibla.</string>
+    <string name="cardinal_north">north</string>
+    <string name="cardinal_east">east</string>
+    <string name="cardinal_south">south</string>
+    <string name="cardinal_west">west</string>
+    <string name="cardinal_north_toward">north</string>
+    <string name="cardinal_east_toward">east</string>
+    <string name="cardinal_south_toward">south</string>
+    <string name="cardinal_west_toward">west</string>
+    <string name="compass_between">%2$s° %3$s of %1$s</string>
+    <string name="qibla_ok">The compass is working well.</string>
+    <string name="qibla_warn_title">The compass is not reliable</string>
+    <string name="qibla_warn_unsure">The needle is grey: do not rely on it.</string>
+    <string name="qibla_reason_no_reading">The compass has not given a reading yet.</string>
+    <string name="qibla_reason_low_accuracy">The compass reading is not accurate.</string>
+    <string name="qibla_reason_field_strong">A magnet or metal seems to be close by. Move the phone away from it.</string>
+    <string name="qibla_reason_field_weak">The magnetic field around you is unusually weak. Move the phone away from metal.</string>
+    <string name="qibla_reason_no_declination">The magnetic correction for this place is not known, so no needle is shown.</string>
+    <string name="qibla_calibrate">To calibrate the compass, hold the phone and move it in a figure of eight in the air a few times.</string>
+    <string name="qibla_lay_flat">Lay the phone flat.</string>
+    <string name="qibla_no_sensor">This phone has no compass sensor, so no needle can be shown.</string>
+    <string name="qibla_no_sensor_hint">Check the number above against another compass, or use a place whose Qibla direction you already know.</string>
+    <string name="qibla_needle_desc">Qibla needle: the Qibla is %1$s degrees clockwise from the top of the phone</string>
+    <string name="qibla_needle_desc_unsure">Qibla needle, not reliable: %1$s degrees clockwise from the top of the phone</string>
+</resources>

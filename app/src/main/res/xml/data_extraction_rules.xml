@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Android 12 and later. Nothing is backed up or transferred yet: the app stores nothing so far.
-    Phase 4 decides the real rules (settings and deed completions in, alarm log out) and must re-run the
-    health check after a restore, because exact-alarm permission is denied on a restored install.
+    Android 12 and later (F1 #12, spec 03 "Backup"). Once an <include> exists, only what is listed is backed up. In: the
+    settings file (planner settings and app preferences: district, reminders, offsets, language), and the deed database
+    deed-days.db (the days a card was shown and done, F4#4). Out, by not being listed: the alarm log, alarm-log.db, which is
+    a record of one phone's own alarms and must not describe another's (G34); the "device" file (the "I did the brand steps"
+    answer belongs to one phone); everything else. The database domain has no <exclude> on purpose: an exclude of the
+    whole domain could cancel the include above it.
+    After a restore nothing is planned until the app opens; opening it runs replan and the health check, which names any
+    permission the new phone has not granted.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <exclude domain="root" />
+        <include domain="sharedpref" path="settings.xml" />
+        <include domain="database" path="deed-days.db" />
         <exclude domain="file" />
-        <exclude domain="database" />
-        <exclude domain="sharedpref" />
+        <exclude domain="root" />
         <exclude domain="external" />
     </cloud-backup>
     <device-transfer>
-        <exclude domain="root" />
+        <include domain="sharedpref" path="settings.xml" />
+        <include domain="database" path="deed-days.db" />
         <exclude domain="file" />
-        <exclude domain="database" />
-        <exclude domain="sharedpref" />
+        <exclude domain="root" />
         <exclude domain="external" />
     </device-transfer>
 </data-extraction-rules>

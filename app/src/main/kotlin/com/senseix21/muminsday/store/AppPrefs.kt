@@ -1,0 +1,62 @@
+package com.senseix21.muminsday.store
+
+import com.senseix21.muminsday.districts.DistrictId
+import com.senseix21.muminsday.l10n.Language
+
+/** F1 #15: whether the Adhan sounds when the phone is on silent or vibrate. */
+enum class SilentMode { RespectSilent, AlwaysRing }
+
+/**
+ * Choices that are not part of the planner's input: what the user picked on the first-run screens. Stored beside the
+ * planner settings, under their own prefix, and so backed up with them.
+ */
+data class AppPrefs(
+    val language: Language = Language.Bengali,
+    /** The spec's default (F1 #15, decided 2026-11-27). */
+    val silentMode: SilentMode = SilentMode.RespectSilent,
+    /** False until the first-run screens are finished; false again for a fresh install. */
+    val onboarded: Boolean = false,
+    /** Which district the place came from, so the settings screen can name it. Null until one is picked. */
+    val districtId: DistrictId? = null,
+)
+
+private const val A = "app."
+
+/** Parse at the edge: each value that is missing or unknown takes its default on its own; nothing throws. */
+fun parseAppPrefs(stored: Map<String, *>): AppPrefs {
+    fun text(key: String): String? = stored[A + key] as? String
+    val defaults = AppPrefs()
+    return AppPrefs(
+        language = Language.entries.firstOrNull { it.name == text("language") } ?: defaults.language,
+        silentMode = SilentMode.entries.firstOrNull { it.name == text("silentMode") } ?: defaults.silentMode,
+        onboarded = text("onboarded") == "true",
+        districtId = text("districtId")?.let(DistrictId::of),
+    )
+}
+
+fun encodeAppPrefs(prefs: AppPrefs): Map<String, String> = buildMap {
+    put(A + "language", prefs.language.name)
+    put(A + "silentMode", prefs.silentMode.name)
+    put(A + "onboarded", prefs.onboarded.toString())
+    prefs.districtId?.let { put(A + "districtId", it.value) }
+}
+
+/** The keys [encodeAppPrefs] can write, so a write removes a district that is no longer chosen. */
+fun appPrefKeys(): Set<String> = encodeAppPrefs(AppPrefs(districtId = DistrictId.of("x"))).keys
+
+/** What one write does to the settings file: every key to put, and the stale keys to remove. Nothing else is touched. */
+class Edits(val remove: Set<String>, val put: Map<String, String>)
+
+/**
+ * G27: the planner settings own the `v1.` keys and only those. A write replaces them and leaves every other key (the
+ * app preferences) alone, so one writer cannot wipe another's values.
+ */
+fun settingsEdits(existingKeys: Set<String>, settings: com.senseix21.muminsday.planner.PlannerSettings): Edits {
+    val put = encodeSettings(settings)
+    return Edits(remove = existingKeys.filter { it.startsWith(SETTINGS_PREFIX) && it !in put }.toSet(), put = put)
+}
+
+fun appPrefsEdits(existingKeys: Set<String>, prefs: AppPrefs): Edits {
+    val put = encodeAppPrefs(prefs)
+    return Edits(remove = existingKeys.filter { it.startsWith(A) && it !in put }.toSet(), put = put)
+}

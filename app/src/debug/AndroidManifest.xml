@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Debug builds only. Lets tests/inst/run.sh drive the alarm path with `adb shell am broadcast`, because the shell
+        cannot reach a non-exported component. Only a caller holding DUMP (the shell) may send to it. It is not in the release manifest, so it ships nowhere.
+    -->
+    <application>
+        <receiver
+            android:name=".alarm.DebugReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+    </application>
+
+</manifest>

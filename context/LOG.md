@@ -350,3 +350,93 @@ has no declared outputs, so it runs on every build; that is intended for a gate.
 - `maxSdkVersion=32` on `SCHEDULE_EXACT_ALARM` is ASSUMED to be the recommended pairing.
 - G25 opened: the real transitive dependency list, and what Compose will do to it.
 - CI has not built the Android module yet; result follows the push.
+
+## 2026-11-27 00:08 +0600 · First run on the Mac emulator
+
+**Done.**
+- Set up the Mac per the handoff: `JAVA_HOME` = Homebrew openjdk@21, `local.properties` with
+  `sdk.dir` (git-ignored), `sdkmanager "platforms;android-37.0" "build-tools;37.0.0"`.
+- `./gradlew build`; started `streambert`; `adb install -r` the debug APK; launched `MainActivity`.
+
+**Verified.**
+- `./gradlew build`: BUILD SUCCESSFUL, 107 tasks (2m36s), lint and all four gates passed.
+- Emulator: "Boot completed in 20411 ms" (no "requires neon" error this time, when run with the
+  sandbox off). `adb install -r`: Success.
+- `adb shell am start -W -n com.senseix21.muminsday/.MainActivity`: Status ok, LaunchState COLD,
+  TotalTime 334 ms; `dumpsys activity` showed it as `topResumedActivity`; logcat had no
+  AndroidRuntime or FATAL lines for the package.
+
+**Not done / follow-up.**
+- `git pull` was blocked by the sandbox (github.com); the clone was already at `cd502e7`.
+- `adb shell monkey -p com.senseix21.muminsday -c android.intent.category.LAUNCHER 1` did not
+  bring the app forward, though `resolve-activity` finds `.MainActivity`. The manifest filter
+  is correct (`MAIN` + `LAUNCHER`, read in `AndroidManifest.xml`), so this is probably a
+  `monkey` quirk. UNKNOWN; a launch from the home screen by hand would settle it.
+- No screenshot was kept. The store, alarm path and health checks are next (`PLAN.md`, phase 3).
+
+## 2026-11-27 01:02 +0600 · Phase 3: store and alarm path
+
+**Done** (written by subagents, each result re-run by me).
+- Android docs read for G6, G7, ADR-4 (recorded in `GAPS.md`, `03-architecture.md`).
+- `store/`: settings (SharedPreferences), SQLite `alarm_log` and `deed_day`, numbered migrations, 30-day trim.
+- `alarm/`: `apply(plan)`, system-event and alarm receivers, delivery with the late rule, `mediaPlayback` service (Stop action, one playback), notifications, health facts, Test Adhan, generated test tone; debug-only receiver for adb; `tests/inst/run.sh`.
+- Gaps G26 to G31 opened from what the alarm path exposed.
+
+**Verified.**
+- `./gradlew build --rerun-tasks`: green (lint warnings-as-errors, T-BUILD-1…3, content gate). Release manifest: 9 permissions, no `DebugReceiver`.
+- Unit tests in `:app`: 9 `TriggerTest`, 4 `AlarmLogTest`, 7 `MigrationsTest`, 7 `SettingsTest`, 0 failures.
+- `bash tests/inst/run.sh` on emulator `streambert` (API 36), run by me: T-INST-1, 2 (31 s after boot), 3, 4, 5, 7, 8, 9, 10 PASS. A pending alarm survived `adb install -r`. Both `setAlarmClock` and `setExactAndAllowWhileIdle` started the `mediaPlayback` service (G7). With `POST_NOTIFICATIONS` revoked the service still started and an alarm-usage AudioTrack was playing per `dumpsys audio`.
+
+**Not done / follow-up.**
+- T-INST-6 NOT RUN (needs API 31 or 32). Audio never heard: the emulator is headless, so alarm-to-audio latency (target 3 s) and the planner time (50 ms) are unmeasured. `Database`, `SettingsStore`, `DeedDays` never exercised through app code on a device.
+- No T-BUILD-5 (Bengali/English completeness) yet; no Bengali exists. Six English placeholder strings are marked for native review.
+- Decisions for the founder: G26, G30, test-only dependencies (`kotlin("test-junit")` is outside the T-BUILD-3 scan).
+- Nothing committed.
+
+## 2026-11-27 13:16 +0600 · Phase 4: districts, l10n, strings gate, screens
+
+**Done** (subagents; every result re-run by me).
+- ADR-11: platform Views, no new dependency (closes G25). Districts model, validator and gate; `l10n` time/date/plural/isolates in `:core`; T-BUILD-5 string gate; `app/l10n-review.txt`.
+- Screens: onboarding, district picker, Home, Settings, Reminder health, Licences, brand steps, entitlements, silent-mode setting, Stop button, backup rules (G26, G27, G31 closed; G33, G34 opened). Per-brand facts recorded as G32.
+
+**Verified.**
+- `./gradlew build --rerun-tasks`: green; string gate 112 keys; 124 core, 45 app, 12 gate tests, 0 failures. Permission gate 9, no INTERNET; dependency gate 6.
+- Emulator (API 36): I installed the build, opened Home and looked at a screenshot: Bengali digits and day-part words, two health panels with fix buttons, countdown. `tests/inst/ui.sh`: T-UNIT-9, 48 dp targets, labels PASS. The subagent also saw first run in airplane mode, language switch, 200 % font on four screens, Stop button, offset and Asr changes.
+
+**Not done / follow-up.**
+- T-UI-3 not run (no Arabic text on a screen); TalkBack unchecked; brand steps, backup and restore, the report draft text, exact-alarm grant never seen; nothing on a phone.
+- Dhuhr at 11:48 shows the day-part "সকাল" (morning): the hour boundaries are Claude's draft; the native speaker decides.
+- Real districts (Q4), Bengali review (G9), support email (G15), spec wording on default language (INV-L1 says English fallback; Bengali is the default `values/`).
+- Nothing committed.
+
+## 2026-11-27 13:43 +0600 · Phase 5: deed card and database split
+
+**Done** (subagent; re-run by me). G34: `alarm-log.db` and `deed-days.db` apart, backup rules include only the deed file. Packaging of `deeds.json`, `checkDebugDeeds` on 30 fake records, `loadDeeds` through `checkContent`, `DeedActivity` (card, done, swap, week dots), Bengali drafts (123 keys unreviewed). Nudge not built (G35).
+
+**Verified.** `./gradlew build --rerun-tasks` green: 124 core, 52 app, 12 gate tests, 0 failures; string gate 123 keys; permission gate 9. On the emulator I ran `tests/inst/run.sh` (T-INST-1, 2 at 44 s, 3, 4, 5, 7, 8, 9, 10 PASS; 6 NOT RUN) and `tests/inst/deed.sh` (text, dots, swap, restart, done, quiet done, 200 % font, no Latin digit, 48 dp, labels: PASS).
+
+**Not done.** Rejected and release-without-file paths not run on a device; English card not seen; backup and restore not run; `loadDeeds` has no JVM test; G36, G37 open; Bengali book names বুখারি and মুসলিম are Claude drafts. Nothing committed.
+
+## 2026-11-27 14:05 +0600 · Phase 6: Qibla
+
+**Done** (subagent; re-run by me). `:core` `CompassState`, `Degrees`, `MicroTesla`, circular heading filter, 16 new tests; `sensors/` (rotation vector with fallback, platform declination); `QiblaActivity` and plain `NeedleView`; Home button; 26 Bengali drafts (152 keys, all unreviewed). New AVD `streambert_nomag`.
+
+**Verified.** `./gradlew build --rerun-tasks` green: 140 core, 52 app, 12 gate tests, 0 failures; string gate 152 keys. Emulator: `qibla.sh field` T-INST-12 trusted, strong, weak, recover PASS; `qibla.sh nomag` on `streambert_nomag` T-INST-13 PASS; `ui.sh` checks PASS on the Qibla screen; `deed.sh` still 15 PASS, 0 FAIL. I looked at the 200 microtesla screenshot: grey outline needle, warning, calibration prompt. Declination -0.25 to -0.87 degrees across Bangladesh (agent's measurement, not re-run).
+
+**Not done.** Low accuracy cannot be injected on an emulator; M-3 NOT RUN; rotation, tilt limit, filter feel and the figure-of-eight prompt unproven on hardware. G38 to G40 opened. Nothing committed.
+
+## 2026-11-27 14:14 +0600 · Phase 7 and 8, no-phone parts
+
+**Done** (subagent; numbers re-checked by me where marked). `context/spec/05-licences.md`, `context/spec/06-release-drafts.md`, `BudgetTest` in `:core`. R8 tried and reverted (G45). `build.yml` unchanged.
+
+**Verified.** `./gradlew build --rerun-tasks` green: 142 core, 52 app, 12 gate tests, 0 failures. I measured: release APK 1,034,164 bytes (`ls -l`). Agent measured, not re-run: cold start median 2600 ms (10 runs, emulator, debug), PSS 42,627 KB, year of times 1.21 ms, one plan 0.03 ms, release gate failing with `-PdeedsRequired=true -PdistrictsRequired=true` as intended. I confirmed the backup contradiction (`allowBackup="true"` in the manifest).
+
+**Not done.** Everything on phones (M-1 to M-4, 2 GB memory, battery, font rendering); legal conclusions; Bengali privacy text; Play Console forms; a CI run of the working tree. Gaps G41 to G46 opened. Nothing committed.
+
+## 2026-11-27 22:10 +0600 · Hardening approved by the founder: permissions, LGPL text, desugaring, R8
+
+**Done** (subagent after a temporary API error; re-run by me). ADR-12 to ADR-15. Removed `ACCESS_COARSE_LOCATION` and `VIBRATE`; four licence texts staged into `assets/licences/` and shown on the Licences screen; `coreLibraryDesugaring` removed; R8 and resource shrinking on for release. Backup kept (G41). Founder answers came through the question dialog: commit and push to a branch, backup kept, remove both permissions, all three hardening changes.
+
+**Verified.** `./gradlew build --rerun-tasks` green: permission gate 7, dependency gate 4, string gate 152, 142 core, 52 app, 12 gate tests, 0 failures. Release APK 1,055,071 bytes; `unzip -l` shows the four licence files; `aapt2 dump permissions` shows 7. On the emulator: `run.sh` T-INST-1, 2, 3, 4, 5, 7, 8, 9, 10 PASS (6 NOT RUN), `deed.sh` 15 PASS 0 FAIL, `ui.sh` PASS, `qibla.sh field` 7 PASS 0 FAIL. Agent-reported, not re-run: the minified release copy opened onboarding, Home, Settings, Qibla, deed card, Reminder health and Licences with no FATAL in logcat.
+
+**Not done.** Adhan not played from a minified build; no API 26 device; no real phone. G47: an ANR dialog made a Qibla run fail once. Apache notices for Kotlin libraries not shown. Lawyer's view on LGPL 4(b) open (Q6).
