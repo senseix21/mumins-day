@@ -351,6 +351,22 @@ has no declared outputs, so it runs on every build; that is intended for a gate.
 - G25 opened: the real transitive dependency list, and what Compose will do to it.
 - CI has not built the Android module yet; result follows the push.
 
+## 2026-11-26 23:58 +0600 · Mac attached; handoff written
+
+**Did.**
+- The founder shared `~/dev` on `ABUs-MacBook-Pro-2` and confirmed trust; the folder is
+  attached to this session. Wrote `context/HANDOFF.md` at the founder's request.
+
+**Verified.** On the Mac: `~/dev/mumins-day` is a clone of this repository at `cd502e7`, clean.
+SDK at `~/Library/Android/sdk` with platform 36 and build tools 35, 36; AVD `streambert`
+(Pixel 8, API 36, arm64). No Java on the default path; Homebrew `openjdk@21` present.
+Starting `adb` failed ("could not install smartsocket listener: Operation not permitted") and
+the emulator exited ("Incompatible processor… requires neon"): Claude Code's sandbox on the
+Mac. Nothing was changed on the Mac.
+
+**Not done / follow-up.** The APK has still never been installed. Needs the sandbox off for
+`~/dev`, or the founder running the steps in `HANDOFF.md`.
+
 ## 2026-11-27 00:08 +0600 · First run on the Mac emulator
 
 **Done.**
