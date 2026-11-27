@@ -21,13 +21,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <!-- Keep the phone awake while the Adhan plays. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- Vibrate if chosen. -->
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- Find the district and the Qibla. Optional: a district can be picked by hand. -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/full_backup_content"
         android:icon="@drawable/ic_placeholder"
@@ -43,6 +39,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.OnboardingActivity" android:exported="false" />
+        <activity android:name=".ui.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.DistrictActivity" android:exported="false" />
+        <activity android:name=".ui.ReminderHealthActivity" android:exported="false" />
+        <activity android:name=".ui.LicencesActivity" android:exported="false" />
+        <activity android:name=".ui.BrandStepsActivity" android:exported="false" />
+        <activity android:name=".ui.DeedActivity" android:exported="false" />
+        <activity android:name=".ui.QiblaActivity" android:exported="false" />
+
+        <!--
+            Not exported: only the system (protected broadcasts) and the app itself reach these. LOCKED_BOOT_COMPLETED is
+            not listed on purpose: reminders after reboot but before first unlock are not promised (F1 #10).
+        -->
+        <receiver
+            android:name=".alarm.SystemEventReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false" />
+
+        <service
+            android:name=".alarm.PlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
     </application>
 

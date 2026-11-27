@@ -1,5 +1,7 @@
 # Handoff
 
+> **Note, 2026-11-27 22:43 +0600:** this page was written on 2026-11-26 and describes the project before phases 3 to 8 were built. `STATE.md` is newer and wins where they differ (for example: 7 permissions, not 9; 4 libraries; the app now runs on the Mac emulator; screens, alarm path, deed card and Qibla exist on an emulator). The decisions and the list of what only the founder can unblock below still hold.
+
 Written 2026-11-26 for whoever picks this up next: a person, or Claude Code running on the
 founder's Mac. Read this page first, then `CLAUDE.md`, then `context/STATE.md`.
 

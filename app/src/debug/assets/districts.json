@@ -1,0 +1,7 @@
+{
+  "districts": [
+    { "id": "test-1", "name_bn": "TEST DISTRICT 1 BN", "name_en": "TEST DISTRICT 1", "latitude": 23.5, "longitude": 90.0, "elevation_m": 10 },
+    { "id": "test-2", "name_bn": "TEST DISTRICT 2 BN", "name_en": "TEST DISTRICT 2", "latitude": 24.5, "longitude": 91.0, "elevation_m": 20 },
+    { "id": "test-3", "name_bn": "TEST DISTRICT 3 BN", "name_en": "TEST DISTRICT 3", "latitude": 22.5, "longitude": 89.5, "elevation_m": 5 }
+  ]
+}

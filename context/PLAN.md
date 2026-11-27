@@ -183,47 +183,49 @@ clock changes.
 
 Before code
 - [x] Fetched and recorded Android's rules: foreground-service start from an exact alarm, `mediaPlayback` type, notification-denied behaviour (in `GAPS.md` G6, G7). 2026-11-26
-- [ ] Still to fetch: whether the user can stop a foreground service from the Task Manager (the "handle-user-stopping" page), and direct boot [G6, F1#10].
-- [ ] Decide how the user stops the Adhan when notifications are blocked [G6].
+- [ ] Still to fetch: direct boot [G6, F1#10]. Done 2026-11-27: the user can stop a foreground service from the Task Manager on Android 13+ (G6).
+- [x] Decided (ASSUMED, confirm on a device): the service always posts its notification with a Stop action; opening the app also stops it; on Android 13+ the Task Manager stops it too [G6, G31]. 2026-11-27
 - [x] `SCHEDULE_EXACT_ALARM` carries `maxSdkVersion=32`; Android 13+ relies on `USE_EXACT_ALARM` [ADR-4]. 2026-11-26
 - [ ] The grant flow for Android 12 (API 31, 32), where the user must allow exact alarms [ADR-4, F1#3].
 
 Build
 - [x] `:app` module: application id, minSdk 26, target and compile 37, one build, no flavours, desugaring for `java.time`; lint with warnings as errors; a placeholder screen and icon. 2026-11-26
-- [x] Manifest with exactly the nine allowlisted permissions, no `INTERNET`; confirmed inside the built APK with `aapt2`. 2026-11-26
+- [x] The debug APK installs and opens on the `streambert` emulator (Pixel 8, API 36, arm64): `MainActivity` resumed, cold start 334 ms, no crash in logcat. First time the app has run. 2026-11-27
+- [x] Manifest with exactly the allowlisted permissions, no `INTERNET`; confirmed inside the built APK with `aapt2`. Nine on 2026-11-26; seven since 2026-11-27 (ADR-12).
 - [x] T-BUILD-1: fail on `INTERNET` in the merged manifest [INV-P1]; seen failing. 2026-11-26
 - [x] T-BUILD-2: fail if merged permissions differ from `app/allowlist/permissions.txt`, either way, including `maxSdkVersion` [INV-P3]; seen failing three ways. 2026-11-26
 - [x] T-BUILD-3: fail if packaged libraries differ from `app/allowlist/dependencies.txt`, transitive ones included [INV-P4]; seen failing. 2026-11-26
 - [ ] Backup is switched off for now (nothing is stored). Phase 4 writes the real rules.
-- [ ] Before phase 4: Compose and Material 3 bring dozens of transitive AndroidX libraries, and `androidx.core` adds a permission of its own to the merged manifest. Both allowlists will need an ADR-backed update then [G25].
+- [x] Closed 2026-11-27 by ADR-11 (platform Views, no new dependency). Was: Compose and Material 3 bring dozens of transitive AndroidX libraries, and `androidx.core` adds a permission of its own to the merged manifest. Both allowlists will need an ADR-backed update then [G25].
 
 Store
-- [ ] Settings in one SharedPreferences file with versioned keys, parsed once into typed values [ADR-5].
-- [ ] SQLite via the platform helper: `alarm_log`, `deed_done`; numbered migrations and a migration test.
-- [ ] Alarm log trimmed to 30 days.
+- [x] Settings in one SharedPreferences file with versioned keys, parsed once into typed values [ADR-5]. JVM tests pass (7); the Android `SettingsStore` shell has not run on a device. 2026-11-27
+- [ ] SQLite via the platform helper: `alarm_log`, `deed_day`; numbered migrations and a migration test. Written; JVM tests check the migration list (7) and log logic (4) and pass 2026-11-27; the SQL ran only as raw `sqlite3` on the emulator, never through the app. Tick when an on-device run opens and upgrades a real database.
+- [x] Alarm log trimmed to 30 days: `trim(now)` and pure `logCutoff(now)`, unit-tested. 2026-11-27
 
 Alarm path
-- [ ] `apply(plan)`: cancel all 64 ids, register the plan [INV-S4]. Adhan via `setAlarmClock`; silent and pre-reminder via `setExactAndAllowWhileIdle`.
-- [ ] Replan on: boot, time set, zone changed, package replaced, exact-alarm permission changed, app foreground, settings change, alarm delivered, the replan alarm [INV-S3, F1#9, 10, 11].
-- [ ] Delivery: late rule, silent-mode choice, phone-call check, then play or post silently [F1#15, 16, 17].
-- [ ] Playback as a `mediaPlayback` foreground service; wake lock for the recording plus a margin; a Stop control.
-- [ ] One place builds notifications; channels defined once.
-- [ ] Log planned and delivered instants and the outcome [INV-S8]. On replan, delete log rows for alarms that were planned but not yet due, or a reminder the user switched off will later read as missed.
-- [ ] "Test Adhan": a real alarm 30 seconds ahead through the same path.
-- [ ] Health checks: exact alarms, notifications, battery optimisation, late or missed alarms, manufacturer [INV-S6, F1#2, 3, 12].
-- [ ] A test tone bundled until the real recording is licensed. (real audio blocked: Q5)
+- [x] `apply(plan)` (emulator only): cancel all 64 ids, register the plan [INV-S4]. Adhan via `setAlarmClock`; silent and pre-reminder via `setExactAndAllowWhileIdle`.
+- [x] Replan on (emulator only): boot, time set, zone changed, package replaced, exact-alarm permission changed, app foreground, settings change, alarm delivered, the replan alarm [INV-S3, F1#9, 10, 11].
+- [x] Delivery (emulator only): late rule, silent-mode choice, phone-call check, then play or post silently [F1#15, 16, 17].
+- [x] Playback (emulator only) as a `mediaPlayback` foreground service; wake lock for the recording plus a margin; a Stop control.
+- [x] One place builds notifications; channels defined once (`alarm/Notifications.kt`).
+- [x] Log planned and delivered instants and the outcome [INV-S8]. On replan, delete log rows for alarms that were planned but not yet due, or a reminder the user switched off will later read as missed.
+- [x] "Test Adhan": a real alarm 30 seconds ahead through the same path (adb-triggered in debug; no screen yet).
+- [x] Health checks (gather facts, call `assessHealth`; no screen, not run on a phone): exact alarms, notifications, battery optimisation, late or missed alarms, manufacturer [INV-S6, F1#2, 3, 12].
+- [x] A test tone (440 Hz sine generated in code, no third-party audio) until the real recording is licensed. (real audio blocked: Q5)
 
 Instrumented tests
-- [ ] T-INST-1 window present in `dumpsys alarm` [INV-S1].
-- [ ] T-INST-2 reboot · T-INST-3 zone · T-INST-4 clock · T-INST-5 update · T-INST-6 permission regrant [INV-S3].
-- [ ] T-INST-7 schedule 100 times, set unchanged [INV-S4].
-- [ ] T-INST-8 replan during playback, one playback [INV-S5].
-- [ ] T-INST-9 late rule [INV-S7].
-- [ ] T-INST-10 log rows [INV-S8].
+- [x] T-INST-1 window present in `dumpsys alarm` [INV-S1]. Emulator API 36 2026-11-27
+- [x] T-INST-2 reboot, T-INST-3 zone, T-INST-4 clock, T-INST-5 update pass on the emulator 2026-11-27.
+- [ ] T-INST-6 permission regrant [INV-S3]. NOT RUN: needs an API 31 or 32 device (on API 36 `USE_EXACT_ALARM` keeps the permission true).
+- [x] T-INST-7 schedule 100 times, set unchanged [INV-S4]. 2026-11-27
+- [x] T-INST-8 replan during playback, one playback [INV-S5]. 2026-11-27
+- [x] T-INST-9 late rule [INV-S7]. 2026-11-27
+- [x] T-INST-10 log rows [INV-S8]. 2026-11-27
 
 Measure and decide
 - [ ] Alarm-to-audio latency (target 3 s); planner run (target 50 ms).
-- [ ] Does a pending alarm survive `adb install -r`? [audit §3 unknown]
+- [x] Does a pending alarm survive `adb install -r`? Yes, on the emulator (API 36) 2026-11-27; a phone is still to check.
 - [ ] Is before-first-unlock support worth it? Default no [F1#10].
 - [ ] Does the alarm-clock icon bother users? Fallback is exact-while-idle for all kinds.
 - [ ] Port note: upstream's Samsung dedupe stays out unless D2 shows it is needed [S5].
@@ -238,33 +240,34 @@ digits, turn the Adhan on, be told plainly about anything that could stop it.
 **Needs.** District data (Q4), native speaker (G9), UI direction (G12).
 
 Content and data
-- [ ] `content/districts.json`, validated at build into typed values; fixed elevation per district [ADR-8, F2#3].
-- [ ] Bengali strings in `values/`, English in `values-en/`; T-BUILD-5 fails on a missing key [INV-L1].
-- [ ] `l10n`: time text (12-hour with day-part words, 24-hour option), Gregorian date in Bengali; wording from the native speaker.
-- [ ] Plural resources for every counted phrase.
-- [ ] Arabic runs wrapped in directional isolates [INV-L3].
+- [ ] `content/districts.json`, validated at build into typed values; fixed elevation per district [ADR-8, F2#3]. Parser, validator (116 core tests), build gate `checkDistricts` and debug fixture (3 fake records) done 2026-11-27; the real list is blocked on Q4. `loadDistricts` has not run on a device.
+- [x] T-BUILD-5 (`:app:checkStrings`) fails on a missing key either way, an empty English value, or a Latin digit in Bengali; seen failing eight ways 2026-11-27.
+- [ ] Bengali strings reviewed by a native speaker: 16 of 16 drafted by Claude are listed unreviewed in `app/l10n-review.txt` (blocked: G9).
+- [ ] `l10n`: time text (12-hour with day-part words, 24-hour option), Gregorian date in Bengali; wording from the native speaker. Pure code and property tests done 2026-11-27 (words come in as data); the day-part hour boundaries and all words need the native speaker.
+- [ ] Plural resources for every counted phrase. Selection logic done; phrases come with the screens and the native speaker.
+- [x] Arabic runs wrapped in directional isolates [INV-L3]: `isolateArabicRuns` in `:core`, property-tested 2026-11-27. Screen check T-UI-3 not run.
 
-Screens (Compose, Material 3, no navigation library)
-- [ ] Onboarding: language, district (list or coarse location), reminder choices, silent-mode choice, per-brand steps, the force-stop sentence [F1#18].
-- [ ] Home: five times, next-prayer countdown, Sehri end and Iftar largest in Ramadan [F2#5, 6], health warnings in words [INV-S6].
-- [ ] Settings: per-prayer mode and pre-reminder, per-prayer offset ±30 framed as "matches my mosque" [F2#1], Asr convention under Advanced, language, "Send a report".
-- [ ] Reminder health: seven days of planned and actual times [INV-S8].
-- [ ] Open-source licences screen, with the engine's LGPL notices.
-- [ ] "—" for a time that cannot be computed [F2#4].
+Screens (platform Views, no Compose, no Material, no AndroidX, no navigation library) [ADR-11]
+- [x] Onboarding (platform Views; emulator, airplane mode, Bengali; location left out by choice): language, district (list or coarse location), reminder choices, silent-mode choice, per-brand steps, the force-stop sentence [F1#18].
+- [ ] Home: five times, countdown and health warnings in words are built and seen on the emulator 2026-11-27 [INV-S6]. Still open: Sehri end and Iftar largest in Ramadan [F2#5, 6] needs a Hijri calendar, which core does not have (new gap G33).
+- [x] Settings (seen on emulator 2026-11-27; offset and Asr convention changed times as expected): per-prayer mode and pre-reminder, per-prayer offset ±30 framed as "matches my mosque" [F2#1], Asr convention under Advanced, language, "Send a report".
+- [x] Reminder health 2026-11-27 (emulator): seven days of planned and actual times [INV-S8].
+- [ ] Open-source licences screen built 2026-11-27; wording and the repo URL shown need the founder's confirmation.
+- [x] "—" for a time that cannot be computed [F2#4]: `times_unavailable`, JVM-tested; not seen on a device 2026-11-27.
 
 Behaviour
-- [ ] Location read only while a screen needs it; coarse; only the district or rounded coordinates stored [INV-P2]; T-INST-11.
+- [ ] Location: NOT built (district by hand only); the three location items remain. Location read only while a screen needs it; coarse; only the district or rounded coordinates stored [INV-P2]; T-INST-11.
 - [ ] A fix outside Bangladesh or over 50 km away asks before changing; a new nearest district is offered once, never switched silently [F1#6, 7].
 - [ ] Per-brand guidance: fetch each brand's page, write steps, deep-link where a settings screen exists. Xiaomi first.
-- [ ] "Send a report": plain-text email draft with versions, model, health results, 7-day log; no identifiers [ADR-7].
-- [ ] Backup rules: settings and deed completions in, alarm log out; health check after restore [F1#12].
-- [ ] `entitlements` interface that returns "everything".
+- [ ] "Send a report" (draft intent and `ReportTest` done 2026-11-27; recipient empty until G15; the draft text itself not seen): plain-text email draft with versions, model, health results, 7-day log; no identifiers [ADR-7].
+- [ ] Backup rules written, lint-clean, never run (settings in; alarm log, database and device flag out; deed completions share the alarm log's database, so they are out too: G34). Original item: settings and deed completions in, alarm log out; health check after restore [F1#12].
+- [x] `entitlements` interface that returns "everything" (`core/.../entitlements`). 2026-11-27
 
 Tests
-- [ ] T-UI-1 each Degraded reason shows its message and fix.
-- [ ] T-UNIT-9 (screen part): no Latin digit in any Bengali screenshot [INV-L2].
-- [ ] T-UI-3 Arabic inside Bengali; T-UI-4 nothing clips at 200 % font scale [INV-L3, INV-L4].
-- [ ] TalkBack labels in Bengali; touch targets at least 48 dp.
+- [ ] T-UI-1 each Degraded reason shows its message and fix. JVM half passes; on the emulator 2 of 5 reasons seen 2026-11-27.
+- [x] T-UNIT-9 (screen part): no Latin digit in text or content-desc on Home, Settings, onboarding in Bengali (`tests/inst/ui.sh`) 2026-11-27.
+- [ ] T-UI-3 Arabic inside Bengali NOT RUN (no Arabic on any screen yet). [x] T-UI-4 at 200 % font scale: Home, Reminder health, Licences, Settings seen not clipping 2026-11-27 [INV-L3, INV-L4]; Bengali Licences/Health/Settings at 200 % not seen.
+- [ ] TalkBack labels in Bengali not tested. Touch targets >= 48 dp: passed on Home and Settings 2026-11-27 (`ui.sh`).
 
 ## Phase 5 · One good deed a day (F4)
 
@@ -290,12 +293,12 @@ Pure, in `:core` (can start now)
 
 Build and app
 - [x] T-BUILD-4: `tools/content-gate` parses `content/deeds.json` and runs the core gate as part of `./gradlew build`; fails on a draft, a missing field, reviewer or date, or fewer than 30 approved; lists every problem [INV-C1, INV-C3, ADR-10]. 2026-11-26
-- [ ] When the app module packages the deeds file, set `deedsRequired=true` so a missing file fails the build.
-- [ ] On the phone: parse the same file with the platform parser into `RawDeed` and call `checkContent`; refuse to show a card if it is rejected.
+- [ ] (packaging done 2026-11-27: release stages `content/deeds.json` when present and prints a notice when missing; flag stays off until the file exists) When the app module packages the deeds file, set `deedsRequired=true` so a missing file fails the build.
+- [x] On the phone (2026-11-27, debug build on the emulator; Rejected path and release/Unavailable path not run on a device): parse the same file with the platform parser into `RawDeed` and call `checkContent`; refuse to show a card if it is rejected.
 - [ ] `content/deeds.json` and the reviewer's signed note, both from the reviewer. (blocked: G9)
-- [ ] Card: text, source book and number, Bengali digits; one tap marks done; quiet done state.
-- [ ] Week view: seven dots, no numbers [INV-C4].
-- [ ] Optional daily nudge, off by default, at most one a day, built by the one notification builder.
+- [x] Card: text, source book and number, Bengali digits; one tap marks done; quiet done state. Seen on the emulator with 30 fake records, 2026-11-27 (`tests/inst/deed.sh`, T-UI-2 screen part PASS, 200 % font seen).
+- [x] Week view: seven dots, no numbers [INV-C4]; 3 of 7 filled after seeding, seen 2026-11-27.
+- [ ] NOT BUILT 2026-11-27 (needs a founder decision, new gap G35): optional daily nudge, off by default, at most one a day, built by the one notification builder.
 - [ ] `deed_day` table keyed by local date, one row per card shown; moving the clock back does not undo a day [F4#4].
 - [ ] Retiring a deed is a content change only [F4#5].
 - [ ] T-UI-2: tone review of every string and screen by the reviewer and the native speaker.
@@ -314,15 +317,15 @@ Pure, in `:core` (can start now)
 - [ ] Re-check the spread against real district extents once the district table exists; the largest districts are wider than 50 km. (blocked: Q4)
 - [x] Compass point as a structure (`Exactly(West)`, `Between(West, 8, North)`); Dhaka gives the spec's own "8° north of west". 2026-11-26
 - [x] `magneticBearing(trueBearing, declinationEast)`, so the app only has to supply the declination [F3#6]. 2026-11-26
-- [ ] Bengali wording for compass points, from the native speaker. (blocked: G9)
+- [ ] Bengali wording for compass points: 26 Claude drafts (`qibla_*`, `cardinal_*`, locative forms) listed unreviewed; the native speaker must review. (blocked: G9)
 
 App
-- [ ] Declination from the platform's geomagnetic model, offline; measure the size of the correction in Bangladesh [F3#6].
-- [ ] Sensor fusion and low-pass filter, ported from upstream with credit.
-- [ ] Accuracy below high: needle greyed, warning, calibration prompt [INV-Q2]; T-INST-12.
-- [ ] Field strength outside the plausible range: interference warning; thresholds from the sensor documentation [F3#2].
-- [ ] No magnetometer: number and compass point only, no needle [INV-Q3]; T-INST-13.
-- [ ] "Lay the phone flat" prompt [F3#5].
+- [x] Declination from the platform's `GeomagneticField`, offline; measured on the emulator 2026-11-27: -0.25 to -0.87 degrees across 11 Bangladesh points (-0.61 at Dhaka) [F3#6]. Phone value not measured.
+- [x] Rotation-vector heading with accelerometer+magnetometer fallback, and a circular low-pass filter written new in `:core` (not ported from upstream, so no NOTICE entry), property-tested, 2026-11-27. Behaviour on real hardware unmeasured; the 200 ms time constant is a (target).
+- [ ] Accuracy below high: needle greyed, warning, calibration prompt [INV-Q2]. JVM-tested for all lower levels; T-INST-12 passes on the emulator for field strength only (the emulator always reports high accuracy), so the accuracy half is NOT RUN on a device.
+- [x] Field strength outside 30 to 60 microtesla (the platform's own `MAGNETIC_FIELD_EARTH_MIN/MAX`): interference warning, seen at 200 and 5 microtesla on the emulator 2026-11-27 [F3#2]. Treating them as hard limits is our choice (target).
+- [x] No magnetometer: number and compass point only, no needle [INV-Q3]; T-INST-13 PASS on the AVD `streambert_nomag` (no magnetometer), 2026-11-27.
+- [x] "Lay the phone flat" prompt [F3#5]: shown above 25 degrees tilt (our number, target); seen upright on the emulator, untested on a phone.
 
 ## Phase 7 · Proof on real phones
 
@@ -336,7 +339,7 @@ App
 - [ ] M-3 Qibla at a surveyed point; magnet and laptop tests.
 - [ ] M-4 first run offline on every device.
 - [ ] Bengali conjuncts and Arabic diacritics render on every phone; bundle a font only if one fails.
-- [ ] Measured: download size (target 15 MB), cold start, memory on 2 GB, battery under 1 % a day, a year of times under 100 ms.
+- [ ] Measured 2026-11-27 (emulator and JVM only, never a 2 GB phone): release APK 1,055,071 bytes after R8 and the bundled licence texts (target 15 MB; no Adhan recording yet; 1,034,164 before); cold start median 2600 ms (debug, emulator, no target); PSS 42.6 MB; a year of times 1.21 ms and one plan 0.03 ms on an Apple M5 Pro (targets 100 ms and 50 ms). Still to measure on phones: cold start, memory on 2 GB, battery under 1 % a day.
 - [ ] Every miss filed with its health log and fixed or documented.
 
 ## Phase 8 · Release
@@ -344,8 +347,8 @@ App
 **Outcome.** On Google Play, staged.
 
 Licences
-- [ ] Dependency report generated and every licence read; allowlist matches.
-- [ ] Engine notices in the app and repository; modified engine source public.
+- [ ] Dependency report drafted in `context/spec/05-licences.md` 2026-11-27 (licences read from POMs, not licence texts); lawyer review open (Q6).
+- [ ] Engine notices in the app (LGPL, GPL-3.0, NOTICE and Apache texts ship as assets and show on the Licences screen, 2026-11-27, ADR-13) and repository; modified engine source public. Lawyer's reading of LGPL 4(b) open (Q6); Apache notices for Kotlin and kotlinx-datetime not yet shown.
 - [ ] `NOTICE` credits upstream for ported code.
 - [ ] Adhan recording licence in writing (Q5). District data licence recorded (Q4).
 
@@ -354,8 +357,8 @@ Content
 - [ ] Native-speaker review and tone review complete.
 
 Privacy and policy
-- [ ] Privacy page in Bengali and English.
-- [ ] Play Data safety form; exact-alarm and foreground-service declarations [ADR-4].
+- [ ] Privacy page: English draft in `context/spec/06-release-drafts.md` 2026-11-27 with placeholders for developer name, support email, URL, date; Bengali must come from the native speaker.
+- [ ] Play Data safety form; exact-alarm and foreground-service declarations [ADR-4]: ASSUMED drafts in `06-release-drafts.md` 2026-11-27; Play Console forms never read.
 - [ ] Side-by-side review against upstream: clearly a different product.
 
 Testing

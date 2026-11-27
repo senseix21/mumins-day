@@ -184,8 +184,6 @@ stateDiagram-v2
 | `POST_NOTIFICATIONS` | Show the prayer notification |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Play the Adhan |
 | `WAKE_LOCK` | Keep the phone awake while the Adhan plays |
-| `VIBRATE` | Vibrate if chosen |
-| `ACCESS_COARSE_LOCATION` | Find your district and Qibla. Optional; a district can be picked by hand |
 
 Removed relative to the base (KNOWN list, audit §3): `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_FINE_LOCATION`, `DISABLE_KEYGUARD`, `ACCESS_NOTIFICATION_POLICY`, `FOREGROUND_SERVICE_SPECIAL_USE`, `SET_ALARM`, `INSTALL_SHORTCUT`.
 
@@ -193,7 +191,9 @@ Removed relative to the base (KNOWN list, audit §3): `INTERNET`, `ACCESS_NETWOR
 
 **Crash reporting.** None automatic. A "Send a report" button in Settings opens the user's email app with a plain-text draft they can read: app version, Android version, manufacturer and model, health-check results, the 7-day alarm log. No identifiers. The user chooses whether to send. This is the only way information leaves the phone, and it does not need the `INTERNET` permission.
 
-**Location.** Read on demand from the platform location service at coarse precision; never in the background; stored only as a district id or rounded coordinates.
+**Location.** The app does not read the phone's location and declares no location permission (ADR-12). The user picks a district by hand; what is stored is the district id and its centre's coordinates. Adding location back needs an ADR and the founder's yes (INV-P3).
+
+**Vibration.** Not used and not declared (ADR-12). Adding `VIBRATE` back needs an ADR.
 
 ## Dependency policy
 
@@ -205,7 +205,6 @@ Default answer is no. Allowlist (INV-P4):
 | `calctimes` engine | LGPL-3.0 (KNOWN) | Prayer time calculation | ADR-2 |
 | `kotlinx-datetime` | Apache-2.0 (ASSUMED) | Required by the engine's API (KNOWN, `calctimes/build.gradle.kts`) | Goes if the engine is replaced |
 | Jetpack Compose + Material 3 + Activity | Apache-2.0 (ASSUMED) | UI | A rewrite in Views; more code, not less |
-| Core library desugaring | (ASSUMED permissive) | `java.time` on older Android, as the base does (KNOWN, `app/build.gradle`) | Raise minSdk |
 | Test only: JUnit, a property-testing library (the base already uses Kotest: KNOWN) | (ASSUMED permissive) | Tests | None shipped |
 
 Sizes: UNKNOWN until built. Verify every license from the generated dependency report before release.
@@ -273,6 +272,7 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 - **Decision.** (a), with the Degraded state and grant flow built regardless, so (b) is a manifest edit away.
 - **Consequences.** Best reliability if accepted. A rejection costs one review cycle.
 - **Reverse.** Remove one manifest line; the grant flow already exists.
+- **Re-read 2026-11-27 (KNOWN, developer.android.com/about/versions/14/changes/schedule-exact-alarms and /develop/background-work/services/alarms).** The pages say an app targeting Android 13+ may declare "either" `SCHEDULE_EXACT_ALARM` or `USE_EXACT_ALARM`. They do not mention `maxSdkVersion` or declaring both, so the pairing stays ASSUMED. `USE_EXACT_ALARM` is "Granted automatically", cannot be revoked, and is "subject to an upcoming Google Play policy". On Android 12 and 12L the flow is: `canScheduleExactAlarms()`, then `ACTION_REQUEST_SCHEDULE_EXACT_ALARM`, then re-check in `onResume`; on `ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED` re-check and replan. Revocation stops the app and cancels its exact alarms. Built in `alarm/AlarmScheduler.kt`; the grant flow itself has not run (no API 31/32 device, T-INST-6).
 - **Built 2026-11-26.** Both are declared; `SCHEDULE_EXACT_ALARM` carries `maxSdkVersion=32`, so Android 13 and later rely on `USE_EXACT_ALARM` alone (ASSUMED to be the recommended pairing; the alarms page read on 2026-11-26 does not state it). The machine-readable allowlists are `app/allowlist/permissions.txt` and `app/allowlist/dependencies.txt`; the tables in this file explain them, the files are what the build checks.
 
 ### ADR-5 · Platform storage only
@@ -324,3 +324,45 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 - **Decision.** (c).
 - **Consequences.** Nothing is downloaded and nothing is added to the app, so the dependency allowlist (INV-P4), which governs what ships, is unchanged. The tool only reads the file's shape (types, unknown keys); every judgement about a record is `checkContent` in `:core`, the same function the app will call. Two parsers will read the same file, Gradle's at build time and the platform's on the phone; a file both accept could in principle be read differently, so the tool refuses anything but plain strings and whole numbers. The task passes with a notice while `content/deeds.json` does not exist; `-PdeedsRequired=true` makes absence a failure, and the app module must set it.
 - **Reverse.** Replace the reader behind `runGate`; the rules do not move.
+
+### ADR-11 · The UI is built with platform Views
+
+- **Date.** 2026-11-27. Founder decision; closes gap G25.
+- **Context.** The dependency allowlist is checked transitively (INV-P4) and the permission allowlist against the merged manifest (INV-P3). Compose and Material 3 would add dozens of transitive AndroidX libraries, and AndroidX core adds a permission of its own to the merged manifest.
+- **Options.** (a) Compose and Material 3, with an ADR accepting the real transitive list. (b) Platform Views (`android.widget`, `android.view`), no Compose, no Material, no AndroidX.
+- **Decision.** (b).
+- **Consequences.** Neither allowlist grows: no new dependency, no new permission. Screens are written as plain Activity and View code with layouts and string resources; there is no navigation library (it was already refused). Bengali text, plurals and directional isolates come from platform resources and `:core`'s `l10n`. The cost is more code per screen and no ready-made components; the app stays small and its supply chain stays as short as it is today. Material components, if ever wanted, need a new ADR and the founder's yes.
+- **Reverse.** Add Compose behind an ADR that accepts the transitive list and the permission it brings, then move screens one at a time.
+
+### ADR-12 · No location and no vibrate permission
+
+- **Date.** 2026-11-27. Founder decision (yes recorded for INV-P3).
+- **Context.** The manifest declared `ACCESS_COARSE_LOCATION` and `VIBRATE`. No code uses either: the district is picked by hand and nothing calls a location or vibration API (KNOWN: `grep -rn -i "location\|vibrat" app/src core/src` finds only comments saying location is not used). A permission the app never uses invites a Play review question (ASSUMED).
+- **Options.** (a) Keep both for a later feature. (b) Remove both now.
+- **Decision.** (b). `app/allowlist/permissions.txt`, the manifest and the permissions table above now list seven permissions (KNOWN: gate output "permission gate: passed, 7 permissions, no INTERNET.", 2026-11-27).
+- **Consequences.** A smaller privacy page and Play surface. ADR-8's "coarse location" is now only the coarse district centre the user picks; the app never asks the platform for a position. The in-app "find my district" idea is gone until a new ADR.
+- **Reverse.** Add the line to the manifest and the allowlist, with an ADR and the founder's yes (INV-P3).
+
+### ADR-13 · The LGPL licence texts ship inside the app
+
+- **Date.** 2026-11-27. Founder decision; closes G43 as far as the build goes (the legal reading stays Q6).
+- **Context.** The engine jar's `META-INF/LICENSE` and `NOTICE.txt` are dropped when the APK is packaged, so the LGPL text was not in the APK (KNOWN: `05-licences.md` finding 1). LGPL-3.0 section 4(b) asks that the GPL and LGPL texts accompany the object code (KNOWN: quoted from `engine/calctimes/LICENSE`).
+- **Decision.** `app/build.gradle.kts` task `stageLicenceTexts` copies, byte for byte, `engine/calctimes/LICENSE`, `LICENSE.GPL-3.0`, `NOTICE.txt` and the root `LICENSE` (Apache-2.0) into `assets/licences/` of every variant. The Licences screen shows them after the existing notices, as plain scrollable text. They are English in both languages and not run through the digit converter (legal text). They are assets, not `strings.xml`, so the string gate is unchanged.
+- **Consequences.** About 54 KB of text added to the APK. The texts cannot drift from the repository files. KNOWN: the LGPL text was seen on the emulator, release build. The Bengali intro line "the full licence texts are in the files named below" still reads correctly; changing Bengali copy needs a native speaker.
+- **Reverse.** Delete the task and the loop in `LicencesActivity`.
+
+### ADR-14 · Core library desugaring removed
+
+- **Date.** 2026-11-27. Founder approved trying it (INV-P4).
+- **Context.** `minSdk` is 26, and `java.time` is in the platform from API 26 (ASSUMED, general knowledge). The desugaring library is GPLv2 with the Classpath Exception (KNOWN, its POM, `05-licences.md`).
+- **Decision.** Removed `coreLibraryDesugaring`, `isCoreLibraryDesugaringEnabled`, the version-catalog entries and the two allowlist lines. Result: `./gradlew build --rerun-tasks` green with Android lint (warnings as errors, which includes the NewApi check) and the dependency gate "passed, 4 libraries" (KNOWN, 2026-11-27). `:core` uses `java.time` and `kotlinx-datetime`; nothing above API 26 was flagged.
+- **Consequences.** The only GPL-family library leaves the app; four libraries remain (kotlin-stdlib, annotations, kotlinx-datetime and its jvm artifact). Whether any `java.time` call behaves differently on an API 26 device than with the library: UNKNOWN, no API 26 device was run; the emulator is newer.
+- **Reverse.** Restore the four items listed above and the two allowlist lines.
+
+### ADR-15 · R8 minification and resource shrinking for release
+
+- **Date.** 2026-11-27. Founder decision.
+- **Context.** Release was unminified. Manifest components are kept by AGP's generated rules; the app uses only platform APIs and `org.json`, which need no rules (ASSUMED, then tested).
+- **Decision.** `release { isMinifyEnabled = true; isShrinkResources = true }`, no proguard file. The release APK stays unsigned in the repo (signing is outside it).
+- **Consequences.** KNOWN (2026-11-27): a copy signed with the debug keystore installed on the `streambert` emulator, launched, showed onboarding, Home, Settings, Qibla, the deed card, Reminder health and Licences with no `FATAL EXCEPTION`; `dumpsys package` listed `MainActivity` and `SystemEventReceiver`, and the dex still names `AlarmReceiver` and `PlaybackService`. For this test the signed copy had the debug district and deed files added, because the release build ships none yet. Not tested: an Adhan playing from a minified build (no audio check), a real phone.
+- **Reverse.** Set both flags to false.

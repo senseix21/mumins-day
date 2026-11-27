@@ -10,7 +10,3 @@ org.jetbrains:annotations
 # Required by the calctimes engine's API (ADR-2). Goes if the engine is replaced.
 org.jetbrains.kotlinx:kotlinx-datetime
 org.jetbrains.kotlinx:kotlinx-datetime-jvm
-
-# java.time on Android 8 and 9.
-com.android.tools:desugar_jdk_libs
-com.android.tools:desugar_jdk_libs_configuration
