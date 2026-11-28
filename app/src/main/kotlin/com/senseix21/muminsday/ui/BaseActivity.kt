@@ -2,7 +2,6 @@ package com.senseix21.muminsday.ui
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import com.senseix21.muminsday.l10n.Language
 import com.senseix21.muminsday.store.Stores
-import java.util.Locale
 
 /**
  * Every screen is an Activity on this base: no navigation library (ADR-11), and the system's own back button works. It
@@ -27,10 +25,7 @@ abstract class BaseActivity : Activity() {
     override fun attachBaseContext(base: Context) {
         val chosen = Stores.settings(base).readApp().language
         language = chosen
-        val configuration = Configuration(base.resources.configuration)
-        // Bengali is the default resource set, so "bn" resolves to values/ and "en" to values-en/.
-        configuration.setLocale(Locale.forLanguageTag(if (chosen == Language.Bengali) "bn" else "en"))
-        super.attachBaseContext(base.createConfigurationContext(configuration))
+        super.attachBaseContext(base.inLanguage(chosen))
     }
 
     override fun onResume() {

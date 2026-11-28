@@ -173,3 +173,8 @@ settings_nudge
 settings_nudge_help
 settings_nudge_on
 settings_nudge_time
+widget_next_label
+widget_five_label
+widget_next_description
+widget_five_description
+widget_degraded

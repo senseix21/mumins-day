@@ -1,6 +1,7 @@
 package com.senseix21.muminsday.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import com.senseix21.muminsday.R
 import com.senseix21.muminsday.bearing.Bearing
 import com.senseix21.muminsday.bearing.Cardinal
@@ -22,6 +23,17 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.Locale
+
+/**
+ * [this] with the user's chosen language on its resources, whatever the phone's language is. Bengali is the default
+ * resource set, so "bn" resolves to values/ and "en" to values-en/. Screens and widgets both read words through this.
+ */
+fun Context.inLanguage(language: Language): Context {
+    val configuration = Configuration(resources.configuration)
+    configuration.setLocale(Locale.forLanguageTag(if (language == Language.Bengali) "bn" else "en"))
+    return createConfigurationContext(configuration)
+}
 
 /** What a time cannot be computed shows as (F2 #4). Not a time, so no digit and nothing to translate. */
 const val NO_TIME: String = "—"

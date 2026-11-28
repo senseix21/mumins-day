@@ -291,4 +291,11 @@
     <string name="settings_nudge_help">আপনার বেছে নেওয়া সময়ে দিনে একবার একটি নীরব বিজ্ঞপ্তি আসবে। না দেখলে আবার আসবে না।</string>
     <string name="settings_nudge_on">স্মরণ চালু</string>
     <string name="settings_nudge_time">সময়: %1$s</string>
+
+    <!-- Home-screen widgets (phase 10). Bengali drafted by Claude, native review pending. -->
+    <string name="widget_next_label">পরবর্তী নামায</string>
+    <string name="widget_five_label">পাঁচ ওয়াক্তের সময়</string>
+    <string name="widget_next_description">পরবর্তী নামাযের সময় এক নজরে।</string>
+    <string name="widget_five_description">আজকের পাঁচ ওয়াক্তের সময়।</string>
+    <string name="widget_degraded">অনুস্মারক নাও বাজতে পারে। অ্যাপ খুলুন।</string>
 </resources>

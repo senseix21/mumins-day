@@ -549,3 +549,11 @@ the plan until fetched.
 **Verified.** `./gradlew build` on `main` before the edit: exit 0, gates passed (64 districts, 7 permissions). The edit is documentation only; no code changed.
 
 **Not done / follow-up.** Navigation and the content-kind generalisation are deferred to phases 10 and 13, where the first user exists; reasons are in the plan lines. INV-P1 and ADR-12 are unchanged until phases 16 and 10 change the manifest.
+
+## 2026-11-28 17:03 +0600 · Phase 10, slice 1: home-screen widgets
+
+**Did.** Two platform widgets (next prayer, five times) with no library. Pure view model in `core/.../widget/WidgetModel.kt` (built on `upcomingSalah` and `PrayerClock.dayTimes`); shell in `app/.../widget/PrayerWidgets.kt`. `replan` now ends in `refreshWidgets`; one extra alarm (request code 1001, outside the planner's id space) redraws at the next prayer or local midnight, so prayers set to Off still keep the widget current. Degraded reminders show a warning line in words; "—" is shown where no time can be named. Added `Context.inLanguage` (shared by `BaseActivity` and the widgets). Five new keys in both languages, listed in `app/l10n-review.txt`.
+
+**Decision to confirm.** The plan line says "—" and a warning when Degraded. Most phones are Degraded by default (battery optimisation), so blanking the times would make the widget useless for them. The times stay (they are right); the warning line is added; "—" is for a time that cannot be computed.
+
+**Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 167 tests (7 new), `:app` 64, gates passed. **Not verified:** any drawing or behaviour of the widgets (no emulator or phone).

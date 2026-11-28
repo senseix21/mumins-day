@@ -69,6 +69,38 @@
             android:name=".alarm.AlarmReceiver"
             android:exported="false" />
 
+        <!--
+            The two widgets. AppWidgetProviders are exported: the launcher sends them APPWIDGET_UPDATE. Neither adds a
+            permission. The refresh receiver is the app's own alarm and is not exported.
+        -->
+        <receiver
+            android:name=".widget.NextPrayerWidget"
+            android:exported="true"
+            android:label="@string/widget_next_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.FiveTimesWidget"
+            android:exported="true"
+            android:label="@string/widget_five_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_five_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.WidgetRefreshReceiver"
+            android:exported="false" />
+
         <service
             android:name=".alarm.PlaybackService"
             android:exported="false"

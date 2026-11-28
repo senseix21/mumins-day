@@ -277,4 +277,11 @@
     <string name="settings_nudge_help">One quiet notification a day at the time you choose. If you do not open it, it does not come again.</string>
     <string name="settings_nudge_on">Nudge on</string>
     <string name="settings_nudge_time">Time: %1$s</string>
+
+    <!-- Home-screen widgets (phase 10). Bengali drafted by Claude, native review pending. -->
+    <string name="widget_next_label">Next prayer</string>
+    <string name="widget_five_label">Five prayer times</string>
+    <string name="widget_next_description">The next prayer at a glance.</string>
+    <string name="widget_five_description">Today\'s five prayer times.</string>
+    <string name="widget_degraded">Reminders may not ring. Open the app.</string>
 </resources>

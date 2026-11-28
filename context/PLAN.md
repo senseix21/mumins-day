@@ -447,12 +447,13 @@ content gate takes more than one kind of record.
 **Outcome.** The next prayer at a glance on the home screen; a private, guilt-free record of
 prayers; an optional "find my district" button.
 
-**Widgets** (platform `AppWidgetProvider`, no new dependency)
-- [ ] Next-prayer widget and a five-times widget, Bengali digits [INV-L2].
-- [ ] Read the planner and clock only; the widget computes nothing [spec 03 forward path].
-- [ ] Updated from the alarm path's replan and at each prayer, never by a polling job; no new permission [INV-P3].
-- [ ] Shows "—" and a warning state when reminders are Degraded [INV-S6, INV-T7].
-- [ ] Tests: the widget's view model as a pure function; instrumented check on an emulator.
+**Widgets** (platform `AppWidgetProvider`, no new dependency). Built 2026-11-28 17:00 +0600 (KNOWN: `./gradlew build` green, lint clean, 8 JVM tests of the model). Nothing has been drawn on an emulator or a phone, so the behaviour items stay open.
+- [ ] Next-prayer widget and a five-times widget, Bengali digits [INV-L2]. Built (`app/.../widget/PrayerWidgets.kt`, two layouts, two provider files); digits come from the same `Texts` the home screen uses. Open: look at both on an emulator in both languages.
+- [x] Read the planner and clock only; the widget computes nothing [spec 03 forward path]. 2026-11-28: the model is `core/.../widget/WidgetModel.kt`, built only from `upcomingSalah` and `PrayerClock.dayTimes`; the shell only formats it.
+- [ ] Updated from the alarm path's replan and at each prayer, never by a polling job; no new permission [INV-P3]. Built: `replan` ends in `refreshWidgets`; one alarm (request code 1001) at the next prayer or local midnight; both provider files set `updatePeriodMillis="0"`; the permission gate is unchanged. Open: watch a widget change at a prayer on an emulator.
+- [ ] Shows "—" and a warning state when reminders are Degraded [INV-S6, INV-T7]. Built as: "—" where no time can be named (INV-T7), and a warning line in words under the times whenever `Health` is Degraded (INV-S6); the times themselves stay (see the 2026-11-28 LOG entry for why). Open: render check.
+- [x] Tests: the widget's view model as a pure function (7 tests, `WidgetModelTest`, 2026-11-28).
+- [ ] Tests: instrumented check on an emulator. Not run.
 
 **Salah tracker**
 - [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41].
