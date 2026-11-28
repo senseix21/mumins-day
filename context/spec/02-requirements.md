@@ -185,7 +185,7 @@ Design seams for these are in `03-architecture.md`. None is built in v1.
 | Feature | Problem | Blocking unknown | Seam |
 |---|---|---|---|
 | Bangla Quran with tafsir, audio, offline | Core need; existing Bangla apps are cluttered (Sheet #7) | Written permission for a Bengali translation. Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit (both KNOWN from earlier fetches) | Content packs (downloaded, verified, stored on device). First feature that needs `INTERNET` |
-| Verse search | Users missed it when a competitor removed it (Sheet #3) | Depends on the Quran text | On-device full-text index |
+| Verse search | Users missed it when a competitor removed it (Sheet #3) | Depends on the Quran text | On-device full-text index. Built 2026-11-28 (ADR-23): FTS4 over Arabic with and without diacritics and surah:ayah lookup; Bengali and English only once a translation exists; not run on a device |
 | Daily duas, Hisnul Muslim | Short daily practice (Sheet #7) | Source text and translation license; reviewer | Same review gate as deeds (ADR-22). Built 2026-11-28 on fake records: `TodayActivity`, one dua a day by the deed rotation, Arabic right to left, source and grading shown; no notification |
 | Daily hadith with source and grade | Weak or mis-cited narrations (Sheet #13) | Data source terms (sunnah.com terms unverified) | Same review gate (ADR-22). Built 2026-11-28 on fake records, same screen as duas; collection, number, edition and grading shown as the reviewer wrote them |
 | Salah tracker | Help staying consistent (Sheet #11) | None technical. Tone rules of INV-C4 apply | Local table; "Prayed" action on the Adhan notification |

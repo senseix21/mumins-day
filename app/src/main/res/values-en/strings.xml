@@ -382,4 +382,24 @@
     <string name="today_rejected">The list has an error, so nothing is shown.</string>
     <string name="today_fixture_banner">TEST TEXT: these records are made up, only to try the app. They are not a dua or a hadith.</string>
 
+    <!-- Phase 14: the Quran reader and search (ADR-23). -->
+    <string name="quran_title">Quran</string>
+    <string name="quran_preparing">Checking and preparing the Quran text. The first time can take a few seconds.</string>
+    <string name="quran_missing">This version of the app has no Quran text.</string>
+    <string name="quran_unverified">The Quran text could not be verified, so it is not shown. Try installing the app again.</string>
+    <string name="quran_credit">Arabic text: Tanzil Project (tanzil.net), unchanged. Details on the open-source licences page.</string>
+    <string name="quran_continue">Continue: surah %1$s, ayah %2$s</string>
+    <string name="quran_search_hint">An Arabic word, or surah:ayah such as 2:255</string>
+    <string name="quran_search">Search</string>
+    <string name="quran_results">Ayahs where it was found</string>
+    <string name="quran_no_results">Nothing found.</string>
+    <string name="quran_no_such_verse">There is no surah or ayah with that number.</string>
+    <string name="quran_results_capped">Only the first ayahs found are shown. More words narrow the search.</string>
+    <string name="quran_search_arabic_only">There is no translation, so only Arabic can be searched.</string>
+    <string name="quran_surahs">Surahs</string>
+    <string name="quran_surah_title">Surah %1$s</string>
+    <string name="quran_ayah_number">Ayah %1$s</string>
+    <string name="quran_no_translation">This version has no translation.</string>
+    <string name="quran_fake_translation_banner">TEST TRANSLATION: the line under each ayah is made up, only to try the app. It is not a translation.</string>
+
 </resources>

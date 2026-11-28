@@ -2,13 +2,18 @@ package com.senseix21.muminsday.store
 
 import com.senseix21.muminsday.districts.DistrictId
 import com.senseix21.muminsday.l10n.Language
+import com.senseix21.muminsday.quran.SurahNumber
+import com.senseix21.muminsday.quran.VerseRef
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AppPrefsTest {
-    private val chosen = AppPrefs(Language.English, SilentMode.AlwaysRing, onboarded = true, districtId = DistrictId.of("dhaka"))
+    private val chosen = AppPrefs(
+        Language.English, SilentMode.AlwaysRing, onboarded = true, districtId = DistrictId.of("dhaka"),
+        quranPosition = VerseRef(SurahNumber.of(2)!!, 255),
+    )
 
     @Test
     fun `nothing stored gives the defaults - Bengali, respect silent mode, not onboarded`() {
@@ -75,5 +80,14 @@ class AppPrefsTest {
         assertEquals(setOf("app.districtId"), edits.remove)
         assertTrue(edits.put.keys.all { it.startsWith("app.") })
         assertEquals(appPrefKeys(), encodeAppPrefs(chosen).keys)
+    }
+
+    @Test
+    fun `the Quran position survives a round trip and anything malformed is no position`() {
+        assertEquals(VerseRef(SurahNumber.of(2)!!, 255), parseAppPrefs(encodeAppPrefs(chosen)).quranPosition)
+        for (bad in listOf("", "2", "2:", ":5", "0:1", "115:1", "2:0", "2:-1", "x:y")) {
+            assertEquals(null, parseAppPrefs(mapOf("app.quranPosition" to bad)).quranPosition, bad)
+        }
+        assertEquals(setOf("app.quranPosition"), appPrefsEdits(encodeAppPrefs(chosen).keys, chosen.copy(quranPosition = null)).remove)
     }
 }

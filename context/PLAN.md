@@ -419,8 +419,8 @@ decisions, and nothing here may break a v1 rule without an ADR and the founder's
 - [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [Q11, G55]. The file format and gate are built (ADR-21); only the reviewer's file is missing.
 - [ ] Duas: the source text (Hisnul Muslim, Arabic) and a Bengali translation, each with a written licence; the reviewer for selection and wording.
 - [ ] Hadith: a source collection whose terms allow offline redistribution, a Bengali translation with a licence, and the reviewer for selection and grading.
-- [ ] Quran: an Arabic text source with its terms (ASSUMED: Tanzil Uthmani, which permits verbatim redistribution with credit; fetch and confirm) and a **Bengali translation with written permission** (KNOWN from earlier research: Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit).
-- [ ] Quran: an Arabic Uthmani font with a licence that allows bundling (candidates and licences UNKNOWN; research in phase 14).
+- [ ] Quran: an Arabic text source with its terms (ASSUMED: Tanzil Uthmani, which permits verbatim redistribution with credit; fetch and confirm) and a **Bengali translation with written permission** (KNOWN from earlier research: Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit). **Arabic half done 2026-11-28:** Tanzil v1.1 fetched, its terms read and quoted ("Permission is granted to copy and distribute verbatim copies of this text, but CHANGING IT IS NOT ALLOWED", source indicated, link to tanzil.net), bundled (`content/quran-SOURCES.md`, ADR-23). Open: the translation; the founder's read of "a link is made" offline (Q13).
+- [x] Quran: an Arabic Uthmani font with a licence that allows bundling (candidates and licences UNKNOWN; research in phase 14). 2026-11-28: Amiri Quran 1.003, SIL OFL 1.1 read in full; covers all 69 code points of the text (measured); bundled with its licence. KFGQPC not researched.
 - [ ] Tafsir: a Bengali tafsir with written permission (phase 16).
 - [ ] Recitation: at least one reciter's audio with written permission, and a host for the packs (phase 16).
 - [ ] A reviewer for every new content kind; may be the same person as for deeds (G9).
@@ -515,15 +515,17 @@ through the same gate as deeds. Built 2026-11-28 17:41 +0600 on FAKE records onl
 ## Phase 14 · Quran: text offline, reader, verse search
 
 **Outcome.** The whole Quran in Arabic with a Bengali translation, readable and searchable
-with the radio off.
+with the radio off. Built 2026-11-28 with the real Tanzil Arabic text and no translation (none has written permission); ADR-23. Not run on an emulator or phone.
 
-- [ ] Fetch the chosen Arabic text and translation; record source, version, licence and hash (founder track).
-- [ ] Bundled read-only SQLite database built at build time from the source files; the build fails if the text's hash differs from the recorded one (INV-Q-text: the Quran text is never modified).
-- [ ] Size measured against the budget (ASSUMED: text and one translation under 5 MB with an index; measure).
-- [ ] Reader: surah list, ayah view, Arabic in the licensed Uthmani font, translation below, last position remembered.
-- [ ] Verse search with SQLite FTS: Bengali and English words, Arabic with and without diacritics, surah:ayah lookup.
-- [ ] Credits and licence shown on the Licences screen and with the text as the licence requires.
-- [ ] Tests: every surah and ayah count matches the source; search finds known verses; the text round-trips byte for byte.
+- [ ] Fetch the chosen Arabic text and translation; record source, version, licence and hash (founder track). Arabic done 2026-11-28 (`content/quran-SOURCES.md`: URLs, version 1.1, licence quoted, SHA-256 of five files). Translation: none has written permission, so none is fetched; stays open.
+- [ ] Bundled read-only SQLite database built at build time from the source files; the build fails if the text's hash differs from the recorded one (INV-Q-text: the Quran text is never modified). **Changed by ADR-23:** the verified text files ship and the database is built on the phone (a build-time SQLite needs a JDBC library, INV-P4). Hash half done 2026-11-28: T-BUILD-6 (`checkQuranText`, `QuranGateTest` tampering) fails the build; `stageQuran` depends on it; the five files in the release APK have the recorded hashes. Open: the on-phone build and its read-back check have not run on a device.
+- [x] Size measured against the budget (ASSUMED: text and one translation under 5 MB with an index; measure). 2026-11-28: release APK 233,370 to 867,257 bytes (+633,887); compressed Quran assets 612,262 (ADR-17 line updated). Index size on a phone: UNKNOWN (built on the device).
+- [ ] Reader: surah list, ayah view, Arabic in the licensed Uthmani font, translation below, last position remembered. Built 2026-11-28 (`QuranActivity`, `SurahActivity`, Amiri Quran, translation slot empty in release and FAKE in debug, `AppPrefs.quranPosition` with a JVM round-trip test). Open: seen on an emulator and phones (T-UI-2, T-UI-3, INV-L4).
+- [ ] Verse search with SQLite FTS: Bengali and English words, Arabic with and without diacritics, surah:ayah lookup. Built 2026-11-28: FTS4 (API 26 has FTS3/FTS4, no FTS5, KNOWN from AOSP), `quran.indexWords` for index and query only; `QuranTest` checks diacritics in and out give the same index words for all 6236 ayahs, 300 random ayahs are found from two of their own words in either text, references in three digit systems; the SQL ran by hand on desktop SQLite 3.54.1 with the real text. Bengali and English only once a translation exists (debug: the FAKE one). Open: FTS on Android SQLite 3.18 on a device.
+- [ ] Credits and licence shown on the Licences screen and with the text as the licence requires. Built 2026-11-28: credit line on the reader and surah screens; Licences screen has the Tanzil and Amiri notices, the text's own copyright block read from the shipped file, and the OFL in full; `NOTICE` updated. Open: seen on a device; the offline "link" question (Q13).
+- [x] Tests: every surah and ayah count matches the source; search finds known verses; the text round-trips byte for byte. 2026-11-28: `QuranTest` (12; 114 and 6236 from the metadata, per-surah counts in both texts, byte-for-byte round trip, 2:255 found by reference and by its own words) and `QuranGateTest` (6). The database round trip is checked by the app on each rebuild; not run on a device.
+- [ ] On an emulator: first open (time it), a surah, search with and without diacritics, 2:255, the remembered position, the FAKE translation banner, the Licences screen, Bengali digits, 200 % font [T-UI-2, T-UI-3, INV-L4].
+- [ ] Founder: Tanzil's "a link is made to tanzil.net" in an app with no internet, and joining Tanzil's update mailing list [Q13].
 
 ## Phase 15 · Khatam planner
 

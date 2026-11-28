@@ -72,6 +72,39 @@ val deedMigrations: List<Migration> = listOf(
     ),
 )
 
+/**
+ * The Quran search database's history (ADR-23). It is built on the phone from the verified assets and holds nothing of
+ * the user's, so it is never backed up (not listed in the backup rules) and can be deleted and rebuilt at any time.
+ * FTS4, not FTS5: API 26's SQLite is built with FTS3 and FTS4 only (KNOWN, AOSP `external/sqlite/dist/Android.mk` at
+ * android-8.0.0_r1: `-DSQLITE_ENABLE_FTS3`, `-DSQLITE_ENABLE_FTS4`, no FTS5). The `simple` tokenizer: every character
+ * above 127 is part of a word, and the app has already reduced each text to space-separated words (`quran.indexWords`),
+ * so the tokenizer only splits on spaces. `unicode61` is not used: whether API 26 has it was not established.
+ */
+val quranMigrations: List<Migration> = listOf(
+    Migration(
+        version = 1,
+        statements = listOf(
+            // content_key: the SHA-256 of every asset the rows were built from. A different key means rebuild.
+            // notice: the Tanzil copyright block, which its terms ask to reproduce in every derived file.
+            "CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+            "CREATE TABLE surah (number INTEGER PRIMARY KEY, name TEXT NOT NULL, ayah_count INTEGER NOT NULL)",
+            // text is the Uthmani ayah exactly as in the asset (INV-QT1); translation is null when none is bundled.
+            """
+            CREATE TABLE ayah (
+                id INTEGER PRIMARY KEY,
+                surah INTEGER NOT NULL,
+                ayah INTEGER NOT NULL,
+                text TEXT NOT NULL,
+                translation TEXT,
+                UNIQUE (surah, ayah)
+            )
+            """.trimIndent(),
+            // docid = ayah.id. Index words only, never shown.
+            "CREATE VIRTUAL TABLE ayah_index USING fts4(arabic, arabic_simple, translation, tokenize=simple)",
+        ),
+    ),
+)
+
 /** The version a fresh database with this [history] is created at. */
 fun latestVersion(history: List<Migration>): Int = history.last().version
 

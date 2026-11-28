@@ -1,0 +1,3 @@
+# INV-QT1: the Quran text, its metadata and the font are kept byte for byte as their sources published them.
+# Git must never convert their line endings (quran-data.xml mixes CRLF and LF as published).
+content/quran/** -text -diff

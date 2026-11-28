@@ -396,4 +396,24 @@
     <string name="today_rejected">তালিকায় একটি ভুল আছে, তাই কিছু দেখানো হচ্ছে না।</string>
     <string name="today_fixture_banner">পরীক্ষার লেখা: এগুলো বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এগুলো দোয়া বা হাদিস নয়।</string>
 
+    <!-- Phase 14: the Quran reader and search (ADR-23). -->
+    <string name="quran_title">কুরআন</string>
+    <string name="quran_preparing">কুরআনের পাঠ যাচাই করে সাজানো হচ্ছে। প্রথমবার কয়েক সেকেন্ড লাগতে পারে।</string>
+    <string name="quran_missing">অ্যাপের এই সংস্করণে কুরআনের পাঠ নেই।</string>
+    <string name="quran_unverified">কুরআনের পাঠ যাচাই করা যায়নি, তাই দেখানো হচ্ছে না। অ্যাপটি আবার ইনস্টল করে দেখুন।</string>
+    <string name="quran_credit">আরবি পাঠ: Tanzil Project (tanzil.net), কোনো পরিবর্তন ছাড়া। বিস্তারিত ওপেন-সোর্স লাইসেন্স পাতায়।</string>
+    <string name="quran_continue">যেখানে ছিলেন: সূরা %1$s, আয়াত %2$s</string>
+    <string name="quran_search_hint">আরবি শব্দ, অথবা সূরা:আয়াত যেমন ২:২৫৫</string>
+    <string name="quran_search">খুঁজুন</string>
+    <string name="quran_results">যেসব আয়াতে পাওয়া গেছে</string>
+    <string name="quran_no_results">কিছু পাওয়া যায়নি।</string>
+    <string name="quran_no_such_verse">এই নম্বরের কোনো সূরা বা আয়াত নেই।</string>
+    <string name="quran_results_capped">শুধু প্রথম দিকের আয়াতগুলো দেখানো হলো। আরও শব্দ লিখলে খোঁজা ছোট হবে।</string>
+    <string name="quran_search_arabic_only">অনুবাদ নেই, তাই শুধু আরবিতে খোঁজা যায়।</string>
+    <string name="quran_surahs">সূরাসমূহ</string>
+    <string name="quran_surah_title">সূরা %1$s</string>
+    <string name="quran_ayah_number">আয়াত %1$s</string>
+    <string name="quran_no_translation">এই সংস্করণে কোনো অনুবাদ নেই।</string>
+    <string name="quran_fake_translation_banner">পরীক্ষার অনুবাদ: প্রতিটি আয়াতের নিচের লেখা বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এটি অনুবাদ নয়।</string>
+
 </resources>

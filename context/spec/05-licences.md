@@ -92,3 +92,15 @@ so this is a "Combined Work" under option 4(d)(0), not 4(d)(1). (ASSUMED classif
 - [ ] Notices for the Apache-2.0 libraries (Kotlin, kotlinx-datetime): not shown in app yet (finding 3). The Classpath-Exception library is gone (ADR-14).
 - [ ] Lawyer's opinion on the LGPL engine, the Classpath-Exception library and Play distribution: Q6, not started.
 - [ ] Adhan recording licence in writing (Q5); district data licence (Q4): nothing to read yet.
+
+## 5. Content that ships (added 2026-11-28, phase 14)
+
+Not libraries, so not on the dependency allowlist; files under `content/quran/`, staged into `assets/quran/` of every build.
+Full record, quoted licence wording and SHA-256 in `content/quran-SOURCES.md`; credited in `NOTICE` and on the Licences screen.
+
+| Content | Licence (where read) | What it asks, as read | How it is met (ASSUMED reading, lawyer: Q6, Q13) |
+|---|---|---|---|
+| Tanzil Quran Text, Uthmani and Simple Clean, v1.1 | CC BY 3.0 with Tanzil's terms (KNOWN, https://tanzil.net/docs/text_license, 2026-11-28) | Verbatim copies only; source "Tanzil Project" clearly indicated; a link to tanzil.net; the notice in all copies and reproduced in derived files | Files byte for byte (T-BUILD-6); credit on the reader and Licences screen; the file's own notice shown on the Licences screen and stored in the on-phone database's `notice` table; tanzil.net shown as text (no internet) |
+| Tanzil Quran metadata `quran-data.xml` | `license="cc-by"` in the file (KNOWN) | Attribution (ASSUMED, CC BY) | Credited with the text |
+| Amiri Quran 1.003 font | SIL OFL 1.1 (KNOWN, `content/quran/Amiri-OFL.txt`, read in full) | Copyright notice and licence with each copy; not sold by itself | OFL shown in full on the Licences screen; font unchanged |
+

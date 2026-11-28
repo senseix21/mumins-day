@@ -43,3 +43,24 @@ was written with that project as a reference. Taken from it so far:
   - the coordinates used for the Kaaba (21.42247 N, 39.826198 E).
 
 Anything ported from it later is added to this list.
+
+------------------------------------------------------------------------
+content/quran/  (Tanzil Quran Text, CC BY 3.0; Amiri Quran font, OFL 1.1)
+------------------------------------------------------------------------
+
+  Tanzil Quran Text (Uthmani and Simple Clean, Version 1.1)
+  Copyright (C) 2007-2026 Tanzil Project
+  License: Creative Commons Attribution 3.0
+  https://tanzil.net/  (updates: http://tanzil.net/updates/)
+
+  Shipped verbatim, with its copyright block, as content/quran/quran-uthmani.txt and
+  content/quran/quran-simple-clean.txt; the Tanzil Quran metadata (cc-by) as
+  content/quran/quran-data.xml. Changing the text is not allowed by its terms.
+
+  Amiri Quran 1.003
+  Copyright 2010-2022 The Amiri Project Authors (https://github.com/aliftype/amiri)
+  Licensed under the SIL Open Font License, Version 1.1:
+  content/quran/Amiri-OFL.txt
+
+Sources, the licence wording read and the SHA-256 of each file are in
+content/quran-SOURCES.md.

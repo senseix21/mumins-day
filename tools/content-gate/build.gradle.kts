@@ -141,3 +141,22 @@ val kindGates = registerKindGates("Dua", "duas.json", "duasRequired") + register
 
 tasks.check { dependsOn(checkDeedContent, checkDistricts, checkDebugDistricts, checkDebugDeeds, checkZakatRules, checkDebugZakatRules) }
 tasks.check { dependsOn(kindGates) }
+
+/**
+ * T-BUILD-6 (INV-QT1): every file in `content/quran/` must have the SHA-256 recorded in `content/quran-SOURCES.md`,
+ * nothing unrecorded may be there, a translation needs its written permission recorded, and the text, search text and
+ * metadata must describe the same 114 surahs. The app's asset staging depends on this task, so no build that packages
+ * the Quran can skip it.
+ */
+val quranSources = rootProject.layout.projectDirectory.file("content/quran-SOURCES.md")
+val quranDirectory = rootProject.layout.projectDirectory.dir("content/quran")
+val checkQuranText = tasks.register<JavaExec>("checkQuranText") {
+    group = "verification"
+    description = "T-BUILD-6: the bundled Quran files match their recorded SHA-256 and describe 114 surahs."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.QuranMain")
+    args(quranSources.asFile.absolutePath, quranDirectory.asFile.absolutePath, rootProject.layout.projectDirectory.dir("content").asFile.absolutePath)
+    inputs.file(quranSources).withPropertyName("sources")
+    inputs.dir(quranDirectory).withPropertyName("quran")
+}
+tasks.check { dependsOn(checkQuranText) }

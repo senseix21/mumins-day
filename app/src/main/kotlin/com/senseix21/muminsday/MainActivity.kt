@@ -37,6 +37,7 @@ import com.senseix21.muminsday.ui.LicencesActivity
 import com.senseix21.muminsday.ui.NO_TIME
 import com.senseix21.muminsday.ui.OnboardingActivity
 import com.senseix21.muminsday.ui.QiblaActivity
+import com.senseix21.muminsday.ui.QuranActivity
 import com.senseix21.muminsday.ui.Palette
 import com.senseix21.muminsday.ui.ReminderHealthActivity
 import com.senseix21.muminsday.ui.SettingsActivity
@@ -194,6 +195,10 @@ class MainActivity : BaseActivity() {
 
         page.addView(actionButton(getString(R.string.today_title), primary = false) {
             startActivity(Intent(this, TodayActivity::class.java))
+        })
+
+        page.addView(actionButton(getString(R.string.quran_title), primary = false) {
+            startActivity(Intent(this, QuranActivity::class.java))
         })
 
         page.addView(actionButton(getString(R.string.test_adhan)) { testAdhan() })
