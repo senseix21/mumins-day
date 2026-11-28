@@ -7,16 +7,15 @@ import com.senseix21.muminsday.BuildConfig
 import com.senseix21.muminsday.khatam.LayoutCheck
 import com.senseix21.muminsday.khatam.QuranLayout
 import com.senseix21.muminsday.khatam.buildLayout
+import com.senseix21.muminsday.quran.Edition
+import com.senseix21.muminsday.quran.EditionFormat
 import com.senseix21.muminsday.quran.JuzParse
-import com.senseix21.muminsday.quran.Line
 import com.senseix21.muminsday.quran.Lookup
 import com.senseix21.muminsday.quran.Quran
 import com.senseix21.muminsday.quran.QuranCheck
 import com.senseix21.muminsday.quran.SurahInfo
 import com.senseix21.muminsday.quran.SurahNumber
-import com.senseix21.muminsday.quran.TEST_FIXTURE_MARKER
 import com.senseix21.muminsday.quran.TextParse
-import com.senseix21.muminsday.quran.Translation
 import com.senseix21.muminsday.quran.TranslationCheck
 import com.senseix21.muminsday.quran.VerseRef
 import com.senseix21.muminsday.quran.checkQuran
@@ -26,11 +25,15 @@ import com.senseix21.muminsday.quran.notice
 import com.senseix21.muminsday.quran.parseJuzStarts
 import com.senseix21.muminsday.quran.parseMetadata
 import com.senseix21.muminsday.quran.parseText
+import com.senseix21.muminsday.quran.quranEncTranscript
 import java.io.FileNotFoundException
 import java.security.MessageDigest
 
-/** One ayah as the reader shows it: [text] exactly as in the asset (INV-QT1); [translation] null when none is bundled. */
-data class ShownAyah(val ref: VerseRef, val text: String, val translation: String?)
+/** One ayah as the reader shows it: [text] exactly as in the asset (INV-QT1); [translation] null when none is chosen. */
+data class ShownAyah(val ref: VerseRef, val text: String, val translation: ShownTranslation?)
+
+/** The chosen translation of one ayah, both strings exactly as the source has them (INV-QT1); [footnotes] "" when empty. */
+data class ShownTranslation(val text: String, val footnotes: String)
 
 sealed interface QuranOpen {
     data class Ready(val reader: QuranReader) : QuranOpen
@@ -52,7 +55,7 @@ sealed interface QuranOpen {
  */
 fun openQuran(context: Context): QuranOpen {
     val assets = context.assets
-    val names = assets.list(QURAN_ASSETS).orEmpty().sorted()
+    val names = assetFiles(assets, "").sorted()
     if (TEXT !in names) return QuranOpen.Missing
 
     val recorded = BuildConfig.QURAN_HASHES.split(',').filter { it.isNotBlank() }
@@ -60,10 +63,8 @@ fun openQuran(context: Context): QuranOpen {
     val hashes = mutableMapOf<String, String>()
     for (name in names) {
         val hash = sha256(read(assets, name))
-        val expected = recorded[name]
-        val fakeTranslation = BuildConfig.DEBUG && name == FAKE_TRANSLATION
-        if (expected == null && !fakeTranslation) return QuranOpen.Unverified("$name is not recorded")
-        if (expected != null && expected != hash) return QuranOpen.Unverified("$name does not match its recorded SHA-256")
+        val expected = recorded[name] ?: return QuranOpen.Unverified("$name is not recorded")
+        if (expected != hash) return QuranOpen.Unverified("$name does not match its recorded SHA-256")
         hashes[name] = hash
     }
     val key = hashes.entries.joinToString(",") { "${it.key}=${it.value}" }
@@ -85,6 +86,16 @@ fun openQuran(context: Context): QuranOpen {
     }
 }
 
+/**
+ * Every file under `assets/quran/[folder]`, by its path below `assets/quran/`. `AssetManager.list` gives a folder's
+ * entries and an empty array for a file (ASSUMED from its use here; the Quran's files are never empty folders).
+ */
+private fun assetFiles(assets: AssetManager, folder: String): List<String> =
+    assets.list(if (folder.isEmpty()) QURAN_ASSETS else "$QURAN_ASSETS/$folder").orEmpty().flatMap { name ->
+        val path = if (folder.isEmpty()) name else "$folder/$name"
+        if (assets.list("$QURAN_ASSETS/$path").isNullOrEmpty()) listOf(path) else assetFiles(assets, path)
+    }
+
 private fun readSurahs(database: SQLiteDatabase): List<SurahInfo> =
     database.rawQuery("SELECT number, name, ayah_count FROM surah ORDER BY number", null).use { cursor ->
         buildList {
@@ -100,27 +111,47 @@ private fun readSurahs(database: SQLiteDatabase): List<SurahInfo> =
  */
 class QuranReader internal constructor(private val database: SQLiteDatabase, val surahs: List<SurahInfo>, val layout: QuranLayout) {
 
-    /** True when a translation is bundled; false in every release until one has written permission (INV-QT1). */
-    val hasTranslation: Boolean = meta(database, TRANSLATION_KIND) != null
+    /** The translations this build bundles (ADR-26), in [Edition] order. */
+    val editions: List<Edition> = database.rawQuery("SELECT DISTINCT edition FROM translation", null).use { cursor ->
+        buildList { while (cursor.moveToNext()) Edition.ofKey(cursor.getString(0))?.let(::add) }
+    }.sorted()
 
-    /** True for the FAKE debug translation only. */
-    val translationIsFake: Boolean = meta(database, TRANSLATION_KIND) == FIXTURE
+    /** The ayahs of [surah], with [edition]'s translation when one is given and bundled. */
+    fun verses(surah: SurahNumber, edition: Edition?): List<ShownAyah> =
+        query("WHERE a.surah = ?", listOf(surah.value.toString()), edition, limit = null)
 
-    fun verses(surah: SurahNumber): List<ShownAyah> =
-        query("SELECT surah, ayah, text, translation FROM ayah WHERE surah = ? ORDER BY id", arrayOf(surah.value.toString()))
+    /**
+     * FTS4, one query per word (ADR-26): an ayah is found when each word is in its Arabic index or in [edition]'s
+     * translation index. The shown text is the asset's (ADR-23). At most [limit] ayahs, in Quran order.
+     */
+    fun search(words: Lookup.Words, edition: Edition?, limit: Int): List<ShownAyah> {
+        val arguments = mutableListOf<String>()
+        val conditions = words.terms.map { term ->
+            arguments += term
+            val arabic = "SELECT docid FROM arabic_index WHERE arabic_index MATCH ?"
+            if (edition == null) {
+                "a.id IN ($arabic)"
+            } else {
+                arguments += term
+                arguments += edition.key
+                "a.id IN ($arabic UNION SELECT t.ayah_id FROM translation_index JOIN translation t ON t.id = translation_index.docid " +
+                    "WHERE translation_index MATCH ? AND t.edition = ?)"
+            }
+        }
+        return query("WHERE " + conditions.joinToString(" AND "), arguments, edition, limit)
+    }
 
-    /** FTS4 over the index words; the shown text is the asset's (ADR-23). At most [limit] ayahs, in Quran order. */
-    fun search(words: Lookup.Words, limit: Int): List<ShownAyah> = query(
-        "SELECT a.surah, a.ayah, a.text, a.translation FROM ayah_index JOIN ayah a ON a.id = ayah_index.docid " +
-            "WHERE ayah_index MATCH ? ORDER BY a.id LIMIT $limit",
-        arrayOf(words.match),
-    )
-
-    private fun query(sql: String, arguments: Array<String>): List<ShownAyah> = database.rawQuery(sql, arguments).use { cursor ->
-        buildList {
-            while (cursor.moveToNext()) {
-                val surah = SurahNumber.of(cursor.getInt(0)) ?: continue
-                add(ShownAyah(VerseRef(surah, cursor.getInt(1)), cursor.getString(2), if (cursor.isNull(3)) null else cursor.getString(3)))
+    private fun query(where: String, arguments: List<String>, edition: Edition?, limit: Int?): List<ShownAyah> {
+        // The edition is bound first: it belongs to the join, which comes before the WHERE clause.
+        val sql = "SELECT a.surah, a.ayah, a.text, t.text, t.footnotes FROM ayah a " +
+            "LEFT JOIN translation t ON t.ayah_id = a.id AND t.edition = ? $where ORDER BY a.id" + (limit?.let { " LIMIT $it" } ?: "")
+        return database.rawQuery(sql, (listOf(edition?.key ?: "") + arguments).toTypedArray()).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) {
+                    val surah = SurahNumber.of(cursor.getInt(0)) ?: continue
+                    val translation = if (cursor.isNull(3)) null else ShownTranslation(cursor.getString(3), cursor.getString(4))
+                    add(ShownAyah(VerseRef(surah, cursor.getInt(1)), cursor.getString(2), translation))
+                }
             }
         }
     }
@@ -131,6 +162,32 @@ fun quranNotice(context: Context): String? = try {
     read(context.assets, TEXT).toString(Charsets.UTF_8).split('\n').filter { it.startsWith("#") }.joinToString("\n")
 } catch (_: FileNotFoundException) {
     null
+}
+
+/**
+ * [edition]'s transcript information as its shipped file has it (QuranEnc condition 4), for the Licences screen; null
+ * when its source carries none. Reads only the file's first kilobytes: the block is at the top.
+ */
+fun translationTranscript(context: Context, edition: Edition): String? = when (edition.format) {
+    EditionFormat.SuraResponses -> null
+    EditionFormat.WholeXml -> try {
+        val folder = "$QURAN_ASSETS/$TRANSLATIONS${edition.key}"
+        context.assets.list(folder).orEmpty().singleOrNull()?.let { name ->
+            context.assets.open("$folder/$name").use { stream ->
+                // InputStream.readNBytes needs API 33; minSdk is 26.
+                val head = ByteArray(TRANSCRIPT_HEAD)
+                var filled = 0
+                while (filled < head.size) {
+                    val read = stream.read(head, filled, head.size - filled)
+                    if (read < 0) break
+                    filled += read
+                }
+                quranEncTranscript(String(head, 0, filled, Charsets.UTF_8))
+            }
+        }
+    } catch (_: FileNotFoundException) {
+        null
+    }
 }
 
 /**
@@ -145,40 +202,28 @@ private fun rebuild(database: SQLiteDatabase, assets: AssetManager, names: List<
         is QuranCheck.Verified -> check.quran
         is QuranCheck.Refused -> return "the Quran files do not agree: ${check.reasons.take(3)}"
     }
-    val translationName = names.firstOrNull { it.startsWith("translation-") }
-    val translation: Translation? = translationName?.let { name ->
-        val body = text(name)
-        when (val checked = checkTranslation(quran, parseText(body), body.lineSequence().first())) {
-            is TranslationCheck.Refused -> return checked.reason
-            is TranslationCheck.Accepted ->
-                if (checked.translation.testFixture && !BuildConfig.DEBUG) return "$name is a test fixture" else checked.translation
-        }
-    }
     val copyright = notice((parsedText as? TextParse.Parsed)?.lines.orEmpty())
 
     database.beginTransaction()
     try {
-        for (table in listOf("meta", "surah", "ayah", "ayah_index")) database.execSQL("DELETE FROM $table")
+        for (table in listOf("meta", "surah", "ayah", "arabic_index", "translation", "translation_index")) database.execSQL("DELETE FROM $table")
         for (surah in quran.surahs) {
             database.execSQL("INSERT INTO surah (number, name, ayah_count) VALUES (?, ?, ?)", arrayOf<Any>(surah.number.value, surah.name, surah.ayahCount))
         }
-        val ayah = database.compileStatement("INSERT INTO ayah (id, surah, ayah, text, translation) VALUES (?, ?, ?, ?, ?)")
-        val index = database.compileStatement("INSERT INTO ayah_index (docid, arabic, arabic_simple, translation) VALUES (?, ?, ?, ?)")
+        val ayah = database.compileStatement("INSERT INTO ayah (id, surah, ayah, text) VALUES (?, ?, ?, ?)")
+        val index = database.compileStatement("INSERT INTO arabic_index (docid, arabic, arabic_simple) VALUES (?, ?, ?)")
         quran.verses.forEachIndexed { at, verse ->
             val id = (at + 1).toLong()
-            val translated: Line.Verse? = translation?.verses?.get(at)
             ayah.clearBindings()
             ayah.bindLong(1, id)
             ayah.bindLong(2, verse.ref.surah.value.toLong())
             ayah.bindLong(3, verse.ref.ayah.toLong())
             ayah.bindString(4, verse.text)
-            if (translated == null) ayah.bindNull(5) else ayah.bindString(5, translated.text)
             ayah.executeInsert()
             index.clearBindings()
             index.bindLong(1, id)
             index.bindString(2, indexWords(verse.text))
             index.bindString(3, indexWords(quran.searchVerses[at].text))
-            index.bindString(4, translated?.let { indexWords(it.text) } ?: "")
             index.executeInsert()
         }
         // INV-QT1 on the phone: every stored ayah reads back exactly as the asset has it, in order.
@@ -186,9 +231,41 @@ private fun rebuild(database: SQLiteDatabase, assets: AssetManager, names: List<
             buildList { while (cursor.moveToNext()) add(cursor.getString(0)) }
         }
         if (stored != quran.verses.map { it.text }) return "the stored text differs from the asset"
+
+        // One edition at a time, so only one translation's text is in memory (Zakaria's files are 30 MB of escapes).
+        var nextId = 1L
+        for (edition in Edition.entries) {
+            val folder = "$TRANSLATIONS${edition.key}/"
+            val files = names.filter { it.startsWith(folder) }.associate { it.removePrefix(folder) to text(it) }
+            if (files.isEmpty()) continue
+            val translation = when (val checked = checkTranslation(quran, edition, files)) {
+                is TranslationCheck.Refused -> return checked.reason
+                is TranslationCheck.Accepted -> checked.translation
+            }
+            val row = database.compileStatement("INSERT INTO translation (id, edition, ayah_id, text, footnotes) VALUES (?, ?, ?, ?, ?)")
+            val words = database.compileStatement("INSERT INTO translation_index (docid, text) VALUES (?, ?)")
+            translation.verses.forEachIndexed { at, translated ->
+                val id = nextId++
+                row.clearBindings()
+                row.bindLong(1, id)
+                row.bindString(2, edition.key)
+                row.bindLong(3, (at + 1).toLong())
+                row.bindString(4, translated.text)
+                row.bindString(5, translated.footnotes)
+                row.executeInsert()
+                words.clearBindings()
+                words.bindLong(1, id)
+                words.bindString(2, indexWords(translated.text))
+                words.executeInsert()
+            }
+            // The same read-back for the translation: text and footnotes exactly as the source has them.
+            val back = database.rawQuery("SELECT text, footnotes FROM translation WHERE edition = ? ORDER BY ayah_id", arrayOf(edition.key)).use { cursor ->
+                buildList { while (cursor.moveToNext()) add(cursor.getString(0) to cursor.getString(1)) }
+            }
+            if (back != translation.verses.map { it.text to it.footnotes }) return "the stored ${edition.key} translation differs from the asset"
+        }
         putMeta(database, CONTENT_KEY, key)
         putMeta(database, NOTICE, copyright)
-        translation?.let { putMeta(database, TRANSLATION_KIND, if (it.testFixture) FIXTURE else "bundled") }
         database.setTransactionSuccessful()
     } finally {
         database.endTransaction()
@@ -216,10 +293,11 @@ private const val TEXT = "quran-uthmani.txt"
 private const val SEARCH_TEXT = "quran-simple-clean.txt"
 private const val METADATA = "quran-data.xml"
 
-/** The FAKE translation a debug build generates; it has no recorded hash and starts with [TEST_FIXTURE_MARKER]. */
-const val FAKE_TRANSLATION: String = "translation-test.txt"
+/** Where the translations are staged, below `assets/quran/` (`content/quran/translations/<key>/`, ADR-26). */
+private const val TRANSLATIONS = "translations/"
+
+/** Rowwad's `<meta>` block ends within its first 700 bytes (KNOWN, the shipped file); 4 KB leaves room. */
+private const val TRANSCRIPT_HEAD = 4096
 
 private const val CONTENT_KEY = "content_key"
 private const val NOTICE = "notice"
-private const val TRANSLATION_KIND = "translation"
-private const val FIXTURE = "test_fixture"

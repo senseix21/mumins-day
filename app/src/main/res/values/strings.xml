@@ -403,18 +403,23 @@
     <string name="quran_unverified">কুরআনের পাঠ যাচাই করা যায়নি, তাই দেখানো হচ্ছে না। অ্যাপটি আবার ইনস্টল করে দেখুন।</string>
     <string name="quran_credit">আরবি পাঠ: Tanzil Project (tanzil.net), কোনো পরিবর্তন ছাড়া। বিস্তারিত ওপেন-সোর্স লাইসেন্স পাতায়।</string>
     <string name="quran_continue">যেখানে ছিলেন: সূরা %1$s, আয়াত %2$s</string>
-    <string name="quran_search_hint">আরবি শব্দ, অথবা সূরা:আয়াত যেমন ২:২৫৫</string>
+    <string name="quran_search_hint">আরবি বা বাংলা শব্দ, অথবা সূরা:আয়াত যেমন ২:২৫৫</string>
     <string name="quran_search">খুঁজুন</string>
     <string name="quran_results">যেসব আয়াতে পাওয়া গেছে</string>
     <string name="quran_no_results">কিছু পাওয়া যায়নি।</string>
     <string name="quran_no_such_verse">এই নম্বরের কোনো সূরা বা আয়াত নেই।</string>
     <string name="quran_results_capped">শুধু প্রথম দিকের আয়াতগুলো দেখানো হলো। আরও শব্দ লিখলে খোঁজা ছোট হবে।</string>
-    <string name="quran_search_arabic_only">অনুবাদ নেই, তাই শুধু আরবিতে খোঁজা যায়।</string>
+    <string name="quran_search_arabic_only">কোনো অনুবাদ বেছে নেওয়া হয়নি, তাই শুধু আরবিতে খোঁজা হলো।</string>
     <string name="quran_surahs">সূরাসমূহ</string>
     <string name="quran_surah_title">সূরা %1$s</string>
     <string name="quran_ayah_number">আয়াত %1$s</string>
-    <string name="quran_no_translation">এই সংস্করণে কোনো অনুবাদ নেই।</string>
-    <string name="quran_fake_translation_banner">পরীক্ষার অনুবাদ: প্রতিটি আয়াতের নিচের লেখা বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এটি অনুবাদ নয়।</string>
+    <string name="quran_translation_choose_title">বাংলা অনুবাদ বেছে নিন</string>
+    <string name="quran_translation_choose_help">দুটি অনুবাদই QuranEnc.com থেকে নেওয়া, কোনো পরিবর্তন ছাড়া। অ্যাপ নিজে থেকে কোনোটি বেছে দেয় না। বেছে নেওয়ার আগে শুধু আরবি দেখানো হয়। পরে সেটিংসে বদলাতে পারবেন।</string>
+    <string name="quran_translation_credit">অনুবাদ: %1$s। উৎস ও প্রকাশক: QuranEnc.com, সংস্করণ %2$s, কোনো পরিবর্তন ছাড়া।</string>
+    <string name="quran_footnotes">টীকা</string>
+    <string name="quran_edition_zakaria">বাংলা ভাষায় অনুবাদ- ড. আবূ বকর মুহাম্মাদ যাকারিয়া</string>
+    <string name="quran_edition_rwwad">বাংলা ভাষায় অনুবাদ - রুওয়াদ অনুবাদ</string>
+    <string name="settings_quran_translation">কুরআনের অনুবাদ</string>
 
     <!-- Phase 15: the khatam plan (ADR-24). Every key starts with khatam_ and is scanned by KhatamStringsTest. -->
     <string name="khatam_title">খতম পরিকল্পনা</string>

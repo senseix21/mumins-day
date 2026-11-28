@@ -2,6 +2,7 @@ package com.senseix21.muminsday.store
 
 import com.senseix21.muminsday.districts.DistrictId
 import com.senseix21.muminsday.l10n.Language
+import com.senseix21.muminsday.quran.Edition
 import com.senseix21.muminsday.quran.SurahNumber
 import com.senseix21.muminsday.quran.VerseRef
 import kotlin.test.Test
@@ -12,7 +13,7 @@ import kotlin.test.assertTrue
 class AppPrefsTest {
     private val chosen = AppPrefs(
         Language.English, SilentMode.AlwaysRing, onboarded = true, districtId = DistrictId.of("dhaka"),
-        quranPosition = VerseRef(SurahNumber.of(2)!!, 255),
+        quranPosition = VerseRef(SurahNumber.of(2)!!, 255), quranTranslation = Edition.BengaliRwwad,
     )
 
     @Test
@@ -100,5 +101,17 @@ class AppPrefsTest {
             assertEquals(null, parseAppPrefs(mapOf("app.quranPosition" to bad)).quranPosition, bad)
         }
         assertEquals(setOf("app.quranPosition"), appPrefsEdits(encodeAppPrefs(chosen).keys, chosen.copy(quranPosition = null)).remove)
+    }
+
+    // ADR-26: the app never picks a translation; the user does, and the choice survives a round trip.
+    @Test
+    fun `no translation is chosen until the user picks one, and an unknown key is no choice`() {
+        assertEquals(null, AppPrefs().quranTranslation)
+        assertEquals(null, parseAppPrefs(emptyMap<String, String>()).quranTranslation)
+        for (edition in Edition.entries) assertEquals(edition, parseAppPrefs(encodeAppPrefs(chosen.copy(quranTranslation = edition))).quranTranslation)
+        for (bad in listOf("", "zakaria", "BengaliRwwad", "english_saheeh")) {
+            assertEquals(null, parseAppPrefs(mapOf("app.quranTranslation" to bad)).quranTranslation, bad)
+        }
+        assertEquals(setOf("app.quranTranslation"), appPrefsEdits(encodeAppPrefs(chosen).keys, chosen.copy(quranTranslation = null)).remove)
     }
 }

@@ -11,8 +11,10 @@ class QuranGateTest {
 
     private val content = File("../../content")
     private val sources = File(content, "quran-SOURCES.md").readText()
-    private val files: Map<String, ByteArray> = File(content, "quran").listFiles().orEmpty().filter { it.isFile }.associate { it.name to it.readBytes() }
-    private val paths = setOf("quran-SOURCES.md") + files.keys.map { "quran/$it" }
+    private val quranDirectory = File(content, "quran")
+    private val files: Map<String, ByteArray> = quranDirectory.walkTopDown().filter { it.isFile }
+        .associate { it.relativeTo(quranDirectory).invariantSeparatorsPath to it.readBytes() }
+    private val paths = setOf("quran-SOURCES.md", "quranenc-terms.txt") + files.keys.map { "quran/$it" }
 
     private fun run(files: Map<String, ByteArray> = this.files, sources: String = this.sources, paths: Set<String> = this.paths) =
         runQuranGate(sources, files, paths)
@@ -21,7 +23,13 @@ class QuranGateTest {
     fun T_BUILD_6_the_shipped_files_match_their_recorded_hashes_and_describe_114_surahs() {
         val report = run()
         assertTrue(report.passed, report.lines.toString())
-        assertEquals(listOf("quran gate: passed. 5 files match their recorded SHA-256; 114 surahs, 6236 ayahs, as the metadata gives; 0 translation(s)."), report.lines)
+        assertEquals(
+            listOf(
+                "quran gate: passed. 120 files match their recorded SHA-256; 114 surahs, 6236 ayahs, as the metadata gives; " +
+                    "2 translation(s): bengali_zakaria 6236 ayahs, bengali_rwwad 6236 ayahs.",
+            ),
+            report.lines,
+        )
     }
 
     @Test
@@ -49,29 +57,63 @@ class QuranGateTest {
         assertFalse(run(sources = "").passed)
     }
 
+    private val zakaria = "${TRANSLATIONS}bengali_zakaria/"
+    private val rwwad = "${TRANSLATIONS}bengali_rwwad/bengali_rwwad_v1.1.4-xml.1.xml"
+
     @Test
-    fun INV_QT1_a_translation_needs_a_recorded_hash_and_a_written_permission_in_content() {
-        val refs = files.getValue(QURAN_TEXT).toString(Charsets.UTF_8).split('\n').filter { it.isNotEmpty() && !it.startsWith("#") }
-            .map { it.split('|').take(2).joinToString("|") }
-        val translation = refs.joinToString("\n") { "$it|TEST TRANSLATION" }.toByteArray()
-        val hashLine = "sha256 ${sha256(translation)} translation-bn.txt\n"
-        val withFile = files + ("translation-bn.txt" to translation)
-        val noPermission = run(withFile, sources + hashLine)
-        assertTrue(noPermission.lines.any { "translation-bn.txt is a translation without" in it }, noPermission.lines.toString())
-        val permissionLine = "permission translation-bn.txt permissions/TEST-PERMISSION.md\n"
-        assertFalse(run(withFile, sources + hashLine + permissionLine).passed, "the permission file must exist")
-        // With the permission recorded, a complete translation passes (in memory only; nothing like it is in content/).
-        val passed = run(withFile, sources + hashLine + permissionLine, paths + "permissions/TEST-PERMISSION.md")
-        assertTrue(passed.passed, passed.lines.toString())
-        assertTrue("1 translation(s)" in passed.lines.single())
-        // The FAKE debug translation, marked as a fixture, can never pass, even with a hash and a permission.
-        val fixture = ("# test_fixture\n" + translation.toString(Charsets.UTF_8)).toByteArray()
-        val fixtureSources = sources + "sha256 ${sha256(fixture)} translation-bn.txt\n" + permissionLine
-        val refused = run(files + ("translation-bn.txt" to fixture), fixtureSources, paths + "permissions/TEST-PERMISSION.md")
-        assertTrue(refused.lines.any { "is a test fixture and cannot ship" in it }, refused.lines.toString())
-        // An incomplete translation is refused.
-        val partial = translation.toString(Charsets.UTF_8).substringBeforeLast('\n').toByteArray()
-        assertFalse(run(files + ("translation-bn.txt" to partial), sources + "sha256 ${sha256(partial)} translation-bn.txt\n" + permissionLine, paths + "permissions/TEST-PERMISSION.md").passed)
+    fun T_BUILD_6_changing_one_byte_of_the_zakaria_translation_fails_the_build() {
+        val name = zakaria + "002.json"
+        val tampered = files.getValue(name).copyOf().also { it[it.size / 2] = (it[it.size / 2] + 1).toByte() }
+        val report = run(files + (name to tampered))
+        assertFalse(report.passed)
+        assertTrue(report.lines.any { name in it && "must not be changed" in it }, report.lines.toString())
+    }
+
+    @Test
+    fun T_BUILD_6_changing_one_byte_of_the_rwwad_translation_fails_the_build() {
+        val tampered = files.getValue(rwwad).copyOf().also { it[it.size / 2] = (it[it.size / 2] + 1).toByte() }
+        val report = run(files + (rwwad to tampered))
+        assertFalse(report.passed)
+        assertTrue(report.lines.any { rwwad in it && "must not be changed" in it }, report.lines.toString())
+    }
+
+    /** [sources] with [name]'s recorded hash replaced by [bytes]'s, so only the content check can refuse it. */
+    private fun recorded(name: String, bytes: ByteArray): String =
+        sources.replace(Regex("sha256 [0-9a-f]{64} ${Regex.escape(name)}\\n"), "sha256 ${sha256(bytes)} $name\n")
+
+    @Test
+    fun INV_QT1_a_translation_missing_one_ayah_fails_even_with_its_hash_recorded() {
+        // Zakaria: drop the last entry of surah 1's response.
+        val first = zakaria + "001.json"
+        val body = files.getValue(first).toString(Charsets.UTF_8)
+        val shorter = (body.substring(0, body.lastIndexOf("},{") + 1) + "]}").toByteArray()
+        val zakariaReport = run(files + (first to shorter), recorded(first, shorter))
+        assertFalse(zakariaReport.passed)
+        assertTrue(zakariaReport.lines.any { "bengali_zakaria" in it && "not numbered like the text" in it }, zakariaReport.lines.toString())
+        // Rowwad: drop one whole <aya> element.
+        val xml = files.getValue(rwwad).toString(Charsets.UTF_8)
+        val start = xml.indexOf("<aya number=\"2\">")
+        val cut = (xml.substring(0, start) + xml.substring(xml.indexOf("</aya>", start) + "</aya>".length)).toByteArray()
+        val rwwadReport = run(files + (rwwad to cut), recorded(rwwad, cut))
+        assertFalse(rwwadReport.passed)
+        assertTrue(rwwadReport.lines.any { "bengali_rwwad" in it }, rwwadReport.lines.toString())
+    }
+
+    @Test
+    fun INV_QT1_a_translation_needs_its_permission_recorded_and_present_in_content() {
+        val noPermission = run(sources = sources.replace(Regex("^permission bengali_rwwad .*\\n", RegexOption.MULTILINE), ""))
+        assertTrue(noPermission.lines.any { "bengali_rwwad is a translation without" in it }, noPermission.lines.toString())
+        assertFalse(run(paths = paths - "quranenc-terms.txt").passed, "the permission file must exist")
+    }
+
+    @Test
+    fun INV_QT1_only_a_bundled_edition_in_its_own_folder_can_ship() {
+        val other = byteArrayOf(1)
+        for (path in listOf("${TRANSLATIONS}english_saheeh/001.json", "translation-bn.txt", "${TRANSLATIONS}bengali_rwwad/a/b.xml")) {
+            val report = run(files + (path to other), sources + "sha256 ${sha256(other)} $path\n")
+            assertFalse(report.passed, path)
+            assertTrue(report.lines.any { path in it }, report.lines.toString())
+        }
     }
 
     @Test

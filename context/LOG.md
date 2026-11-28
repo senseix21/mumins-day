@@ -614,3 +614,32 @@ the plan until fetched.
 **Verified (KNOWN, those commands).** T-INST-1,2,3,4,5,7,8,9,10 PASS, T-INST-6 NOT RUN (API 36). deed.sh all PASS. qibla.sh field 7 of 7 PASS. Before the fixes: `ZakatActivity` crashed on open (NPE: `column()` in a field initializer, no Context yet); `QuranActivity` search box 125 px tall, under 48 dp (126 px); `ReminderHealthActivity` failed T-UNIT-9 because `ui.sh` read the dump's `&#10;` line break as Latin digits (script bug). After the fixes, Zakat, Reminder health, Quran and Home: T-UNIT-9, T-UI-target, T-UI-label PASS, 0 crashes. `./gradlew build` green.
 
 **Not done / follow-up.** `TodayActivity` fails T-UNIT-9 only on the fake fixture text ("TEST HADITH 3" has ASCII digits); real content is untested. `SurahActivity` needs a surah extra and was not opened alone. Not exercised: widgets, notification "Prayed" action, location dialog, khatam reminder, packs (no host), Recitation playback, API 26/31 runs of the new screens. Draft PR #2 opened for CI.
+
+## 2026-11-28 20:24 +0600 · Two QuranEnc Bengali translations, the user picks (ADR-26)
+
+**Did.** Branch `quran-bengali-translations` from `phase-15-16-khatam-packs` (dd179b5), on the founder's decision to bundle
+QuranEnc's `bengali_zakaria` and `bengali_rwwad` and not use github.com/imranpollob/bangla-quran. Fetched with `curl`
+into new empty temp directories, never executed: https://quranenc.com/en/home/api (terms: seven conditions, quoted
+exactly; the brief had five), https://quranenc.com/api/v1/translations/list/bn and `/list`, the `en` and `bn` index pages
+(titles, versions; Zakaria has no download buttons and is not in the list API), Rowwad's
+https://quranenc.com/downloads/xml/bengali_rwwad_v1.1.4-xml.1.xml, Zakaria's 114
+https://quranenc.com/api/v1/translation/sura/bengali_zakaria/{n} (1 to 101 at 19:04, the run stalled, 102 to 114 at
+20:13). Stored byte for byte under `content/quran/translations/`, 115 `sha256` lines and two `permission` lines in
+`content/quran-SOURCES.md`, terms in `content/quranenc-terms.txt`. Code: `core/quran/Translation.kt` (`Edition`,
+`checkTranslation` for both formats), `core/quran/Json.kt`, `Lookup.Words.terms`; gate reads subfolders and editions;
+`stageQuran` copies subfolders; FAKE translation removed; `quranMigrations` v2; `QuranStore` stores both and searches the
+chosen one; `AppPrefs.quranTranslation`; choice on Quran and surah screens and in Settings; credit and footnotes in the
+reader; Licences screen and `NOTICE`. 7 new string keys (5 Claude drafts in `app/l10n-review.txt`, 2 QuranEnc's own
+titles), 2 removed, 2 reworded. ADR-26; ADR-17 size line; INV-QT1 amended; `spec/02`, `spec/04`, `spec/05`; Q13 note,
+Q15, G65, G66. I wrote no translation text and changed none.
+
+**Verified.** Python scratch checks: Rowwad 114 suras, 6236 ayahs, counts equal `quran-data.xml`; Zakaria 6236, counts
+equal, all 114 files re-encode byte for byte. `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 428 tests
+(`:core` 288, `:app` 101, gate 36, engine 3). Gate: "quran gate: passed. 120 files match their recorded SHA-256; 114 surahs,
+6236 ayahs, as the metadata gives; 2 translation(s): bengali_zakaria 6236 ayahs, bengali_rwwad 6236 ayahs."; permission
+gate "8 permissions, no INTERNET"; dependency gate "4 libraries"; string gate "329 keys". Release APK 5,440,616 bytes
+(`ls -l`); its 120 `assets/quran/` files have the recorded hashes (`unzip`, `shasum -a 256`, `cmp`); no
+`translation-test` in either APK. The schema (both migrations) and the search SQL ran on desktop SQLite 3.54.1 with
+Rowwad's real text: 6236 rows read back equal, a two-word search finds its ayah. **Not verified:** anything on an emulator
+or phone (rebuild time, FTS4 on SQLite 3.18, screens, footnote layout at 200 %); QuranEnc's view on Zakaria (Q15).
+

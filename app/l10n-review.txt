@@ -268,8 +268,6 @@ quran_search_arabic_only
 quran_surahs
 quran_surah_title
 quran_ayah_number
-quran_no_translation
-quran_fake_translation_banner
 khatam_title
 khatam_help
 khatam_none
@@ -328,3 +326,10 @@ recitation_ayah
 recitation_no_timings
 recitation_unverified
 recitation_cannot_play
+# ADR-26 (2026-11-28). quran_edition_zakaria and quran_edition_rwwad are not Claude's: they are QuranEnc's own Bengali
+# titles, copied from https://quranenc.com/bn/home, so they are not listed. The keys below are Claude's drafts.
+quran_translation_choose_title
+quran_translation_choose_help
+quran_translation_credit
+quran_footnotes
+settings_quran_translation

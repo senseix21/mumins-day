@@ -383,9 +383,9 @@ val stageReleaseContent = tasks.register<StageContent>("stageReleaseContent") {
 }
 
 /**
- * The Quran assets (ADR-23): every recorded file of `content/quran/` into `assets/quran/`, byte for byte, in every build.
- * T-BUILD-6 runs first, so a build that packages the text cannot skip the hash check (INV-QT1). Hidden files (a Finder
- * `.DS_Store`) are not content and are neither staged nor checked.
+ * The Quran assets (ADR-23, ADR-26): every recorded file of `content/quran/`, its `translations/` folders included, into
+ * `assets/quran/`, byte for byte, in every build. T-BUILD-6 runs first, so a build that packages the text cannot skip the
+ * hash check (INV-QT1). Hidden files (a Finder `.DS_Store`) are not content and are neither staged nor checked.
  */
 abstract class StageQuran : DefaultTask() {
     @get:InputDirectory
@@ -399,7 +399,8 @@ abstract class StageQuran : DefaultTask() {
         val target = File(assets.get().asFile, "quran")
         target.deleteRecursively()
         target.mkdirs()
-        source.get().asFile.listFiles().orEmpty().filter { it.isFile && !it.name.startsWith(".") }.forEach { it.copyTo(File(target, it.name)) }
+        val root = source.get().asFile
+        root.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }.forEach { it.copyTo(File(target, it.relativeTo(root).path)) }
     }
 }
 
@@ -407,37 +408,6 @@ val stageQuran = tasks.register<StageQuran>("stageQuran") {
     dependsOn(":tools:content-gate:checkQuranText")
     source.set(rootProject.layout.projectDirectory.dir("content/quran"))
     assets.set(layout.buildDirectory.dir("generated/quranAssets"))
-}
-
-/**
- * Debug builds only: a FAKE translation, one line per ayah, "TEST TRANSLATION s:a", so the translation slot and the
- * translation search can be tried. It starts with the fixture marker; a release never has it, and the app and T-BUILD-6
- * both refuse a fixture outside a debug build (INV-QT1). Its numbering is read from the real text's own lines.
- */
-abstract class GenerateFakeTranslation : DefaultTask() {
-    @get:InputFile
-    abstract val text: RegularFileProperty
-
-    @get:OutputDirectory
-    abstract val assets: DirectoryProperty
-
-    @TaskAction
-    fun generate() {
-        val refs = text.get().asFile.readText(Charsets.UTF_8).split('\n').mapNotNull { Regex("^(\\d+)\\|(\\d+)\\|").find(it) }
-            .map { it.groupValues[1] to it.groupValues[2] }
-        val target = File(assets.get().asFile, "quran")
-        target.deleteRecursively()
-        target.mkdirs()
-        File(target, "translation-test.txt").writeText(
-            "# test_fixture\n" + refs.joinToString("\n") { (surah, ayah) -> "$surah|$ayah|TEST TRANSLATION $surah:$ayah পরীক্ষা" },
-            Charsets.UTF_8,
-        )
-    }
-}
-
-val generateFakeTranslation = tasks.register<GenerateFakeTranslation>("generateFakeTranslation") {
-    text.set(rootProject.layout.projectDirectory.file("content/quran/quran-uthmani.txt"))
-    assets.set(layout.buildDirectory.dir("generated/debugQuranAssets"))
 }
 
 androidComponents {
@@ -469,9 +439,6 @@ androidComponents {
 
         variant.sources.assets?.addGeneratedSourceDirectory(stageLicenceTexts, StageLicenceTexts::assets)
         variant.sources.assets?.addGeneratedSourceDirectory(stageQuran, StageQuran::assets)
-        if (variant.buildType == "debug") {
-            variant.sources.assets?.addGeneratedSourceDirectory(generateFakeTranslation, GenerateFakeTranslation::assets)
-        }
 
         if (variant.buildType == "release") {
             variant.sources.assets?.addGeneratedSourceDirectory(stageReleaseContent, StageContent::assets)

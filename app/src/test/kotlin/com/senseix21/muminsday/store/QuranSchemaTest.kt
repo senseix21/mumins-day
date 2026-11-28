@@ -13,7 +13,16 @@ class QuranSchemaTest {
     fun `the quran history is numbered from 1 with no gap and creates every table the store uses`() {
         assertEquals((1..quranMigrations.size).toList(), quranMigrations.map { it.version })
         val sql = statementsBetween(0, latestVersion(quranMigrations), quranMigrations).joinToString("\n")
-        for (table in listOf("TABLE meta", "TABLE surah", "TABLE ayah", "VIRTUAL TABLE ayah_index")) assertTrue(table in sql, table)
+        for (table in listOf("TABLE meta", "TABLE surah", "TABLE ayah", "VIRTUAL TABLE arabic_index", "TABLE translation", "VIRTUAL TABLE translation_index")) {
+            assertTrue(table in sql, table)
+        }
+    }
+
+    @Test
+    fun `version 2 drops the single translation column and forces a rebuild from the assets`() {
+        val step = statementsBetween(1, 2, quranMigrations)
+        assertTrue("DROP TABLE ayah_index" in step && "DROP TABLE ayah" in step && "DELETE FROM meta" in step)
+        assertFalse(step.any { "translation TEXT" in it }, "the new ayah table has no translation column")
     }
 
     @Test

@@ -53,8 +53,11 @@ public sealed interface Lookup {
     /** A reference was typed, but that surah or ayah does not exist. Nothing is guessed. */
     public data object NoSuchVerse : Lookup
 
-    /** Words to find. [match] is the SQLite FTS4 query; [words] are its terms, already in [indexWords] form. */
-    public data class Words(val words: List<String>, val match: String) : Lookup
+    /**
+     * Words to find, already in [indexWords] form. [terms] are one SQLite FTS4 query per word, in the same order: an ayah
+     * matches when each word is found in its Arabic or in the chosen translation (ADR-26).
+     */
+    public data class Words(val words: List<String>, val terms: List<String>) : Lookup
 }
 
 /**
@@ -75,7 +78,7 @@ public fun lookup(input: String, surahs: List<SurahInfo>): Lookup {
     }
     val words = indexWords(input).split(' ').filter { it.isNotEmpty() }
     if (words.isEmpty()) return Lookup.Empty
-    return Lookup.Words(words, words.joinToString(" ") { "\"$it*\"" })
+    return Lookup.Words(words, words.map { "\"$it*\"" })
 }
 
 private val REFERENCE = Regex("(\\d{1,3})\\s*[:.\\-/ ]\\s*(\\d{1,3})")
@@ -90,8 +93,8 @@ private fun asciiDigit(char: Char): Char = when (char) {
 
 /**
  * The reference implementation of a word search over the verified text, for tests and for checking the database: an
- * ayah matches when every word starts some word of its indexed text, search text or translation. The app asks SQLite
- * (FTS4) instead; both must agree.
+ * ayah matches when every word starts some word of its indexed text, search text or the chosen [translation]'s ayah
+ * text (its footnotes are not searched). The app asks SQLite (FTS4) instead; both must agree.
  */
 public class MemoryIndex(private val quran: Quran, translation: Translation? = null) {
     private val tokens: List<List<String>> = quran.verses.indices.map { index ->

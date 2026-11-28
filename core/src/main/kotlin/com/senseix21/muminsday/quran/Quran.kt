@@ -143,28 +143,3 @@ public fun checkQuran(text: TextParse, searchText: TextParse, metadata: Metadata
     if (displayed.map { it.ref } != searched.map { it.ref }) reasons += "the text and the search text are not numbered alike"
     return if (reasons.isEmpty()) QuranCheck.Verified(Quran(surahs, displayed, searched)) else QuranCheck.Refused(reasons)
 }
-
-/**
- * A translation, checked against the [Quran] it translates: exactly one line per ayah, in order. It is shown and
- * indexed as it is. [testFixture] is true for the FAKE debug translation only (the release has none, INV-QT1).
- */
-public class Translation internal constructor(public val verses: List<Line.Verse>, public val testFixture: Boolean)
-
-public sealed interface TranslationCheck {
-    public data class Accepted(val translation: Translation) : TranslationCheck
-
-    public data class Refused(val reason: String) : TranslationCheck
-}
-
-/** The first line of a FAKE translation. A file that starts with it is a test fixture. */
-public const val TEST_FIXTURE_MARKER: String = "# test_fixture"
-
-public fun checkTranslation(quran: Quran, parse: TextParse, firstLine: String): TranslationCheck = when (parse) {
-    is TextParse.Refused -> TranslationCheck.Refused("translation: ${parse.problems.take(5)}")
-    is TextParse.Parsed ->
-        if (parse.verses.map { it.ref } == quran.verses.map { it.ref }) {
-            TranslationCheck.Accepted(Translation(parse.verses, testFixture = firstLine == TEST_FIXTURE_MARKER))
-        } else {
-            TranslationCheck.Refused("translation: ${parse.verses.size} ayahs, not numbered like the text")
-        }
-}

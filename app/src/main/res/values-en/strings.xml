@@ -389,18 +389,23 @@
     <string name="quran_unverified">The Quran text could not be verified, so it is not shown. Try installing the app again.</string>
     <string name="quran_credit">Arabic text: Tanzil Project (tanzil.net), unchanged. Details on the open-source licences page.</string>
     <string name="quran_continue">Continue: surah %1$s, ayah %2$s</string>
-    <string name="quran_search_hint">An Arabic word, or surah:ayah such as 2:255</string>
+    <string name="quran_search_hint">An Arabic or Bengali word, or surah:ayah such as 2:255</string>
     <string name="quran_search">Search</string>
     <string name="quran_results">Ayahs where it was found</string>
     <string name="quran_no_results">Nothing found.</string>
     <string name="quran_no_such_verse">There is no surah or ayah with that number.</string>
     <string name="quran_results_capped">Only the first ayahs found are shown. More words narrow the search.</string>
-    <string name="quran_search_arabic_only">There is no translation, so only Arabic can be searched.</string>
+    <string name="quran_search_arabic_only">No translation is chosen, so only the Arabic was searched.</string>
     <string name="quran_surahs">Surahs</string>
     <string name="quran_surah_title">Surah %1$s</string>
     <string name="quran_ayah_number">Ayah %1$s</string>
-    <string name="quran_no_translation">This version has no translation.</string>
-    <string name="quran_fake_translation_banner">TEST TRANSLATION: the line under each ayah is made up, only to try the app. It is not a translation.</string>
+    <string name="quran_translation_choose_title">Choose a Bengali translation</string>
+    <string name="quran_translation_choose_help">Both translations come from QuranEnc.com, unchanged. The app does not choose one for you. Until you choose, only the Arabic is shown. You can change it later in Settings.</string>
+    <string name="quran_translation_credit">Translation: %1$s. Source and publisher: QuranEnc.com, version %2$s, unchanged.</string>
+    <string name="quran_footnotes">Footnotes</string>
+    <string name="quran_edition_zakaria">Bengali Translation - Abu Bakr Zakaria</string>
+    <string name="quran_edition_rwwad">Bengali Translation - Rowwad Translation Center</string>
+    <string name="settings_quran_translation">Quran translation</string>
 
     <!-- Phase 15: the khatam plan (ADR-24). Every key starts with khatam_ and is scanned by KhatamStringsTest. -->
     <string name="khatam_title">Khatam plan</string>

@@ -130,25 +130,12 @@ class QuranTest {
     fun nothing_typed_can_act_as_an_fts_operator() {
         val found = lookup("TEST\" OR \"x* NEAR (y) -z", quran.surahs) as Lookup.Words
         assertEquals(listOf("test", "or", "x", "near", "y", "z"), found.words)
-        assertEquals("\"test*\" \"or*\" \"x*\" \"near*\" \"y*\" \"z*\"", found.match)
+        assertEquals(listOf("\"test*\"", "\"or*\"", "\"x*\"", "\"near*\"", "\"y*\"", "\"z*\""), found.terms)
     }
 
     @Test
     fun index_words_keep_bengali_marks_and_lower_case_latin() {
         // Bengali letters with a vowel sign and a virama, written as escapes: U+0995 U+09BF, U+09A4 U+09CD U+09A4.
         assertEquals("কি ত্ত test", indexWords("কি, ত্ত। TEST"))
-    }
-
-    @Test
-    fun a_fake_translation_is_accepted_only_when_complete_and_is_searchable() {
-        val fake = TEST_FIXTURE_MARKER + "\n" + quran.verses.joinToString("\n") { "${it.ref.surah.value}|${it.ref.ayah}|TEST TRANSLATION ${it.ref}" }
-        val accepted = checkTranslation(quran, parseText(fake), fake.lineSequence().first()) as TranslationCheck.Accepted
-        assertTrue(accepted.translation.testFixture)
-        val words = lookup("translation 36:1", quran.surahs)
-        assertIs<Lookup.Words>(words)
-        val incomplete = fake.lineSequence().toList().dropLast(1).joinToString("\n")
-        assertIs<TranslationCheck.Refused>(checkTranslation(quran, parseText(incomplete), TEST_FIXTURE_MARKER))
-        val found = MemoryIndex(quran, accepted.translation).find((lookup("TEST TRANSLATION", quran.surahs) as Lookup.Words).words)
-        assertEquals(6236, found.size)
     }
 }

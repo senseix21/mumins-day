@@ -45,7 +45,7 @@ was written with that project as a reference. Taken from it so far:
 Anything ported from it later is added to this list.
 
 ------------------------------------------------------------------------
-content/quran/  (Tanzil Quran Text, CC BY 3.0; Amiri Quran font, OFL 1.1)
+content/quran/  (Tanzil Quran Text, CC BY 3.0; Amiri Quran font, OFL 1.1; QuranEnc.com Bengali translations)
 ------------------------------------------------------------------------
 
   Tanzil Quran Text (Uthmani and Simple Clean, Version 1.1)
@@ -61,6 +61,19 @@ content/quran/  (Tanzil Quran Text, CC BY 3.0; Amiri Quran font, OFL 1.1)
   Copyright 2010-2022 The Amiri Project Authors (https://github.com/aliftype/amiri)
   Licensed under the SIL Open Font License, Version 1.1:
   content/quran/Amiri-OFL.txt
+
+  Bengali translations of the meanings of the Quran, from QuranEnc.com
+  (Encyclopedia of the Noble Quran, https://quranenc.com), source and publisher:
+    - Bengali Translation - Abu Bakr Zakaria ("Bengali Translation of Dr. Abu Bakr
+      Muhammad Zakaria"), version 1.1.1, as QuranEnc.com's sura API serves it:
+      content/quran/translations/bengali_zakaria/001.json to 114.json
+    - Bengali Translation - Rowwad Translation Center ("Translated by the team of
+      Rowwad Translation Center, in cooperation with the Dawah Association in Rabwah,
+      the Islamic Content Service Association in Languages, and the IslamHouse.com
+      website."), version 1.1.4, QuranEnc.com's XML download with its transcript block:
+      content/quran/translations/bengali_rwwad/bengali_rwwad_v1.1.4-xml.1.xml
+  Shipped without modification, addition or deletion, footnotes included, under
+  QuranEnc.com's published terms, quoted in content/quranenc-terms.txt.
 
 Sources, the licence wording read and the SHA-256 of each file are in
 content/quran-SOURCES.md.

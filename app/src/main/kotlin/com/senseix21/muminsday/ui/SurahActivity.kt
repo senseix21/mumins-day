@@ -12,7 +12,7 @@ import com.senseix21.muminsday.store.Stores
 
 /**
  * One surah: each ayah as shipped (INV-QT1), its number in the chosen language's digits, and below it the translation
- * slot, which is empty in a release (no translation has written permission). Opens at the ayah it was given and
+ * the user chose (ADR-26) with its footnotes, both exactly as the source has them. Opens at the ayah it was given and
  * remembers, when left, the first ayah on screen (saved with the settings, so it is backed up).
  */
 class SurahActivity : BaseActivity() {
@@ -64,17 +64,25 @@ class SurahActivity : BaseActivity() {
         page.addView(title(getString(R.string.quran_surah_title, texts.number(number.value))))
         page.addView(arabicText(this, info.name))
         page.addView(body(getString(R.string.quran_credit), muted = true))
+        val edition = Stores.settings(this).readApp().quranTranslation?.takeIf { it in reader.editions }
         when {
-            !reader.hasTranslation -> page.addView(body(getString(R.string.quran_no_translation), muted = true))
-            reader.translationIsFake -> page.addView(panel().apply { addView(body(getString(R.string.quran_fake_translation_banner))) })
+            edition != null -> page.addView(body(translationCredit(this, edition, texts), muted = true))
+            reader.editions.isNotEmpty() -> page.addView(translationChoice(reader.editions) { render(reader, number, startAyah) })
         }
         ayahViews.clear()
-        for (ayah in reader.verses(number)) {
+        for (ayah in reader.verses(number, edition)) {
             val block = column().apply {
                 addView(heading(getString(R.string.quran_ayah_number, texts.number(ayah.ref.ayah))))
                 addView(arabicText(this@SurahActivity, ayah.text))
-                // The translation slot: shown as it is, only the digits follow the language.
-                ayah.translation?.let { addView(body(texts.data(it))) }
+                // INV-QT1: the translation and its footnotes exactly as QuranEnc published them. Not even the digits
+                // change (they are the source's own); the footnotes stay separate, under their label (G65: markup shown).
+                ayah.translation?.let { translation ->
+                    addView(body(translation.text))
+                    if (translation.footnotes.isNotEmpty()) {
+                        addView(body(getString(R.string.quran_footnotes), muted = true))
+                        addView(body(translation.footnotes, muted = true).apply { textSize = 15f })
+                    }
+                }
             }
             ayahViews += ayah.ref.ayah to block
             page.addView(block)

@@ -2,8 +2,10 @@ package com.senseix21.muminsday.ui
 
 import android.os.Bundle
 import com.senseix21.muminsday.R
+import com.senseix21.muminsday.quran.Edition
 import com.senseix21.muminsday.store.QURAN_FONT_LICENCE
 import com.senseix21.muminsday.store.quranNotice
+import com.senseix21.muminsday.store.translationTranscript
 
 /**
  * The open-source notices (spec 03, "Attribution"). The notice text is the repository's own wording, in English in both
@@ -28,6 +30,15 @@ class LicencesActivity : BaseActivity() {
         quranNotice(this)?.let { notice ->
             page.addView(heading("Tanzil Quran Text: copyright notice, as shipped"))
             page.addView(body(notice))
+        }
+        // ADR-26, QuranEnc conditions 2 to 4: each translation's credit and version, and its transcript as shipped.
+        page.addView(heading("Bengali translations: QuranEnc.com"))
+        page.addView(body(QURANENC_NOTICE))
+        for (edition in Edition.entries) {
+            // Our wording follows the language's digits (INV-L2); the quoted terms and the transcript stay as published.
+            page.addView(heading(texts.data("${edition.key}, version ${editionVersion(edition)}")))
+            page.addView(body(texts.data(editionCredit(edition))))
+            page.addView(body(translationTranscript(this, edition) ?: NO_TRANSCRIPT, muted = true))
         }
         // The full texts, copied from the repository at build time (assets/licences/ and assets/quran/, see
         // app/build.gradle.kts). English in both languages and shown as they are: no digit conversion, because this is
@@ -79,3 +90,37 @@ internal val LICENCE_NOTICES: List<Pair<String, String>> = listOf(
         "The way the calctimes engine is called and the coordinates of the Kaaba come from it. The list of what was " +
         "taken is in the file NOTICE.",
 )
+
+/** QuranEnc's terms, quoted exactly as `content/quranenc-terms.txt` holds them (`TranslationCreditTest` compares). */
+internal val QURANENC_TERMS: List<String> = listOf(
+    "Contents of the translations can be downloaded and re-published, with the following terms and conditions:",
+    "1. No modification, addition, or deletion of the content.",
+    "2. Clearly referring to the publisher and the source (QuranEnc.com).",
+    "3. Mentioning the version number when re-publishing the translation.",
+    "4. Keeping the transcript information inside the document.",
+    "5. Notifying the source (QuranEnc.com) of any note on the translation.",
+    "6. Updating the translation according to the latest version issued from the source (QuranEnc.com).",
+    "7. Inappropriate advertisements must not be included when displaying translations of the meanings of the Noble Quran.",
+)
+
+private val QURANENC_NOTICE: String =
+    "The Bengali translations of the meanings of the Quran are published by QuranEnc.com (Encyclopedia of the Noble " +
+        "Quran, quranenc.com) and are included exactly as QuranEnc.com serves them, without modification, addition or " +
+        "deletion, footnotes included. They are re-published under QuranEnc.com's terms, quoted here from " +
+        "quranenc.com/en/home/api:\n\n" + QURANENC_TERMS.joinToString("\n")
+
+/** QuranEnc's own title and description of [edition] (https://quranenc.com/en/home, read 2026-11-28). */
+internal fun editionCredit(edition: Edition): String = when (edition) {
+    Edition.BengaliZakaria ->
+        "Bengali Translation - Abu Bakr Zakaria. Bengali Translation of Dr. Abu Bakr Muhammad Zakaria. " +
+            "Source and publisher: QuranEnc.com. Version 1.1.1 (22/05/2021), as QuranEnc.com lists it. Taken from " +
+            "QuranEnc.com's sura API (api/v1/translation/sura/bengali_zakaria/1 to 114), whose responses carry no " +
+            "transcript block; the record of the download is content/quran-SOURCES.md in the repository."
+    Edition.BengaliRwwad ->
+        "Bengali Translation - Rowwad Translation Center. Translated by the team of Rowwad Translation Center, in " +
+            "cooperation with the Dawah Association in Rabwah, the Islamic Content Service Association in Languages, " +
+            "and the IslamHouse.com website. Source and publisher: QuranEnc.com. Version 1.1.4 (23/11/2026). The file's " +
+            "own transcript information follows, as shipped."
+}
+
+private const val NO_TRANSCRIPT: String = "(No transcript block in the source.)"

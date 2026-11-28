@@ -30,6 +30,7 @@ import com.senseix21.muminsday.planner.PreReminder
 import com.senseix21.muminsday.planner.Reminder
 import com.senseix21.muminsday.planner.ReminderMode
 import com.senseix21.muminsday.planner.Salah
+import com.senseix21.muminsday.quran.Edition
 import com.senseix21.muminsday.store.MAX_OFFSET_MINUTES
 import com.senseix21.muminsday.store.SilentMode
 import com.senseix21.muminsday.store.Stores
@@ -94,6 +95,16 @@ class SettingsActivity : BaseActivity() {
                 ),
                 prefs.hijriAdjustment,
             ) { chosen -> saveApp(this, Stores.settings(this).readApp().copy(hijriAdjustment = chosen)) },
+        )
+
+        // ADR-26: which of the two bundled translations the reader shows. Nothing is ticked until the user picks one.
+        page.addView(heading(getString(R.string.settings_quran_translation)))
+        page.addView(body(getString(R.string.quran_translation_choose_help), muted = true))
+        page.addView(
+            choices<Edition?>(Edition.entries.map { editionTitle(this, it) to it }, prefs.quranTranslation) { chosen ->
+                val settings = Stores.settings(this)
+                settings.writeApp(settings.readApp().copy(quranTranslation = chosen))
+            },
         )
 
         page.addView(heading(getString(R.string.settings_nudge)))

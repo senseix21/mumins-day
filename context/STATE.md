@@ -1,15 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 18:36 +0600
+**Last updated:** 2026-11-28 20:24 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
-without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac:
-411 tests (280 `:core`, 96 `:app`, 32 content gate, 3 engine), lint clean, all gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 324 string keys in both languages, 64 real
-districts, the Quran text matching its recorded SHA-256; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 900,104 bytes, unsigned, minified (879,473 before phase 16, 867,257 before phase 15). **Nothing has run on a real phone, and
-nothing changed on 28 Nov has run on any device.**
+without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac
+(branch `quran-bengali-translations`): 428 tests (288 `:core`, 101 `:app`, 36 content gate, 3 engine), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 329 string keys in both languages, 64 real
+districts, 120 Quran files matching their recorded SHA-256 including two Bengali translations of 6236 ayahs each; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 5,440,616 bytes, unsigned, minified (900,104 before the translations, 879,473 before phase 16). **Nothing has run on a real phone; the translations have not run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
 
@@ -69,9 +68,23 @@ nothing changed on 28 Nov has run on any device.**
 - **Reader and search:** `QuranActivity` (continue, search, 114 surahs) and `SurahActivity` (ayahs, translation slot, remembers
   the first ayah on screen in `AppPrefs`). The search database is built on the phone with `SQLiteOpenHelper` and FTS4 (no
   build-time JDBC library, INV-P4); the phone re-checks every asset's hash and reads every ayah back after building.
-- **No translation ships** (no written permission). Debug builds generate a FAKE one. Bengali/English search waits for one.
+- **Two Bengali translations ship** (ADR-26, founder's decision 2026-11-28), see the next section.
 - KNOWN: build green; the release APK's Quran files have the recorded hashes. UNKNOWN: everything on a device (first-open
   time, FTS4 on SQLite 3.18, rendering), G57 to G59; Q13 (the offline "link" term).
+
+## Bengali translations added (branch `quran-bengali-translations`, ADR-26)
+
+- **What:** QuranEnc's `bengali_zakaria` v1.1.1 (Dr. Abu Bakr Muhammad Zakaria; 114 sura API responses) and `bengali_rwwad`
+  v1.1.4 (Rowwad Translation Center; QuranEnc's XML download), byte for byte in `content/quran/translations/`, hashed;
+  6236 ayahs each, per-surah counts equal the metadata (KNOWN: gate output, `QuranEncTest`).
+- **Permission:** QuranEnc's seven published terms, quoted in `content/quran-SOURCES.md` and `content/quranenc-terms.txt`;
+  INV-QT1 now counts published terms as the writing. No letter from QuranEnc. **Zakaria is not offered for download by
+  QuranEnc** (no buttons, not in its list API): coverage UNKNOWN, ask QuranEnc (Q15).
+- **App:** the user picks (null until then; Arabic alone meanwhile); text and footnotes shown exactly, `<b>` tags literal
+  (G65); credit with QuranEnc.com and version on reader and Licences; Bengali search over the chosen translation (FTS4,
+  migration 2 of `quran.db`). The FAKE debug translation is deleted.
+- KNOWN: JVM tests and gates, the release APK's 120 Quran files have the recorded hashes, schema and search SQL on desktop
+  SQLite. UNKNOWN: everything on a device, first-open time with 36 MB to hash (G66).
 
 ## Phase 15 built (branch `phase-15-16-khatam-packs`)
 
@@ -118,8 +131,8 @@ nothing changed on 28 Nov has run on any device.**
 
 ## Copies and branches
 
-- This cloud copy, `main`, is ahead of GitHub until pushed. The Mac's clone
-  (`~/dev/mumins-day`) has not been updated by this session.
+- On the Mac (`~/dev/mumins-day`): branch `quran-bengali-translations`, from `phase-15-16-khatam-packs` (dd179b5), pushed
+  to GitHub; not merged, no PR. Earlier notes said the cloud copy's `main` was ahead of GitHub.
 - The cloud environment `mumins-day` now also allows Wikidata, Wikipedia, Open-Meteo,
   kivabe.com, the Islamic Foundation, dontkillmyapp.com, Android and Play documentation, and
   Wikimedia Commons.
@@ -134,7 +147,7 @@ nothing changed on 28 Nov has run on any device.**
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
 5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); phases 11 (calculated date; authority open, Q10) and 12 (Zakat on a fake
-   rules file; Q11) 13 (duas and hadith on fake records; Q12) and 14 (Quran Arabic text, reader, search; no translation; Q13) 15 (khatam plan; Q14) and 16 (pack machinery, no `INTERNET`, ADR-25) are built; next is phase 17 (proof and release), which needs phones. Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
+   rules file; Q11) 13 (duas and hadith on fake records; Q12) and 14 (Quran Arabic text, reader, search, two QuranEnc Bengali translations; Q13, Q15) 15 (khatam plan; Q14) and 16 (pack machinery, no `INTERNET`, ADR-25) are built; next is phase 17 (proof and release), which needs phones. Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
 
 ## Waiting on the founder
 
@@ -148,7 +161,8 @@ nothing changed on 28 Nov has run on any device.**
 | Which authority decides the Hijri month; the Maghrib day change | Phase 11 shows a calculated date only | Q10, G54 |
 | Reviewer signs the Zakat rules | Phase 12 calculates nothing in a release without them | Q11, G55 |
 | Reviewer: books, texts and licences for duas and hadith; the no-nudge decision | Phase 13 shows nothing in a release without them | Q12, G56 |
-| A Bengali Quran translation with written permission; Tanzil's offline "link" term | Phase 14 ships Arabic only | Q13, `PLAN` founder track |
+| Ask QuranEnc whether Zakaria (not offered for download) may be republished; notify QuranEnc of the use (condition 5); check for newer versions before each release (condition 6); Tanzil's offline "link" term | Zakaria in a store release; keeping the terms | Q13, Q15, `PLAN` founder track |
+| `<b>` tags shown literally in Zakaria's footnotes, or rendered bold | How the footnotes look | G65 |
 | Khatam unit (ayah) and the reminder riding on the deed nudge | Phase 15 built that way | Q14, G61 |
 | A pack host, and a tafsir or recitation with written permission | Phase 16 downloads nothing until then; `INTERNET` waits (ADR-25) | ADR-25, G62 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |

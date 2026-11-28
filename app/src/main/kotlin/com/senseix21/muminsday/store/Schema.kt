@@ -124,6 +124,43 @@ val quranMigrations: List<Migration> = listOf(
             "CREATE VIRTUAL TABLE ayah_index USING fts4(arabic, arabic_simple, translation, tokenize=simple)",
         ),
     ),
+    // ADR-26: two bundled translations, the user's choice shown and searched. The database holds nothing of the user's,
+    // so this step drops the version 1 tables and clears `meta`; the next open rebuilds every row from the assets.
+    // (`ALTER TABLE ... DROP COLUMN` needs SQLite 3.35; API 26 has 3.18.)
+    Migration(
+        version = 2,
+        statements = listOf(
+            "DROP TABLE ayah_index",
+            "DROP TABLE ayah",
+            "DELETE FROM meta",
+            "DELETE FROM surah",
+            """
+            CREATE TABLE ayah (
+                id INTEGER PRIMARY KEY,
+                surah INTEGER NOT NULL,
+                ayah INTEGER NOT NULL,
+                text TEXT NOT NULL,
+                UNIQUE (surah, ayah)
+            )
+            """.trimIndent(),
+            // docid = ayah.id. Index words of the Uthmani and Simple Clean texts only, never shown.
+            "CREATE VIRTUAL TABLE arabic_index USING fts4(arabic, arabic_simple, tokenize=simple)",
+            // One row per edition and ayah: text and footnotes exactly as the source has them (INV-QT1), "" for empty
+            // footnotes. edition is core's Edition.key.
+            """
+            CREATE TABLE translation (
+                id INTEGER PRIMARY KEY,
+                edition TEXT NOT NULL,
+                ayah_id INTEGER NOT NULL REFERENCES ayah (id),
+                text TEXT NOT NULL,
+                footnotes TEXT NOT NULL,
+                UNIQUE (edition, ayah_id)
+            )
+            """.trimIndent(),
+            // docid = translation.id. Index words of the translation's text (not its footnotes), never shown.
+            "CREATE VIRTUAL TABLE translation_index USING fts4(text, tokenize=simple)",
+        ),
+    ),
 )
 
 /** The version a fresh database with this [history] is created at. */

@@ -1,5 +1,6 @@
 package com.senseix21.muminsday.tools.gate
 
+import com.senseix21.muminsday.quran.Edition
 import com.senseix21.muminsday.quran.QuranCheck
 import com.senseix21.muminsday.quran.TranslationCheck
 import com.senseix21.muminsday.quran.checkQuran
@@ -13,7 +14,7 @@ import kotlin.system.exitProcess
 /** `sha256 <64 hex> <file>` in `content/quran-SOURCES.md`. */
 private val HASH_LINE = Regex("^sha256 ([0-9a-f]{64}) (\\S+)$", RegexOption.MULTILINE)
 
-/** `permission <translation file> <path under content/ of the written permission>`. */
+/** `permission <edition key> <path under content/ of the permission as published>` (ADR-26). */
 private val PERMISSION_LINE = Regex("^permission (\\S+) (\\S+)$", RegexOption.MULTILINE)
 
 /** The three files the reader is built from; the gate parses them as the app will. */
@@ -23,12 +24,16 @@ const val QURAN_METADATA: String = "quran-data.xml"
 
 fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
+/** Where a translation's files live in `content/quran/`: `translations/<edition key>/<file>` (ADR-26). */
+const val TRANSLATIONS: String = "translations/"
+
 /**
- * T-BUILD-6 (INV-QT1). [sources] is the text of `content/quran-SOURCES.md`; [files] is every file in `content/quran/`
- * by name; [contentPaths] are the paths that exist under `content/`, for the permission check. Fails when a file's
- * SHA-256 differs from its recorded line, when a file is not recorded, when a recorded file is missing, when a
- * translation has no recorded written permission, or when the text, search text and metadata do not describe the same
- * 114 surahs.
+ * T-BUILD-6 (INV-QT1). [sources] is the text of `content/quran-SOURCES.md`; [files] is every file under `content/quran/`
+ * by its path there (`translations/bengali_rwwad/...`); [contentPaths] are the paths that exist under `content/`, for the
+ * permission check. Fails when a file's SHA-256 differs from its recorded line, when a file is not recorded, when a
+ * recorded file is missing, when a translation is not one of the bundled [Edition]s or has no recorded permission, when
+ * the text, search text and metadata do not describe the same 114 surahs, or when a translation does not give exactly
+ * one ayah for each of them.
  */
 fun runQuranGate(sources: String, files: Map<String, ByteArray>, contentPaths: Set<String>): GateReport {
     val problems = mutableListOf<String>()
@@ -44,10 +49,22 @@ fun runQuranGate(sources: String, files: Map<String, ByteArray>, contentPaths: S
     for (name in files.keys - recorded.keys) problems += "$name is in content/quran/ but has no recorded hash"
 
     val permissions = PERMISSION_LINE.findAll(sources).associate { it.groupValues[1] to it.groupValues[2] }
-    for (name in files.keys.filter { it.startsWith("translation-") }) {
-        val permission = permissions[name]
+    val editions = mutableMapOf<Edition, MutableMap<String, String>>()
+    for (path in files.keys.sorted()) {
+        if (path.substringAfterLast('/').startsWith("translation-")) problems += "$path: a translation lives in $TRANSLATIONS<edition key>/ (ADR-26)"
+        if (!path.startsWith(TRANSLATIONS)) continue
+        val parts = path.removePrefix(TRANSLATIONS).split('/')
+        val edition = Edition.ofKey(parts.first())
+        when {
+            parts.size != 2 -> problems += "$path: expected $TRANSLATIONS<edition key>/<file>"
+            edition == null -> problems += "$path: ${parts.first()} is not a bundled translation (core Edition)"
+            else -> editions.getOrPut(edition) { mutableMapOf() }[parts[1]] = files.getValue(path).toString(Charsets.UTF_8)
+        }
+    }
+    for (edition in editions.keys) {
+        val permission = permissions[edition.key]
         if (permission == null || permission !in contentPaths) {
-            problems += "$name is a translation without a `permission $name <file>` line naming a file in content/ (INV-QT1)"
+            problems += "${edition.key} is a translation without a `permission ${edition.key} <file>` line naming a file in content/ (INV-QT1)"
         }
     }
 
@@ -57,13 +74,12 @@ fun runQuranGate(sources: String, files: Map<String, ByteArray>, contentPaths: S
     fun text(name: String) = files.getValue(name).toString(Charsets.UTF_8)
     return when (val check = checkQuran(parseText(text(QURAN_TEXT)), parseText(text(QURAN_SEARCH_TEXT)), parseMetadata(text(QURAN_METADATA)))) {
         is QuranCheck.Verified -> {
-            // A translation ships only complete, numbered like the text, and never as the FAKE debug fixture.
-            val translations = files.keys.filter { it.startsWith("translation-") }.sorted()
-            val refused = translations.mapNotNull { name ->
-                val body = text(name)
-                when (val translation = checkTranslation(check.quran, parseText(body), body.lineSequence().first())) {
-                    is TranslationCheck.Refused -> "$name: ${translation.reason}"
-                    is TranslationCheck.Accepted -> if (translation.translation.testFixture) "$name is a test fixture and cannot ship" else null
+            // A translation ships only complete and numbered like the text (ADR-26).
+            val counted = mutableListOf<String>()
+            val refused = editions.toSortedMap().mapNotNull { (edition, editionFiles) ->
+                when (val translation = checkTranslation(check.quran, edition, editionFiles)) {
+                    is TranslationCheck.Refused -> translation.reason
+                    is TranslationCheck.Accepted -> null.also { counted += "${edition.key} ${translation.translation.verses.size} ayahs" }
                 }
             }
             if (refused.isNotEmpty()) {
@@ -73,7 +89,8 @@ fun runQuranGate(sources: String, files: Map<String, ByteArray>, contentPaths: S
                     true,
                     listOf(
                         "quran gate: passed. ${recorded.size} files match their recorded SHA-256; ${check.quran.surahs.size} surahs, " +
-                            "${check.quran.verses.size} ayahs, as the metadata gives; ${translations.size} translation(s).",
+                            "${check.quran.verses.size} ayahs, as the metadata gives; ${counted.size} translation(s)" +
+                            counted.joinToString(", ", prefix = if (counted.isEmpty()) "" else ": ") + ".",
                     ),
                 )
             }
@@ -82,7 +99,7 @@ fun runQuranGate(sources: String, files: Map<String, ByteArray>, contentPaths: S
     }
 }
 
-/** Arguments: the path of `content/quran-SOURCES.md`, of `content/quran/`, and of `content/`. */
+/** Arguments: the path of `content/quran-SOURCES.md`, of `content/quran/` (read with its subfolders), and of `content/`. */
 object QuranMain {
     @JvmStatic
     fun main(args: Array<String>) {
@@ -90,7 +107,9 @@ object QuranMain {
         val sourcesFile = File(args[0])
         val sources = if (sourcesFile.isFile) sourcesFile.readText(Charsets.UTF_8) else ""
         // Hidden files (a Finder `.DS_Store`) are not content; the app's staging skips them too.
-        val files = File(args[1]).listFiles().orEmpty().filter { it.isFile && !it.name.startsWith(".") }.associate { it.name to it.readBytes() }
+        val quran = File(args[1])
+        val files = quran.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }
+            .associate { it.relativeTo(quran).invariantSeparatorsPath to it.readBytes() }
         val content = File(args[2])
         val paths = content.walkTopDown().filter { it.isFile }.map { it.relativeTo(content).invariantSeparatorsPath }.toSet()
         val report = runQuranGate(sources, files, paths)
