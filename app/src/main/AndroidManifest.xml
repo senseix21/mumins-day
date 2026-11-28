@@ -3,7 +3,7 @@
 
     <!--
         The whole list. app/allowlist/permissions.txt must match it exactly or the build fails (INV-P3).
-        There is no INTERNET permission and there never will be in v1 (INV-P1).
+        There is no INTERNET permission in v1 (INV-P1).
     -->
 
     <!-- Ring the Adhan at the exact time. Granted at install on Android 13 and later. -->
@@ -21,6 +21,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <!-- Keep the phone awake while the Adhan plays. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--
+        "Find my district" (ADR-19, reversing ADR-12; the founder's yes is recorded in ADR-17). Coarse only, never fine.
+        Read once, only while the district screen is open, and never stored (INV-P2). Asked for at the tap on that
+        button, never at start.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Location hardware is optional: the district can always be chosen by hand, so no phone is filtered out of Play. -->
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
 
     <application
         android:allowBackup="true"

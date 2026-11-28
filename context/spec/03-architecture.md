@@ -184,14 +184,15 @@ stateDiagram-v2
 | `POST_NOTIFICATIONS` | Show the prayer notification |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Play the Adhan |
 | `WAKE_LOCK` | Keep the phone awake while the Adhan plays |
+| `ACCESS_COARSE_LOCATION` | "Find my district": read once, only while the district screen is open, never stored (ADR-19) |
 
-Removed relative to the base (KNOWN list, audit §3): `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_FINE_LOCATION`, `DISABLE_KEYGUARD`, `ACCESS_NOTIFICATION_POLICY`, `FOREGROUND_SERVICE_SPECIAL_USE`, `SET_ALARM`, `INSTALL_SHORTCUT`.
+Removed relative to the base (KNOWN list, audit §3): `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_FINE_LOCATION` (the app declares coarse only), `DISABLE_KEYGUARD`, `ACCESS_NOTIFICATION_POLICY`, `FOREGROUND_SERVICE_SPECIAL_USE`, `SET_ALARM`, `INSTALL_SHORTCUT`.
 
 **Network allowlist.** Empty. `INTERNET` is not declared (INV-P1). A CI check greps the merged manifest.
 
 **Crash reporting.** None automatic. A "Send a report" button in Settings opens the user's email app with a plain-text draft they can read: app version, Android version, manufacturer and model, health-check results, the 7-day alarm log. No identifiers. The user chooses whether to send. This is the only way information leaves the phone, and it does not need the `INTERNET` permission.
 
-**Location.** The app does not read the phone's location and declares no location permission (ADR-12). The user picks a district by hand; what is stored is the district id and its centre's coordinates. Adding location back needs an ADR and the founder's yes (INV-P3).
+**Location.** The app reads the phone's position only when the user taps "Find my district" on the district screen, once, while that screen is open, with `ACCESS_COARSE_LOCATION` and nothing finer (ADR-19). The position is turned into the nearest district at once and discarded; only the chosen district id and its centre's coordinates are stored. A position outside Bangladesh's bounding box or more than 50 km from every headquarters point is shown with a warning and needs a second tap; no case switches the district without a tap. The district list can always be used by hand.
 
 **Vibration.** Not used and not declared (ADR-12). Adding `VIBRATE` back needs an ADR.
 
@@ -342,6 +343,7 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 - **Decision.** (b). `app/allowlist/permissions.txt`, the manifest and the permissions table above now list seven permissions (KNOWN: gate output "permission gate: passed, 7 permissions, no INTERNET.", 2026-11-27).
 - **Consequences.** A smaller privacy page and Play surface. ADR-8's "coarse location" is now only the coarse district centre the user picks; the app never asks the platform for a position. The in-app "find my district" idea is gone until a new ADR.
 - **Reverse.** Add the line to the manifest and the allowlist, with an ADR and the founder's yes (INV-P3).
+- **Superseded in part 2026-11-28 by ADR-19** for `ACCESS_COARSE_LOCATION`: it is back, for "find my district" only. `VIBRATE` stays removed.
 
 ### ADR-13 · The LGPL licence texts ship inside the app
 
@@ -400,3 +402,12 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 - **Decision.** (b). `deedMigrations` is now described as the backed-up user data's history. The file keeps its name `deed-days.db`. Khatam (phase 15) adds its own migration to the same list.
 - **Consequences.** No change to `data_extraction_rules.xml` or `full_backup_content.xml` beyond a comment; `MigrationsTest` still proves both include `deed-days.db` and exclude the alarm log. One SQLite connection serves deeds and the tracker. Only marked prayers have rows, so the table cannot hold a count of prayers not marked (INV-C5). A restored backup brings the log back; nothing else reads it. The file's name no longer says everything it holds (cosmetic).
 - **Reverse.** Move the table to a new file with a migration that copies the rows, and add the include line.
+
+### ADR-19 · "Find my district" returns, with `ACCESS_COARSE_LOCATION` only
+
+- **Date.** 2026-11-28. The founder's yes for INV-P3 is recorded in ADR-17 (item 3); this is the decision that carries it out.
+- **Context.** ADR-12 removed the permission because no code used it. The founder asked for the button back (ADR-17). F1 #6 and #7 already say what it must do with a position outside Bangladesh and that the app never switches silently.
+- **Options.** (a) Fine location with GPS. (b) Coarse location through the platform `LocationManager`, one read. (c) A location library (Play services): refused, INV-P4 and ADR-6.
+- **Decision.** (b). `ACCESS_COARSE_LOCATION` is in the manifest and `app/allowlist/permissions.txt` (eight permissions). Two `uses-feature` lines mark location hardware as not required, so no phone is filtered out of Play (they are not permissions). The permission is requested at the tap on the button and never at start. `OneShotLocation` reads once (`getCurrentLocation` from API 30; `requestSingleUpdate` before it), from the fused provider (API 31) or the network provider, with a 20 second limit, and is stopped in `onPause`. `core/districts/Nearest.kt` picks the nearest headquarters point by great-circle distance. Every result needs a tap; a position outside the bounding box or more than 50 km from every point (F1 #6) is shown in a warning panel with "use it anyway".
+- **Consequences.** The Data safety and privacy drafts change (`06`). A denied permission, a switched-off location or a phone without a network provider shows a sentence and leaves the list of districts, which always works. Not verified on a device: the system permission dialog, the provider choice, the 20 second limit, `T-INST-11` (no request while backgrounded). Older phones (API 26 to 29) use a deprecated call whose replacement needs API 30.
+- **Reverse.** Delete the button, `OneShotLocation.kt`, the manifest lines and the allowlist line; ADR-12 stands again.

@@ -447,7 +447,7 @@ content gate takes more than one kind of record.
 **Outcome.** The next prayer at a glance on the home screen; a private, guilt-free record of
 prayers; an optional "find my district" button.
 
-**Widgets** (platform `AppWidgetProvider`, no new dependency). Built 2026-11-28 17:00 +0600 (KNOWN: `./gradlew build` green, lint clean, 8 JVM tests of the model). Nothing has been drawn on an emulator or a phone, so the behaviour items stay open.
+**Widgets** (platform `AppWidgetProvider`, no new dependency). Built 2026-11-28 16:59 +0600 (KNOWN: `./gradlew build` green, lint clean, 8 JVM tests of the model). Nothing has been drawn on an emulator or a phone, so the behaviour items stay open.
 - [ ] Next-prayer widget and a five-times widget, Bengali digits [INV-L2]. Built (`app/.../widget/PrayerWidgets.kt`, two layouts, two provider files); digits come from the same `Texts` the home screen uses. Open: look at both on an emulator in both languages.
 - [x] Read the planner and clock only; the widget computes nothing [spec 03 forward path]. 2026-11-28: the model is `core/.../widget/WidgetModel.kt`, built only from `upcomingSalah` and `PrayerClock.dayTimes`; the shell only formats it.
 - [ ] Updated from the alarm path's replan and at each prayer, never by a polling job; no new permission [INV-P3]. Built: `replan` ends in `refreshWidgets`; one alarm (request code 1001) at the next prayer or local midnight; both provider files set `updatePeriodMillis="0"`; the permission gate is unchanged. Open: watch a widget change at a prayer on an emulator.
@@ -455,7 +455,7 @@ prayers; an optional "find my district" button.
 - [x] Tests: the widget's view model as a pure function (7 tests, `WidgetModelTest`, 2026-11-28).
 - [ ] Tests: instrumented check on an emulator. Not run.
 
-**Salah tracker.** Built 2026-11-28 17:40 +0600 (KNOWN: `./gradlew build` green). Not run on an emulator or phone.
+**Salah tracker.** Built 2026-11-28 17:04 +0600 (KNOWN: `./gradlew build` green). Not run on an emulator or phone.
 - [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41]. Built as migration 2 of `deed-days.db`, so backup rules are unchanged (ADR-18, which amends ADR-17 item 6). Statements run by hand in the `sqlite3` CLI (insert, ignore duplicate, range select, delete: all as intended); `MigrationsTest` checks numbering and the backup rules. Open: the 1 to 2 upgrade on a device, and a backup/restore.
 - [ ] "Prayed" action on the prayer notification, built by the one notification builder. Built (`Notifications.post`, `PrayedReceiver`); only on silent notices, not on the Adhan's own notification (G53). Open: tap it on an emulator.
 - [ ] Manual tick on the home screen for today and the past 7 days. Built as `TrackerActivity`, reached by a button on Home (the Phase 10 navigation entry), not inline on Home. Open: look at it on an emulator, in both languages, at 200 % font.
@@ -463,11 +463,12 @@ prayers; an optional "find my district" button.
 - [ ] Never prompts about a prayer not marked; never a notification about the tracker. By construction nothing reads the log except `TrackerActivity`; the only notification change is one action on an existing notice. Open: not machine-checked beyond that.
 - [x] Tests: tone rules as a string check over every tracker string (`TrackerStringsTest`, 4 tests, 2026-11-28); date attribution across midnight and a change of zone (`TrackerTest`, 8 tests including a property over 200 random windows, 2026-11-28).
 
-**Find my district** (only with the founder's yes)
-- [ ] ADR reversing ADR-12 for `ACCESS_COARSE_LOCATION` only; allowlist edit [INV-P3].
-- [ ] Read once while the district screen is open; never in the background; nothing stored but the chosen district [INV-P2, T-INST-11].
-- [ ] Nearest district from the 64 headquarters points; outside the bounding box or more than 50 km away asks before changing [F1#6, F1#7].
-- [ ] Privacy page and Data safety draft updated.
+**Find my district** (the founder's yes is recorded in ADR-17). Built 2026-11-28 17:08 +0600 (KNOWN: `./gradlew build --rerun-tasks` green, permission gate "passed, 8 permissions, no INTERNET"). Not run on an emulator or phone.
+- [x] ADR reversing ADR-12 for `ACCESS_COARSE_LOCATION` only; allowlist edit [INV-P3]. ADR-19; manifest, `app/allowlist/permissions.txt` and the permissions table in `spec/03` edited together; the gate counts 8 and a test run shows the build passing with them.
+- [ ] Read once while the district screen is open; never in the background; nothing stored but the chosen district [INV-P2, T-INST-11]. Built: `OneShotLocation` (one call, 20 s limit, `stop()` in `onPause`), only the district and a distance are kept. Open: T-INST-11 and the permission dialog on an emulator and a phone, including a phone with location off.
+- [x] Nearest district from the 64 headquarters points; outside the bounding box or more than 50 km away asks before changing [F1#6, F1#7]. `core/districts/Nearest.kt`, 10 tests (`NearestTest`: the 50 km edge, the box edge, the nearest wins, each of the 64 real points finds itself, the sea asks, a seeded property). Every case needs a tap; the two far cases show a warning panel first.
+- [ ] Privacy page and Data safety draft updated. Done in `spec/06` (facts table, privacy text, Data safety row, decision 2) and marked as drafts; stays open until the founder reads them and Play's live form is seen (Play's location declaration: UNKNOWN).
+- [ ] Runtime-permission flow with a clear denied state. Built (denied sentence plus the always-present district list); open: seen on a device.
 
 ## Phase 11 · Hijri date, ±1 day
 

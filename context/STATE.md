@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 17:44 +0600
+**Last updated:** 2026-11-28 17:08 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build` is green in the cloud:
-259 tests (175 `:core`, 69 `:app`, 12 content gate, 3 engine), lint clean, all five gates
-passing (no `INTERNET`, 7 permissions, 4 libraries, 169 string keys in both languages, 64 real
-districts). The release APK is 184,738 bytes, minified. **Nothing has run on a real phone, and
+269 tests (185 `:core`, 69 `:app`, 12 content gate, 3 engine), lint clean, all five gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 169 string keys in both languages, 64 real
+districts). The release APK is 202,510 bytes, minified (184,738 before phase 10). **Nothing has run on a real phone, and
 nothing changed on 28 Nov has run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
@@ -20,7 +20,12 @@ nothing changed on 28 Nov has run on any device.**
   unchanged); `core/tracker` holds the model (no field can express a missed count); `TrackerActivity` shows five dots a day
   for eight days, reached by a button on Home; the "Prayed" action is on silent prayer notices (G53: not on the Adhan's own
   notification). Tone is enforced by `TrackerStringsTest` over every `tracker_` string in both languages.
-- "Find my district": not started yet in this entry; see `PLAN.md` phase 10.
+- **"Find my district" built** (slice 3): ADR-19 reverses ADR-12 for `ACCESS_COARSE_LOCATION` only (8 permissions; manifest,
+  allowlist and spec table edited together). `OneShotLocation` reads once while `DistrictActivity` is open; `core/districts/Nearest`
+  picks the nearest headquarters point; every result needs a tap and the far cases show a warning first. The privacy and
+  Data safety drafts in `spec/06` are updated. UNKNOWN: everything on a device (permission dialog, providers, T-INST-11).
+- **Phase 10 is built; it is not verified.** Every behaviour item is open until the founder's one emulator pass. Open items
+  Claude added: G53 (no "Prayed" on the Adhan's own notification).
 
 ## What changed on 28 Nov 2026
 
@@ -57,8 +62,8 @@ nothing changed on 28 Nov has run on any device.**
    G51 (`USE_EXACT_ALARM`); G52 (`mediaPlayback`); G33 and G35 rulings; an Adhan recording (Q5).
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
-5. **Part 2** (phases 9 to 17 in `PLAN.md`): the nine later features, planned. Phases 9 to 13 need
-   no new permission and can be built while v1 waits; they ship in an update after v1.
+5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); next is phase 11
+   (Hijri date). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
 
 ## Waiting on the founder
 

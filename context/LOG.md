@@ -550,7 +550,7 @@ the plan until fetched.
 
 **Not done / follow-up.** Navigation and the content-kind generalisation are deferred to phases 10 and 13, where the first user exists; reasons are in the plan lines. INV-P1 and ADR-12 are unchanged until phases 16 and 10 change the manifest.
 
-## 2026-11-28 17:03 +0600 · Phase 10, slice 1: home-screen widgets
+## 2026-11-28 16:59 +0600 · Phase 10, slice 1: home-screen widgets
 
 **Did.** Two platform widgets (next prayer, five times) with no library. Pure view model in `core/.../widget/WidgetModel.kt` (built on `upcomingSalah` and `PrayerClock.dayTimes`); shell in `app/.../widget/PrayerWidgets.kt`. `replan` now ends in `refreshWidgets`; one extra alarm (request code 1001, outside the planner's id space) redraws at the next prayer or local midnight, so prayers set to Off still keep the widget current. Degraded reminders show a warning line in words; "—" is shown where no time can be named. Added `Context.inLanguage` (shared by `BaseActivity` and the widgets). Five new keys in both languages, listed in `app/l10n-review.txt`.
 
@@ -558,8 +558,14 @@ the plan until fetched.
 
 **Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 167 tests (7 new), `:app` 64, gates passed. **Not verified:** any drawing or behaviour of the widgets (no emulator or phone).
 
-## 2026-11-28 17:44 +0600 · Phase 10, slice 2: Salah tracker
+## 2026-11-28 17:04 +0600 · Phase 10, slice 2: Salah tracker
 
 **Did.** `core/tracker` (model, date attribution, the eight-day window), `store/SalahLog`, `salah_log` as migration 2 of `deed-days.db` (ADR-18, amending ADR-17 item 6; backup rules unchanged), `TrackerActivity` (five dots a day, tap to mark or take back), a Home button to it, a "Prayed" action on silent prayer notices via the one `Notifications` builder and a non-exported `PrayedReceiver`. Six `tracker_` strings in both languages, listed in `app/l10n-review.txt`. Opened G53.
 
 **Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 175 tests (8 new: window, attribution across midnight and zone change, a seeded property, member-name check), `:app` 69 (5 new: tone scan of every tracker string in both languages with a self-check that the scan catches bad examples, plurals ban, migration 2). The SQL of migration 2 was run by hand in the `sqlite3` CLI. **Not verified:** the upgrade from schema 1 to 2 on a device, the notification action, the screen, backup and restore (no emulator or phone).
+
+## 2026-11-28 17:08 +0600 · Phase 10, slice 3: find my district
+
+**Did.** ADR-19 (reverses ADR-12 for `ACCESS_COARSE_LOCATION` only; the founder's yes is the one recorded in ADR-17). Manifest, `app/allowlist/permissions.txt` and the permissions table in `spec/03` edited together; two `uses-feature` lines mark location hardware optional. `core/districts/Nearest.kt` (haversine, 50 km, bounding box), `ui/OneShotLocation.kt`, and a button, privacy sentence, result and denied states on `DistrictActivity`; the district list is always below. Ten new keys in both languages, in `app/l10n-review.txt`. Privacy page, Data safety and decision list in `spec/06` updated. F1 #6 in `spec/02` now says what was built. Also corrected the entry times of slices 1 and 2 in this file and in `PLAN.md`: I had typed 17:03, 17:44 and 17:40 by hand against the rule; the clock said 16:59 and 17:04 (the commit times).
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 269 tests (`:core` 185, `:app` 69, content gate 12, engine 3); permission gate "passed, 8 permissions, no INTERNET"; string gate "190 keys in Bengali and English"; lint clean with warnings as errors; release APK 202,510 bytes. **Not verified:** any behaviour on an emulator or phone (permission dialog, provider choice, the 20 second limit, T-INST-11, widgets, tracker screen, notification action, schema upgrade).

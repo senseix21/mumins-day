@@ -306,4 +306,16 @@
     <string name="tracker_prayer_open">%1$s, %2$s। পড়লে ছুঁয়ে দাগ দিন</string>
     <string name="tracker_prayer_marked">%1$s, %2$s: পড়েছি। ছুঁলে দাগ উঠে যাবে</string>
     <string name="tracker_prayed_action">পড়েছি</string>
+
+    <!-- Find my district (phase 10, ADR-19). Bengali drafted by Claude, native review pending. -->
+    <string name="find_button">আমার জেলা খুঁজুন</string>
+    <string name="find_privacy">আপনার অবস্থান শুধু এই পর্দা খোলা থাকলে একবার পড়া হয়। এটি সংরক্ষণ করা হয় না, কোথাও পাঠানোও হয় না। শুধু আপনার বেছে নেওয়া জেলা রাখা হয়।</string>
+    <string name="find_reading">আপনার অবস্থান খোঁজা হচ্ছে…</string>
+    <string name="find_denied">লোকেশনের অনুমতি দেওয়া হয়নি, তাই কিছু পড়া হয়নি। নিচ থেকে হাতে জেলা বেছে নিতে পারেন।</string>
+    <string name="find_unavailable">আপনার অবস্থান পাওয়া যায়নি। লোকেশন বন্ধ থাকতে পারে, অথবা ফোন বুঝতে পারেনি। নিচ থেকে হাতে জেলা বেছে নিতে পারেন।</string>
+    <string name="find_near">সবচেয়ে কাছের জেলা %1$s, প্রায় %2$s কিমি দূরে।</string>
+    <string name="find_use">%1$s বেছে নিন</string>
+    <string name="find_outside">আপনি বাংলাদেশের বাইরে আছেন মনে হচ্ছে। সবচেয়ে কাছের জেলা %1$s, প্রায় %2$s কিমি দূরে। নামাজের সময় আপনি যেখানে আছেন সেখানকার নয়, %1$s জেলার হিসাবে হবে।</string>
+    <string name="find_far">আপনার কাছাকাছি কোনো জেলা নেই। সবচেয়ে কাছের জেলা %1$s, প্রায় %2$s কিমি দূরে।</string>
+    <string name="find_use_anyway">তবুও %1$s বেছে নিন</string>
 </resources>

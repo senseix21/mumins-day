@@ -184,3 +184,13 @@ tracker_today
 tracker_prayer_open
 tracker_prayer_marked
 tracker_prayed_action
+find_button
+find_privacy
+find_reading
+find_denied
+find_unavailable
+find_near
+find_use
+find_outside
+find_far
+find_use_anyway

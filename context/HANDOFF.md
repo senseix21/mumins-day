@@ -30,15 +30,15 @@ or a Play account.
 | `engine/calctimes` | Upstream's LGPL engine, vendored, one recorded change |
 | `core` | Pure Kotlin: `clock` (times, `Calibration`), `planner` (48-hour plan, late rule, nudge), `health`, `deed`, `bearing`, `l10n`, `districts` |
 | `tools/content-gate` | Build-only gates for `content/deeds.json` and `content/districts.json` |
-| `app` | Platform Views UI, alarm path, store, sensors, phone-maker steps; 7 permissions, no `INTERNET`; release 184,738 bytes |
+| `app` | Platform Views UI, alarm path, store, sensors, phone-maker steps; 8 permissions, no `INTERNET`; release 184,738 bytes |
 
-`./gradlew build`: 239 tests and five gates, green on 2026-11-28.
+`./gradlew build`: 269 tests and five gates, green on 2026-11-28.
 
 ## Decisions that shape everything (do not reopen without the founder)
 
 - New app that ports parts of upstream (ADR-1). Engine vendored with one change (ADR-2).
 - 48-hour alarm window; passed prayers skipped (ADR-3). Platform Views, no Compose (ADR-11).
-- No location, no vibrate (ADR-12). R8 on for release (ADR-15).
+- No vibrate (ADR-12); location only for "find my district", coarse, one read (ADR-19). R8 on for release (ADR-15).
 - **Times = each district's own astronomy + the Islamic Foundation's safety margins (ADR-16).**
 
 ## Claude's rulings that a person must confirm

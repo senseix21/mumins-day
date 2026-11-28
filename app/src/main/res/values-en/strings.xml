@@ -292,4 +292,16 @@
     <string name="tracker_prayer_open">%1$s, %2$s. Tap to mark as prayed</string>
     <string name="tracker_prayer_marked">%1$s, %2$s: prayed. Tap to take the mark back</string>
     <string name="tracker_prayed_action">Prayed</string>
+
+    <!-- Find my district (phase 10, ADR-19). Bengali drafted by Claude, native review pending. -->
+    <string name="find_button">Find my district</string>
+    <string name="find_privacy">Your position is read once, only while this screen is open. It is not saved and not sent anywhere. Only the district you choose is kept.</string>
+    <string name="find_reading">Finding your position…</string>
+    <string name="find_denied">Location was not allowed, so nothing was read. You can choose your district by hand below.</string>
+    <string name="find_unavailable">Your position could not be found. Location may be switched off, or the phone could not tell. You can choose your district by hand below.</string>
+    <string name="find_near">The nearest district is %1$s, about %2$s km away.</string>
+    <string name="find_use">Use %1$s</string>
+    <string name="find_outside">You seem to be outside Bangladesh. The nearest district is %1$s, about %2$s km away. Prayer times would be worked out for %1$s, not for where you are.</string>
+    <string name="find_far">No district is close to you. The nearest is %1$s, about %2$s km away.</string>
+    <string name="find_use_anyway">Use %1$s anyway</string>
 </resources>

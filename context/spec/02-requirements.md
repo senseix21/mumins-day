@@ -21,7 +21,7 @@ Each feature starts with the case for cutting it. It stays only if that case fai
 | 3 | Exact-alarm permission denied or revoked | Home screen shows a persistent, plain-language warning with a one-tap fix. No silent inexact fallback | Silent fallback (S4) |
 | 4 | Notification permission denied | Same: visible warning. Adhan audio does not depend on the notification being shown (ASSUMED possible via the playback service; verify on Android 13+) | Not surfaced |
 | 5 | Location unavailable | Works from the stored district. Location is never needed to ring | Needs network for first setup (audit §6) |
-| 6 | GPS spoofing / wild fix | A fix outside Bangladesh, or more than 50 km **(target)** from the stored point, asks before changing the district | Auto-updates |
+| 6 | GPS spoofing / wild fix | A fix outside Bangladesh, or more than 50 km **(target)** from the stored point, asks before changing the district. Built 2026-11-28 for "find my district" as: outside the bounding box, or more than 50 km from the nearest headquarters point, shows a warning and needs a second tap (ADR-19) | Auto-updates |
 | 7 | Travel between districts | Offer to switch, once, when the nearest district changes. Never switch silently | Auto-updates when "auto location" is on |
 | 8 | Phone's time zone is not Asia/Dhaka | Alarms fire at the true instant for the chosen place (INV-S2) | Wrong instant (S3) |
 | 9 | Manual clock change, time-zone change | Reschedule within 60 s | Handled (KNOWN) |
