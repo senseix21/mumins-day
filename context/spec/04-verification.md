@@ -33,6 +33,11 @@ This file defines what "done" means. A result other than **Not run** names where
 | F4 rotation | INV-C2 | T-PROP-8 | Same date gives same deed; every deed appears once per cycle | Pass on JVM, 2026-11-26 |
 | F4 tone | INV-C4 | T-UI-2 | Manual review of every string and screen by the reviewer and a native speaker | Not run |
 | Bengali complete | INV-L1 | T-BUILD-5 | Build fails on a missing key | Not run |
+| Tracker never judges (phase 10) | INV-C5 | T-UI-2, T-UNIT | No missed count or streak in any tracker type or string | Not built |
+| Later content kinds pass the gate (phase 13) | INV-C6 | T-BUILD-4 per kind | Fake or unreviewed record fails the build | Not built |
+| Quran text unmodified (phase 14) | INV-QT1 | T-BUILD-6 | Hash of each bundled text equals the recorded hash | Not built |
+| Hijri date names its rule, ±1 day (phase 11) | INV-H1 | T-UNIT | Every rendered date carries its rule | Not built |
+| Zakat rules come from a signed file (phase 12) | INV-Z1 | T-BUILD-4, T-UNIT | No rule number in code | Not built |
 | Bengali digits | INV-L2 | T-UNIT-9 | All ten digits map; screenshot test finds no Latin digit | Digit mapping: pass on JVM, 2026-11-26. Screenshot part: not run |
 | Arabic in Bengali | INV-L3 | T-UI-3 | Screenshot review on the matrix | Not run |
 | Font scale | INV-L4 | T-UI-4 | Screenshots at 200 % | Not run |

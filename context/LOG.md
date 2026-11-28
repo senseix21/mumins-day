@@ -541,3 +541,11 @@ Sizes, unit conversions, the Quran text licence and the Hijri authority are mark
 the plan until fetched.
 
 **Not done / follow-up.** Founder decisions at the top of Part 2's founder track.
+
+## 2026-11-28 16:52 +0600 · Phase 9: decisions and invariants
+
+**Did.** Pulled `main` (`e6c8044`; it already contained the Dhaka comparison commit). Recorded the founder's three decisions (all phases, internet for packs only, "find my district" back) as ADR-17 with storage plan and size budget; added INV-C5, INV-C6, INV-QT1, INV-H1, INV-Z1 to `spec/01` and rows to `spec/04`; ticked phase 9 and the three founder-track decisions.
+
+**Verified.** `./gradlew build` on `main` before the edit: exit 0, gates passed (64 districts, 7 permissions). The edit is documentation only; no code changed.
+
+**Not done / follow-up.** Navigation and the content-kind generalisation are deferred to phases 10 and 13, where the first user exists; reasons are in the plan lines. INV-P1 and ADR-12 are unchanged until phases 16 and 10 change the manifest.

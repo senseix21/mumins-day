@@ -412,9 +412,9 @@ decisions, and nothing here may break a v1 rule without an ADR and the founder's
 
 ## Founder track, part 2
 
-- [ ] Decide: after v1 ships, which phases form the first update (suggested: 10 to 12).
-- [ ] Decide: is network ever allowed in the main app (phase 16), or do audio packs live in a separate app? [ADR-6]
-- [ ] Decide: bring back "find my district" with coarse location (reverses ADR-12) [INV-P2, INV-P3].
+- [x] Decide: after v1 ships, which phases form the first update (suggested: 10 to 12). Founder said "All" 2026-11-28: build all of 9 to 17; ship order is decided at release (ADR-17).
+- [x] Decide: is network ever allowed in the main app (phase 16)? Yes, one host, packs only (founder, 2026-11-28, ADR-17).
+- [x] Decide: bring back "find my district" with coarse location: yes (founder, 2026-11-28, ADR-17). The manifest changes in phase 10, not before.
 - [ ] Hijri authority: whose announcement decides the month (ASSUMED candidates: the National Moon Sighting Committee convened by the Islamic Foundation; confirm) [G33].
 - [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [F-Zakat].
 - [ ] Duas: the source text (Hisnul Muslim, Arabic) and a Bengali translation, each with a written licence; the reviewer for selection and wording.
@@ -434,13 +434,13 @@ content gate takes more than one kind of record.
 
 **Exit.** Decisions recorded as ADRs; the gate generalised with tests; v1 behaviour unchanged.
 
-- [ ] ADR-17: release order and the network question (founder track, first two items).
-- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested.
-- [ ] Content kinds: `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10].
-- [ ] Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships.
-- [ ] Storage plan: one SQLite database for user data (tracker, khatam); read-only bundled databases for Quran and hadith; numbered migrations continue [ADR-5].
-- [ ] Size budget per feature, measured against the 15 MB total (INV, `01` constraints).
-- [ ] New invariants written into `spec/01` before their code: tracker tone (INV-C4 extended), Quran integrity (INV-Q-text), Hijri attribution (INV-H1).
+- [x] ADR-17: release order, network, location, storage, size budget (2026-11-28, `spec/03`).
+- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested. Deferred to phase 10, the first phase with a new screen; an entry list with no entries would be a stub.
+- [ ] Content kinds (deferred to phase 13, the second kind; ADR-17 item 5): `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10].
+- [ ] (phase 13) Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships.
+- [x] Storage plan: `user-data.db` for tracker and khatam; read-only asset databases for Quran and hadith; numbered migrations continue [ADR-5, ADR-17 item 6]. Plan only; nothing built.
+- [x] Size budget per feature written in ADR-17 (allowances, ASSUMED); each content phase must measure its real size.
+- [x] New invariants written into `spec/01` before their code 2026-11-28: INV-C5 (tracker), INV-C6 (content kinds), INV-QT1 (Quran), INV-H1 (Hijri), INV-Z1 (Zakat); rows added to `spec/04`.
 
 ## Phase 10 · Widgets, Salah tracker, "find my district"
 
