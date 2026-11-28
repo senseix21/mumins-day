@@ -1,10 +1,15 @@
 package com.senseix21.muminsday.ui
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.ScrollView
 import com.senseix21.muminsday.R
 import com.senseix21.muminsday.quran.SurahNumber
+import com.senseix21.muminsday.quran.boldMarkup
 import com.senseix21.muminsday.quran.VerseRef
 import com.senseix21.muminsday.store.QuranOpen
 import com.senseix21.muminsday.store.QuranReader
@@ -75,12 +80,23 @@ class SurahActivity : BaseActivity() {
                 addView(heading(getString(R.string.quran_ayah_number, texts.number(ayah.ref.ayah))))
                 addView(arabicText(this@SurahActivity, ayah.text))
                 // INV-QT1: the translation and its footnotes exactly as QuranEnc published them. Not even the digits
-                // change (they are the source's own); the footnotes stay separate, under their label (G65: markup shown).
+                // change (they are the source's own). Their <b> markup is drawn as bold, not shown (G65, founder's
+                // yes 2026-11-28). Footnotes stay hidden behind a tap: some run to screens and bury the next ayah.
                 ayah.translation?.let { translation ->
-                    addView(body(translation.text))
+                    addView(body(rendered(translation.text)))
                     if (translation.footnotes.isNotEmpty()) {
-                        addView(body(getString(R.string.quran_footnotes), muted = true))
-                        addView(body(translation.footnotes, muted = true).apply { textSize = 15f })
+                        val notes = body(rendered(translation.footnotes), muted = true).apply {
+                            textSize = 15f
+                            visibility = View.GONE
+                        }
+                        lateinit var toggle: android.widget.Button
+                        toggle = actionButton(getString(R.string.quran_footnotes_show), primary = false) {
+                            val opening = notes.visibility != View.VISIBLE
+                            notes.visibility = if (opening) View.VISIBLE else View.GONE
+                            toggle.text = getString(if (opening) R.string.quran_footnotes_hide else R.string.quran_footnotes_show)
+                        }
+                        addView(toggle)
+                        addView(notes)
                     }
                 }
             }
@@ -90,6 +106,14 @@ class SurahActivity : BaseActivity() {
         show(page)
         val target = ayahViews.firstOrNull { it.first == startAyah }?.second ?: return
         (page.parent as? ScrollView)?.let { scroll -> scroll.post { scroll.scrollTo(0, target.top) } }
+    }
+
+    private fun rendered(source: String): CharSequence {
+        val marked = boldMarkup(source)
+        if (marked.bold.isEmpty()) return marked.shown
+        return SpannableString(marked.shown).apply {
+            marked.bold.forEach { setSpan(StyleSpan(Typeface.BOLD), it.first, it.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) }
+        }
     }
 
     companion object {

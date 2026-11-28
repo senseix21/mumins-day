@@ -416,7 +416,8 @@
     <string name="quran_translation_choose_title">বাংলা অনুবাদ বেছে নিন</string>
     <string name="quran_translation_choose_help">দুটি অনুবাদই QuranEnc.com থেকে নেওয়া, কোনো পরিবর্তন ছাড়া। অ্যাপ নিজে থেকে কোনোটি বেছে দেয় না। বেছে নেওয়ার আগে শুধু আরবি দেখানো হয়। পরে সেটিংসে বদলাতে পারবেন।</string>
     <string name="quran_translation_credit">অনুবাদ: %1$s। উৎস ও প্রকাশক: QuranEnc.com, সংস্করণ %2$s, কোনো পরিবর্তন ছাড়া।</string>
-    <string name="quran_footnotes">টীকা</string>
+    <string name="quran_footnotes_show">টীকা দেখুন</string>
+    <string name="quran_footnotes_hide">টীকা লুকান</string>
     <string name="quran_edition_zakaria">বাংলা ভাষায় অনুবাদ- ড. আবূ বকর মুহাম্মাদ যাকারিয়া</string>
     <string name="quran_edition_rwwad">বাংলা ভাষায় অনুবাদ - রুওয়াদ অনুবাদ</string>
     <string name="settings_quran_translation">কুরআনের অনুবাদ</string>

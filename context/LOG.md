@@ -643,3 +643,11 @@ gate "8 permissions, no INTERNET"; dependency gate "4 libraries"; string gate "3
 Rowwad's real text: 6236 rows read back equal, a two-word search finds its ayah. **Not verified:** anything on an emulator
 or phone (rebuild time, FTS4 on SQLite 3.18, screens, footnote layout at 200 %); QuranEnc's view on Zakaria (Q15).
 
+
+## 2026-11-28 20:34 +0600 · Quran footnotes: bold markup, shown on tap (G65)
+
+**Did.** Founder's yes in chat: `core/quran/Markup.kt` `boldMarkup` turns QuranEnc's paired `<b>…</b>` into bold ranges, removing only the tag characters; unpaired or nested markup is shown exactly as given. `SurahActivity` draws it with `StyleSpan` and hides each ayah's footnotes behind a "টীকা দেখুন / টীকা লুকান" button (two keys replace `quran_footnotes`; both Bengali are Claude drafts in `l10n-review.txt`). Also: the founder offered github.com/khalid-hussain/hisnulMuslimDB for duas; not used (no licence assigned, see QUESTIONS).
+
+**Verified.** `./gradlew build` green with `MarkupTest` (2000-case property: putting tags back at the ranges gives the source) and `QuranEncTest.G65_every_bundled_bold_tag_is_understood`. On `emulator-5554` (API 36): Al-Fatiha 1 opens with footnotes hidden, the tap shows them with the heading bold and no tag characters; `ui.sh` T-UNIT-9, target, label PASS; no crash.
+
+**Not done / follow-up.** Q15 (QuranEnc on Zakaria) still open.

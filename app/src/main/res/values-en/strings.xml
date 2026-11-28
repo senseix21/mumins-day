@@ -402,7 +402,8 @@
     <string name="quran_translation_choose_title">Choose a Bengali translation</string>
     <string name="quran_translation_choose_help">Both translations come from QuranEnc.com, unchanged. The app does not choose one for you. Until you choose, only the Arabic is shown. You can change it later in Settings.</string>
     <string name="quran_translation_credit">Translation: %1$s. Source and publisher: QuranEnc.com, version %2$s, unchanged.</string>
-    <string name="quran_footnotes">Footnotes</string>
+    <string name="quran_footnotes_show">Show footnotes</string>
+    <string name="quran_footnotes_hide">Hide footnotes</string>
     <string name="quran_edition_zakaria">Bengali Translation - Abu Bakr Zakaria</string>
     <string name="quran_edition_rwwad">Bengali Translation - Rowwad Translation Center</string>
     <string name="settings_quran_translation">Quran translation</string>

@@ -30,3 +30,9 @@ spec**. Replace it with the original text if that file exists.
 
 New questions continue from Q10. A closed question keeps its row, with the answer, who gave it
 and the date.
+
+### Dua source offered: github.com/khalid-hussain/hisnulMuslimDB (checked 2026-11-28 20:34 +0600)
+
+- KNOWN (`gh api repos/khalid-hussain/hisnulMuslimDB`, its README): no licence; the README says "The rest of the repository has yet to be assigned a license" and the reference PDF is "copyright to its respective owners". Last push 2018-09-17. Files: `hisnul.xml` (65,600 bytes), LaTeX work file; no Bengali.
+- So it cannot be bundled: with no licence, nothing in it may be redistributed, and Hisnul Muslim's text and translations belong to their publishers. Duas still need a source with written terms, a Bengali translation with permission, and the reviewer (INV-C1, INV-C6). Founder: find a source with stated terms, or ask the repo owner and the book's publisher in writing.
+

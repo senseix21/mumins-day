@@ -331,5 +331,6 @@ recitation_cannot_play
 quran_translation_choose_title
 quran_translation_choose_help
 quran_translation_credit
-quran_footnotes
+quran_footnotes_show
+quran_footnotes_hide
 settings_quran_translation

@@ -44,6 +44,24 @@ class QuranEncTest {
         assertEquals(quran.verses.map { it.ref }, translation.verses.map { it.ref })
     }
 
+    /** G65: every bundled footnote and text with markup pairs cleanly, so none falls back to showing raw tags. */
+    @Test
+    fun G65_every_bundled_bold_tag_is_understood() {
+        for (edition in Edition.entries) {
+            var tagged = 0
+            for (verse in accepted(edition).verses) {
+                for (source in listOf(verse.text, verse.footnotes)) {
+                    if ("<b>" !in source && "</b>" !in source) continue
+                    tagged++
+                    val marked = boldMarkup(source)
+                    assertTrue(marked.bold.isNotEmpty(), "${edition.key} ${verse.ref}: markup not understood")
+                    assertTrue("<b>" !in marked.shown && "</b>" !in marked.shown, "${edition.key} ${verse.ref}")
+                }
+            }
+            if (edition == Edition.BengaliZakaria) assertTrue(tagged > 0)
+        }
+    }
+
     @Test
     fun INV_QT1_zakaria_every_response_re_encodes_to_its_exact_bytes() {
         // QuranEnc's API escapes like PHP's json_encode: every non-ASCII UTF-16 unit as \uxxxx, "/" as "\/". If the
