@@ -42,10 +42,10 @@ t2() {
 t3() {
   reminders Adhan; local before after
   before=$(queued | tr '\n' ' '); log_clear
-  sh_ cmd alarm set-timezone Asia/Tokyo >/dev/null; sleep 4
+  set_zone Asia/Tokyo; sleep 4
   after=$(queued | tr '\n' ' ')
   local event; event=$(count_log "system event: android.intent.action.TIMEZONE_CHANGED")
-  sh_ cmd alarm set-timezone "$ZONE_BEFORE" >/dev/null; sleep 3
+  set_zone "$ZONE_BEFORE"; sleep 3
   if [ "$event" -ge 1 ] && [ "$before" = "$after" ] && [ -n "$after" ]; then
     result T-INST-3 PASS "zone Asia/Dhaka -> Asia/Tokyo: replan ran ($event event), the same $(queued_count) instants stay queued"
   else
@@ -57,11 +57,11 @@ t4() {
   reminders Adhan; log_clear
   local real new out_of_window=0 when now max registered
   real=$(device_now_ms); new=$((real + 3 * 3600 * 1000))
-  sh_ cmd alarm set-time "$new" >/dev/null; sleep 4
+  set_time_ms "$new"; sleep 4
   now=$(device_now_ms); max=$((now + 48 * 3600 * 1000)); registered=$(last_registered)
   for when in $(queued); do { [ "$when" -gt "$now" ] && [ "$when" -le "$max" ]; } || out_of_window=$((out_of_window + 1)); done
   local events actual; events=$(count_log "system event: android.intent.action.TIME_SET"); actual=$(queued_count)
-  sh_ cmd alarm set-time "$(($(date +%s) * 1000))" >/dev/null; sleep 3
+  set_time_ms "$(($(date +%s) * 1000))"; sleep 3
   if [ "$events" -ge 1 ] && [ "$actual" = "$registered" ] && [ "$out_of_window" = 0 ]; then
     result T-INST-4 PASS "clock +3 h: replan ran, $actual alarms queued = $registered registered, all inside the new 48 h window"
   else

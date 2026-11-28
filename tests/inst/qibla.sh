@@ -13,6 +13,9 @@ cd "$(dirname "$0")/../.."
 SHOTS="${SHOTS:-}"
 shot() { [ -z "$SHOTS" ] || adb_ exec-out screencap -p > "$SHOTS/$1.png"; }
 dump() { sh_ uiautomator dump /sdcard/u.xml >/dev/null; adb_ exec-out cat /sdcard/u.xml; }
+# The screen's text including what is below the fold: a short screen (API 26's 1920 px) cuts the warning's later lines out
+# of a dump, and the scroll view keeps them off it. Dump, scroll down, dump again, scroll back.
+full() { dump; sh_ input swipe 500 1500 500 400 300; sleep 1; dump; sh_ input swipe 500 400 500 1500 300; sleep 1; }
 open_qibla() {
   sh_ am force-stop $P; sh_ am start -n "$P/.MainActivity" >/dev/null; sleep 2
   local i xy
@@ -22,7 +25,9 @@ import re,sys
 for m in re.finditer(r"<node [^>]*>",sys.stdin.read()):
     n=m.group(0)
     if "text=\"কিবলা\"" in n and "clickable=\"true\"" in n:
-        b=list(map(int,re.search(r"bounds=\"\[(\d+),(\d+)\]\[(\d+),(\d+)\]\"",n).groups())); print((b[0]+b[2])//2,(b[1]+b[3])//2); break
+        b=list(map(int,re.search(r"bounds=\"\[(\d+),(\d+)\]\[(\d+),(\d+)\]\"",n).groups()))
+        # A zero-area node is a child scrolled out of view (bounds [0,0][0,0]): not tappable yet.
+        if b[2]>b[0] and b[3]>b[1]: print((b[0]+b[2])//2,(b[1]+b[3])//2); break
 ')
     [ -n "$xy" ] && break; sh_ input swipe 500 1800 500 700; sleep 1
   done
@@ -31,20 +36,20 @@ for m in re.finditer(r"<node [^>]*>",sys.stdin.read()):
 has_needle() { echo "$1" | grep -q 'content-desc="কিবলার নির্দেশক'; }
 case "${1:-}" in
 field)
-  adb_ emu sensor set magnetic-field 0:20:-45 >/dev/null; open_qibla; shot qibla-good; d=$(dump)
+  adb_ emu sensor set magnetic-field 0:20:-45 >/dev/null; open_qibla; shot qibla-good; d=$(full)
   if has_needle "$d" && echo "$d" | grep -q 'কম্পাস ভালো আছে' && ! echo "$d" | grep -q 'কম্পাস ঠিক নেই'; then
     result T-INST-12.trusted PASS "good field (about 49 uT): needle, no warning"; else result T-INST-12.trusted FAIL "not trusted on a good field"; fi
-  adb_ emu sensor set magnetic-field 0:0:200 >/dev/null; sleep 2; shot qibla-strong; d=$(dump)
+  adb_ emu sensor set magnetic-field 0:0:200 >/dev/null; sleep 2; shot qibla-strong; d=$(full)
   if echo "$d" | grep -q 'কম্পাস ঠিক নেই' && echo "$d" | grep -q 'বাতাসে আট-এর' && echo "$d" | grep -q 'নির্ভরযোগ্য নয়'; then
     result T-INST-12.strong PASS "200 uT: warning, calibration prompt, needle described as not reliable (<= 2 s)"; else result T-INST-12.strong FAIL "no warning at 200 uT"; fi
-  adb_ emu sensor set magnetic-field 0:0:5 >/dev/null; sleep 2; shot qibla-weak; d=$(dump)
+  adb_ emu sensor set magnetic-field 0:0:5 >/dev/null; sleep 2; shot qibla-weak; d=$(full)
   echo "$d" | grep -q 'অস্বাভাবিক দুর্বল' && result T-INST-12.weak PASS "5 uT: weak-field warning" || result T-INST-12.weak FAIL "no warning at 5 uT"
-  adb_ emu sensor set magnetic-field 0:20:-45 >/dev/null; sleep 2; d=$(dump)
+  adb_ emu sensor set magnetic-field 0:20:-45 >/dev/null; sleep 2; d=$(full)
   has_needle "$d" && ! echo "$d" | grep -q 'কম্পাস ঠিক নেই' && result T-INST-12.recover PASS "good field again: warning gone" || result T-INST-12.recover FAIL "warning stuck"
   tests/inst/ui.sh | grep -E 'T-UNIT-9|T-UI-target|T-UI-label' | sed 's/^/  qibla: /'
   ;;
 nomag)
-  open_qibla; shot qibla-nomag; d=$(dump)
+  open_qibla; shot qibla-nomag; d=$(full)
   echo "$d" | grep -q 'content-desc="কিবলার দিক: ' && echo "$d" | grep -q 'কিবলার দিক: ' && result T-INST-13.number PASS "bearing number shown" || result T-INST-13.number FAIL "no number"
   echo "$d" | grep -q 'কম্পাস সেন্সর নেই' && echo "$d" | grep -q 'মিলিয়ে নিন' && result T-INST-13.hint PASS "no-sensor message and hint shown" || result T-INST-13.hint FAIL "no hint"
   has_needle "$d" && result T-INST-13.noneedle FAIL "a needle is described" || result T-INST-13.noneedle PASS "no needle in the view tree"

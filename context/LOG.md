@@ -456,3 +456,19 @@ Mac. Nothing was changed on the Mac.
 **Verified.** `./gradlew build --rerun-tasks` green: permission gate 7, dependency gate 4, string gate 152, 142 core, 52 app, 12 gate tests, 0 failures. Release APK 1,055,071 bytes; `unzip -l` shows the four licence files; `aapt2 dump permissions` shows 7. On the emulator: `run.sh` T-INST-1, 2, 3, 4, 5, 7, 8, 9, 10 PASS (6 NOT RUN), `deed.sh` 15 PASS 0 FAIL, `ui.sh` PASS, `qibla.sh field` 7 PASS 0 FAIL. Agent-reported, not re-run: the minified release copy opened onboarding, Home, Settings, Qibla, deed card, Reminder health and Licences with no FATAL in logcat.
 
 **Not done.** Adhan not played from a minified build; no API 26 device; no real phone. G47: an ANR dialog made a Qibla run fail once. Apache notices for Kotlin libraries not shown. Lawyer's view on LGPL 4(b) open (Q6).
+
+## 2026-11-27 22:56 +0600 · PR #1 merged; CI ran the app for the first time
+
+**Done.** Found why CI had not started (the PR conflicted with `main`, which gained `context/HANDOFF.md`; merged `main` into the branch, `b036221`). Founder asked for the merge; marked the draft ready and merged with a merge commit: `a7d54ab` on `main`. Local `main` fast-forwarded.
+
+**Verified.** `gh pr view 1`: state MERGED, build check SUCCESS before the merge. `gh run view 46036080102 --log`: gate lines (4 libraries, 7 permissions, 152 strings) and `:app:testDebugUnitTest` present. G46 closed.
+
+**Not done.** The CI log was only grepped for gates and the test task, not read for test counts. Nothing from phases 3 to 8 has run on a phone. This entry and the STATE and GAPS edits are uncommitted on `main`.
+
+## 2026-11-27 23:59 +0600 · Web leads, Dhaka table comparison, API 26, 31 and 35 emulators
+
+**Done.** Web searches for Q2, Q4 and Q5 (leads recorded in `QUESTIONS.md`). Fetched and compared the Dhaka Ramadan 2026 table that follows the Islamic Foundation against the engine (`DhakaTableComparisonTest`, now a regression test). Subagent ran the suites on three new emulators: `mumins_api26` (2 GB RAM), `mumins_api31`, `mumins_api35` (images 3.2, 4.2 and 3.8 GB on disk; none left running); fixed six test-script bugs and added `tests/inst/onboard.sh`.
+
+**Verified.** Mine: `./gradlew build --rerun-tasks` green, 144 core, 52 app, 12 gate tests; the comparison numbers in G48 printed by `./gradlew :core:test --tests '*DhakaTableComparisonTest*' -i`. Agent-reported, not re-run by me: T-INST-1, 2, 3, 4, 5, 7, 8, 9, 10 pass on API 26, 31 and 35; T-INST-6 passes on API 31 with a screenshot of the health banner and the system "Alarms and reminders" screen; no `NoClassDefFound`/`FATAL` on API 26 (ADR-14 holds at minSdk); no foreground-service exception and no playback from the boot receiver on API 35 (10 s to restore alarms); API 26 emulator cold start median 174 ms, PSS 19.5 MB (not a phone).
+
+**Not done.** API 32 and a phone for T-INST-6; Adhan not audible (AudioTrack count 0 on every level, cause not investigated); Settings, Licences, Brand steps and reminder health not opened on API 26; a real prayer-time alarm from a reboot-restored queue not tested. The battery banner shows on stock Google emulators too (not investigated). Whether the Foundation's own tables match is open (Q2).

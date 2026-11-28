@@ -9,7 +9,7 @@ This file defines what "done" means. A result other than **Not run** names where
 | F2 order of prayers | INV-T1 | T-PROP-1 | Property test over random dates and Bangladesh points | Pass on JVM, 2026-11-26 |
 | F2 Sehri and Iftar | INV-T2 | T-UNIT-2 | Iftar equals Maghrib; Sehri end equals Fajr minus margin | Pass on JVM, 2026-11-26 |
 | F2 determinism | INV-T3 | T-PROP-3 | Same result under different default zones and locales | Pass on JVM, 2026-11-26 |
-| F2 matches reference | INV-T4 | T-FIX-4 | Eight cities × 365 days against the reference table, tolerance 1 min | Blocked on Q2 |
+| F2 matches reference | INV-T4 | T-FIX-4 | Eight cities × 365 days against the reference table, tolerance 1 min | Blocked on Q2. Partial, 2026-11-27: Dhaka only, 30 days of Ramadan 2026, secondary copy; within 1 minute at reference longitude 90.2 E, up to 2 minutes off at the city centre (G48) |
 | F2 rounding | INV-T5 | T-UNIT-5 | Sehri end rounds down; Fajr start and all later times round up | Pass on JVM, 2026-11-26 |
 | F2 offsets | INV-T6 | T-PROP-6 | Offset N moves one prayer by N | Pass on JVM, 2026-11-26 |
 | F2 no invented time | INV-T7 | T-UNIT-11 | Forced NaN yields "not computable", no alarm | Pass on JVM, 2026-11-26 |
@@ -19,7 +19,7 @@ This file defines what "done" means. A result other than **Not run** names where
 | F1 zone change | INV-S3 | T-INST-3 | Change device zone; instants unchanged | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 clock change | INV-S3 | T-INST-4 | Set clock ±3 h; window correct | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 app update | INV-S3 | T-INST-5 | `adb install -r`; window present | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
-| F1 permission regrant | INV-S3 | T-INST-6 | Revoke then grant exact alarms; window restored, warning cleared | Not run |
+| F1 permission regrant | INV-S3 | T-INST-6 | Revoke then grant exact alarms; window restored, warning cleared | Pass 2026-11-27 on an API 31 emulator `mumins_api31` (appop deny, queue emptied by the platform, replan registered nothing, banner and grant button shown, re-grant broadcast restored 11 alarms and cleared the banner); evidence gathered by hand and `run.sh`; API 32 and a phone not run |
 | F1 idempotence | INV-S4 | T-INST-7 | Schedule 100 times; alarm set unchanged | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 no double Adhan | INV-S5 | T-INST-8 | Fire replan during playback; one playback only | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |
 | F1 late rule | INV-S7 | T-INST-9 | Deliver 5 and 15 min late; Adhan then silent | Pass 2026-11-27, emulator streambert API 36, `tests/inst/run.sh` |

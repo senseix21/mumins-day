@@ -16,7 +16,8 @@ x=sys.stdin.read()
 for m in re.finditer(r"<node [^>]*>",x):
     n=m.group(0)
     if "text=\"%s\"" % sys.argv[1] in n:
-        b=list(map(int,re.search(r"bounds=\"\[(\d+),(\d+)\]\[(\d+),(\d+)\]\"",n).groups())); print((b[0]+b[2])//2,(b[1]+b[3])//2); break
+        b=list(map(int,re.search(r"bounds=\"\[(\d+),(\d+)\]\[(\d+),(\d+)\]\"",n).groups()))
+        if b[2]>b[0] and b[3]>b[1]: print((b[0]+b[2])//2,(b[1]+b[3])//2); break  # zero-area = scrolled out of view
 ' "$1")
   [ -n "$xy" ] && sh_ input tap $xy
 }
@@ -33,7 +34,9 @@ open_card() {
   local i; for i in 1 2 3 4 5; do dump | grep -q 'text="আজকের একটি ভালো কাজ"' && break; sh_ input swipe 500 1800 500 700; sleep 1; done
   tap "আজকের একটি ভালো কাজ"; sleep 2
 }
-sh_ am force-stop $P; sql_deed "delete from deed_day" 2>/dev/null
+# deed-days.db exists only after the card was shown once (a fresh install has none): show it, then seed.
+open_card
+sh_ am force-stop $P; sql_deed "delete from deed_day"
 # Three earlier days done (1, 2, 4 days ago): the dots must show exactly those three, with no number.
 for back in 1 2 4; do sql_deed "insert into deed_day values('$(day $back)','test-1',1,0,1000)"; done
 open_card; shot card-1

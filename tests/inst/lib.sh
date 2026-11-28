@@ -20,11 +20,12 @@ sql_deed() { sh_ "run-as $P sqlite3 databases/deed-days.db \"$1\""; }
 device_now_ms() { echo "$(sh_ date +%s | tr -d '\r')000"; }
 
 # (`#n:` keeps only the queue's own entries; the "Next alarm clock" summary repeats one of them.)
-# The trigger time (epoch ms) of every alarm this app has queued, sorted. `origWhen` is the instant it was set for.
+# The trigger time (epoch ms) of every alarm this app has queued, sorted. `origWhen` is the instant it was set for; API 26's
+# dump has no `origWhen`, only `when`.
 queued() {
   sh_ dumpsys alarm | tr -d '\r' \
-    | grep -E "#[0-9]+: Alarm\{[0-9a-f]+ type [0-9] origWhen [0-9]+ whenElapsed -?[0-9]+ $P\}" \
-    | sed -E 's/.*origWhen ([0-9]+) .*/\1/' | sort -n
+    | grep -E "#[0-9]+: Alarm\{[0-9a-f]+ type [0-9] (origWhen|when) [0-9]+ .*$P\}" \
+    | sed -E 's/.*(origWhen|when) ([0-9]+) .*/\2/' | sort -n
 }
 queued_count() { queued | grep -c . || true; }
 
@@ -46,4 +47,19 @@ reminders() { debug SET_REMINDERS --es mode "$1"; sleep 2; }
 
 result() { # result ID PASS|FAIL|"NOT RUN" detail
   RESULTS+=("$1|$2|$3"); printf '%-10s %-8s %s\n' "$1" "$2" "$3"
+}
+
+# Zone and clock changes. `cmd alarm` exists from API 29 or so; before that (API 26) the same effect needs root, which
+# the google_apis emulator images give: `service call alarm 3` is IAlarmManager.setTimeZone there, and `date -u` sets the
+# wall clock (the kernel's clock-set event makes AlarmManager send TIME_SET). Transaction 3 is for the API 26 image only.
+set_zone() {
+  if sh_ cmd alarm set-timezone "$1" 2>&1 | grep -q "No shell command"; then
+    adb_ root >/dev/null; adb_ wait-for-device; sh_ service call alarm 3 s16 "$1" >/dev/null
+  fi
+}
+set_time_ms() { # set_time_ms EPOCH_MS
+  if sh_ cmd alarm set-time "$1" 2>&1 | grep -q "No shell command"; then
+    adb_ root >/dev/null; adb_ wait-for-device
+    sh_ date -u "$(python3 -c "import datetime,sys;print(datetime.datetime.fromtimestamp($1/1000,datetime.timezone.utc).strftime('%m%d%H%M%Y.%S'))")" >/dev/null
+  fi
 }
