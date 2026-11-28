@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.text.InputType
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import com.senseix21.muminsday.R
 import com.senseix21.muminsday.l10n.parseTypedNumber
 import com.senseix21.muminsday.store.Stores
@@ -36,7 +37,8 @@ class ZakatActivity : BaseActivity() {
     private val fields = mutableMapOf<String, EditText>()
     private val priceDates = mutableMapOf<Metal, LocalDate>()
     private var hawlBox: CheckBox? = null
-    private var results = column()
+    // Built in render(): a view made in a field initializer has no Context yet and crashed the screen on open.
+    private lateinit var results: LinearLayout
 
     override fun onResume() {
         super.onResume()

@@ -606,3 +606,11 @@ the plan until fetched.
 
 **Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 411 tests (`:core` 280, `:app` 96, gate 32, engine 3); permission gate "passed, 8 permissions, no INTERNET."; dependency gate "4 libraries"; string gate "324 keys in Bengali and English". `PacksTest` (14), `DownloaderTest` (10, local HTTPS server on 127.0.0.1 with a `keytool` certificate), `NetworkSurfaceTest` (5) pass. Release APK 900,104 bytes (`ls -l`); `unzip -l` shows `assets/packs/manifest.txt` and no pack. **Not verified:** anything on an emulator or phone (the screens, `MediaPlayer`, Android's `HttpsURLConnection` headers and TLS); no real host or pack exists to download.
 
+
+## 2026-11-28 18:54 +0600 · End-of-part-2 emulator pass (API 36), three fixes
+
+**Did.** On `phase-15-16-khatam-packs`, installed the debug APK on the API 36 emulator (`emulator-5554`), ran `tests/inst/run.sh`, `deed.sh`, `qibla.sh field`, then opened all 17 activities with `adb root` + `am start -n` and ran `tests/inst/ui.sh` on each, checking `logcat -b crash` after each.
+
+**Verified (KNOWN, those commands).** T-INST-1,2,3,4,5,7,8,9,10 PASS, T-INST-6 NOT RUN (API 36). deed.sh all PASS. qibla.sh field 7 of 7 PASS. Before the fixes: `ZakatActivity` crashed on open (NPE: `column()` in a field initializer, no Context yet); `QuranActivity` search box 125 px tall, under 48 dp (126 px); `ReminderHealthActivity` failed T-UNIT-9 because `ui.sh` read the dump's `&#10;` line break as Latin digits (script bug). After the fixes, Zakat, Reminder health, Quran and Home: T-UNIT-9, T-UI-target, T-UI-label PASS, 0 crashes. `./gradlew build` green.
+
+**Not done / follow-up.** `TodayActivity` fails T-UNIT-9 only on the fake fixture text ("TEST HADITH 3" has ASCII digits); real content is untested. `SurahActivity` needs a surah extra and was not opened alone. Not exercised: widgets, notification "Prayed" action, location dialog, khatam reminder, packs (no host), Recitation playback, API 26/31 runs of the new screens. Draft PR #2 opened for CI.

@@ -77,6 +77,8 @@ class QuranActivity : BaseActivity() {
             imeOptions = EditorInfo.IME_ACTION_SEARCH
             textSize = 18f
             minHeight = dp(MIN_TARGET_DP)
+            // TextView.minHeight bounds the text area only; the view itself measured 1 px under 48 dp on the emulator.
+            minimumHeight = dp(MIN_TARGET_DP)
             isSingleLine = true
         }
         results = column()
