@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.senseix21.muminsday.planner.Salah
+import com.senseix21.muminsday.store.Stores
+import com.senseix21.muminsday.tracker.dateOfPrayer
 import java.time.Instant
 
 /** `AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED` (API 31), spelled out: the constant would fail lint on minSdk 26. */
@@ -45,5 +48,27 @@ class AlarmReceiver : BroadcastReceiver() {
         // Delivery first, because it is the time-critical part; then plan again from this moment (ADR-3).
         deliver(context, trigger, now)
         replan(context, now)
+    }
+}
+
+const val ACTION_PRAYED: String = "com.senseix21.muminsday.PRAYED"
+const val EXTRA_PRAYED_SALAH: String = "prayedSalah"
+const val EXTRA_PRAYED_AT: String = "prayedAt"
+const val EXTRA_NOTIFICATION_ID: String = "notificationId"
+
+/**
+ * The "Prayed" action on a prayer's notification (INV-C5). It records one mark on the date of the prayer's own time and
+ * takes the notification down. It answers nothing else, posts nothing and never replans: the tracker has no effect on
+ * the reminders.
+ */
+class PrayedReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != ACTION_PRAYED) return
+        val salah = Salah.entries.firstOrNull { it.name == intent.getStringExtra(EXTRA_PRAYED_SALAH) } ?: return
+        if (!intent.hasExtra(EXTRA_PRAYED_AT)) return
+        val prayerAt = Instant.ofEpochMilli(intent.getLongExtra(EXTRA_PRAYED_AT, 0L))
+        val zone = Stores.settings(context).read().place.zone
+        Stores.salahLog(context).mark(dateOfPrayer(prayerAt, zone), salah, Instant.now())
+        if (intent.hasExtra(EXTRA_NOTIFICATION_ID)) Notifications.dismiss(context, intent.getIntExtra(EXTRA_NOTIFICATION_ID, 0))
     }
 }

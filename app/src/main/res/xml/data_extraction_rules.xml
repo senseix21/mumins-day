@@ -2,7 +2,7 @@
 <!--
     Android 12 and later (F1 #12, spec 03 "Backup"). Once an <include> exists, only what is listed is backed up. In: the
     settings file (planner settings and app preferences: district, reminders, offsets, language), and the deed database
-    deed-days.db (the days a card was shown and done, F4#4). Out, by not being listed: the alarm log, alarm-log.db, which is
+    deed-days.db (the days a card was shown and done, F4#4, and the Salah log, ADR-18). Out, by not being listed: the alarm log, alarm-log.db, which is
     a record of one phone's own alarms and must not describe another's (G34); the "device" file (the "I did the brand steps"
     answer belongs to one phone); everything else. The database domain has no <exclude> on purpose: an exclude of the
     whole domain could cancel the include above it.

@@ -17,11 +17,14 @@ object Stores {
         },
     )
 
-    fun deedDays(context: Context): DeedDays = DeedDays(
-        synchronized(this) {
-            deedDaysDatabase ?: open(context, DEED_DAYS_FILE, deedMigrations).also { deedDaysDatabase = it }
-        },
-    )
+    fun deedDays(context: Context): DeedDays = DeedDays(userDataDatabase(context))
+
+    /** Shares the deed days' file: one backed-up database for everything the user records (ADR-18). */
+    fun salahLog(context: Context): SalahLog = SalahLog(userDataDatabase(context))
+
+    private fun userDataDatabase(context: Context): Database = synchronized(this) {
+        deedDaysDatabase ?: open(context, DEED_DAYS_FILE, deedMigrations).also { deedDaysDatabase = it }
+    }
 
     private fun open(context: Context, file: String, history: List<Migration>): Database {
         removeLegacyDatabase(context.applicationContext)

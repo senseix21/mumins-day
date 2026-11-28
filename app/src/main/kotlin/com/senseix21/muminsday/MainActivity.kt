@@ -39,6 +39,7 @@ import com.senseix21.muminsday.ui.Palette
 import com.senseix21.muminsday.ui.ReminderHealthActivity
 import com.senseix21.muminsday.ui.SettingsActivity
 import com.senseix21.muminsday.ui.Texts
+import com.senseix21.muminsday.ui.TrackerActivity
 import com.senseix21.muminsday.ui.actionButton
 import com.senseix21.muminsday.ui.body
 import com.senseix21.muminsday.ui.column
@@ -158,6 +159,10 @@ class MainActivity : BaseActivity() {
 
         page.addView(actionButton(getString(R.string.qibla_title), primary = false) {
             startActivity(Intent(this, QiblaActivity::class.java))
+        })
+
+        page.addView(actionButton(getString(R.string.tracker_title), primary = false) {
+            startActivity(Intent(this, TrackerActivity::class.java))
         })
 
         page.addView(actionButton(getString(R.string.test_adhan)) { testAdhan() })

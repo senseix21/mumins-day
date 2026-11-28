@@ -435,7 +435,7 @@ content gate takes more than one kind of record.
 **Exit.** Decisions recorded as ADRs; the gate generalised with tests; v1 behaviour unchanged.
 
 - [x] ADR-17: release order, network, location, storage, size budget (2026-11-28, `spec/03`).
-- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested. Deferred to phase 10, the first phase with a new screen; an entry list with no entries would be a stub.
+- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested. Deferred to phase 10, the first phase with a new screen; an entry list with no entries would be a stub. Phase 10 added the smallest entry: one button on Home to the tracker (2026-11-28); the system back button is the whole back behaviour (BaseActivity). Back behaviour is not tested; stays open.
 - [ ] Content kinds (deferred to phase 13, the second kind; ADR-17 item 5): `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10].
 - [ ] (phase 13) Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships.
 - [x] Storage plan: `user-data.db` for tracker and khatam; read-only asset databases for Quran and hadith; numbered migrations continue [ADR-5, ADR-17 item 6]. Plan only; nothing built.
@@ -455,13 +455,13 @@ prayers; an optional "find my district" button.
 - [x] Tests: the widget's view model as a pure function (7 tests, `WidgetModelTest`, 2026-11-28).
 - [ ] Tests: instrumented check on an emulator. Not run.
 
-**Salah tracker**
-- [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41].
-- [ ] "Prayed" action on the prayer notification, built by the one notification builder.
-- [ ] Manual tick on the home screen for today and the past 7 days.
-- [ ] Week view like the deed's: dots only. No counts, streaks, percentages or "missed" wording anywhere [INV-C4].
-- [ ] Never prompts about a prayer not marked; never a notification about the tracker.
-- [ ] Tests: tone rules as a string check over every tracker string; date attribution across midnight and travel.
+**Salah tracker.** Built 2026-11-28 17:40 +0600 (KNOWN: `./gradlew build` green). Not run on an emulator or phone.
+- [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41]. Built as migration 2 of `deed-days.db`, so backup rules are unchanged (ADR-18, which amends ADR-17 item 6). Statements run by hand in the `sqlite3` CLI (insert, ignore duplicate, range select, delete: all as intended); `MigrationsTest` checks numbering and the backup rules. Open: the 1 to 2 upgrade on a device, and a backup/restore.
+- [ ] "Prayed" action on the prayer notification, built by the one notification builder. Built (`Notifications.post`, `PrayedReceiver`); only on silent notices, not on the Adhan's own notification (G53). Open: tap it on an emulator.
+- [ ] Manual tick on the home screen for today and the past 7 days. Built as `TrackerActivity`, reached by a button on Home (the Phase 10 navigation entry), not inline on Home. Open: look at it on an emulator, in both languages, at 200 % font.
+- [ ] Week view like the deed's: dots only. No counts, streaks, percentages or "missed" wording anywhere [INV-C4]. Built: five dots a day for eight days. Verified by `TrackerTest` (member names) and `TrackerStringsTest` (strings). Open: reviewer's read of the screen (T-UI-2).
+- [ ] Never prompts about a prayer not marked; never a notification about the tracker. By construction nothing reads the log except `TrackerActivity`; the only notification change is one action on an existing notice. Open: not machine-checked beyond that.
+- [x] Tests: tone rules as a string check over every tracker string (`TrackerStringsTest`, 4 tests, 2026-11-28); date attribution across midnight and a change of zone (`TrackerTest`, 8 tests including a property over 200 random windows, 2026-11-28).
 
 **Find my district** (only with the founder's yes)
 - [ ] ADR reversing ADR-12 for `ACCESS_COARSE_LOCATION` only; allowlist edit [INV-P3].

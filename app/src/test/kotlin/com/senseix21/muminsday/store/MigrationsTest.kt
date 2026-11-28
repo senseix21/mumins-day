@@ -79,6 +79,18 @@ class MigrationsTest {
         assertFalse("alarm_log" in sql, "G34: the alarm log must not live in the deed file")
     }
 
+    // ADR-18: the tracker's table lives in the backed-up file, as a later step of the deed history.
+    @Test
+    fun `the Salah log is the second step of the deed history and holds only marked prayers`() {
+        assertEquals(2, latestVersion(deedMigrations))
+        val sql = statementsBetween(1, 2, deedMigrations).joinToString("\n")
+        assertTrue("CREATE TABLE salah_log" in sql)
+        for (column in listOf("local_date", "salah", "prayed_at", "PRIMARY KEY (local_date, salah)")) assertTrue(column in sql, column)
+        // INV-C5: nothing in the table can say a prayer was not marked.
+        for (word in listOf("missed", "skipped", "count", "streak", "status")) assertFalse(word in sql.lowercase(), word)
+        assertFalse("alarm_log" in sql)
+    }
+
     @Test
     fun `the two databases and the retired one are three different files`() {
         assertEquals(3, setOf(ALARM_LOG_FILE, DEED_DAYS_FILE, LEGACY_DATABASE_FILE).size)

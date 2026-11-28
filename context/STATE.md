@@ -1,12 +1,12 @@
 # State
 
-**Last updated:** 2026-11-28 17:03 +0600
+**Last updated:** 2026-11-28 17:44 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build` is green in the cloud:
-246 tests (167 `:core`, 64 `:app`, 12 content gate, 3 engine), lint clean, all five gates
+259 tests (175 `:core`, 69 `:app`, 12 content gate, 3 engine), lint clean, all five gates
 passing (no `INTERNET`, 7 permissions, 4 libraries, 169 string keys in both languages, 64 real
 districts). The release APK is 184,738 bytes, minified. **Nothing has run on a real phone, and
 nothing changed on 28 Nov has run on any device.**
@@ -16,7 +16,11 @@ nothing changed on 28 Nov has run on any device.**
 - **Widgets built** (slice 1): `NextPrayerWidget` and `FiveTimesWidget`, platform `AppWidgetProvider`, no polling
   (`updatePeriodMillis=0`); `replan` redraws them and sets one alarm at the next prayer or local midnight. The view model
   is pure and tested in `:core`. KNOWN: build green. UNKNOWN: how they look and behave on a launcher; no emulator run.
-- Tracker and "find my district": not started yet in this entry; see `PLAN.md` phase 10.
+- **Salah tracker built** (slice 2): `salah_log` is migration 2 of `deed-days.db` (ADR-18, so backup rules are
+  unchanged); `core/tracker` holds the model (no field can express a missed count); `TrackerActivity` shows five dots a day
+  for eight days, reached by a button on Home; the "Prayed" action is on silent prayer notices (G53: not on the Adhan's own
+  notification). Tone is enforced by `TrackerStringsTest` over every `tracker_` string in both languages.
+- "Find my district": not started yet in this entry; see `PLAN.md` phase 10.
 
 ## What changed on 28 Nov 2026
 

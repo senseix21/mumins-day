@@ -284,4 +284,12 @@
     <string name="widget_next_description">The next prayer at a glance.</string>
     <string name="widget_five_description">Today\'s five prayer times.</string>
     <string name="widget_degraded">Reminders may not ring. Open the app.</string>
+
+    <!-- Salah tracker (phase 10, INV-C5). Every tracker string has the prefix tracker_ so a test can scan them all. No digits, no counts, no judgement. Bengali drafted by Claude, native review pending. -->
+    <string name="tracker_title">Salah tracker</string>
+    <string name="tracker_help">Tap a prayer after you have prayed it. This stays on your phone and only you see it.</string>
+    <string name="tracker_today">Today</string>
+    <string name="tracker_prayer_open">%1$s, %2$s. Tap to mark as prayed</string>
+    <string name="tracker_prayer_marked">%1$s, %2$s: prayed. Tap to take the mark back</string>
+    <string name="tracker_prayed_action">Prayed</string>
 </resources>

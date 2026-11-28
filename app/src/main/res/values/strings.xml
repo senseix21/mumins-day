@@ -293,9 +293,17 @@
     <string name="settings_nudge_time">সময়: %1$s</string>
 
     <!-- Home-screen widgets (phase 10). Bengali drafted by Claude, native review pending. -->
-    <string name="widget_next_label">পরবর্তী নামায</string>
+    <string name="widget_next_label">পরবর্তী নামাজ</string>
     <string name="widget_five_label">পাঁচ ওয়াক্তের সময়</string>
-    <string name="widget_next_description">পরবর্তী নামাযের সময় এক নজরে।</string>
+    <string name="widget_next_description">পরবর্তী নামাজের সময় এক নজরে।</string>
     <string name="widget_five_description">আজকের পাঁচ ওয়াক্তের সময়।</string>
     <string name="widget_degraded">অনুস্মারক নাও বাজতে পারে। অ্যাপ খুলুন।</string>
+
+    <!-- Salah tracker (phase 10, INV-C5). Every tracker string has the prefix tracker_ so a test can scan them all. No digits, no counts, no judgement. Bengali drafted by Claude, native review pending. -->
+    <string name="tracker_title">নামাজের খাতা</string>
+    <string name="tracker_help">নামাজ পড়ার পর ছুঁয়ে দাগ দিন। এটি শুধু আপনার ফোনে থাকে, আর কেউ দেখে না।</string>
+    <string name="tracker_today">আজ</string>
+    <string name="tracker_prayer_open">%1$s, %2$s। পড়লে ছুঁয়ে দাগ দিন</string>
+    <string name="tracker_prayer_marked">%1$s, %2$s: পড়েছি। ছুঁলে দাগ উঠে যাবে</string>
+    <string name="tracker_prayed_action">পড়েছি</string>
 </resources>

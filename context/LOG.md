@@ -557,3 +557,9 @@ the plan until fetched.
 **Decision to confirm.** The plan line says "—" and a warning when Degraded. Most phones are Degraded by default (battery optimisation), so blanking the times would make the widget useless for them. The times stay (they are right); the warning line is added; "—" is for a time that cannot be computed.
 
 **Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 167 tests (7 new), `:app` 64, gates passed. **Not verified:** any drawing or behaviour of the widgets (no emulator or phone).
+
+## 2026-11-28 17:44 +0600 · Phase 10, slice 2: Salah tracker
+
+**Did.** `core/tracker` (model, date attribution, the eight-day window), `store/SalahLog`, `salah_log` as migration 2 of `deed-days.db` (ADR-18, amending ADR-17 item 6; backup rules unchanged), `TrackerActivity` (five dots a day, tap to mark or take back), a Home button to it, a "Prayed" action on silent prayer notices via the one `Notifications` builder and a non-exported `PrayedReceiver`. Six `tracker_` strings in both languages, listed in `app/l10n-review.txt`. Opened G53.
+
+**Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 175 tests (8 new: window, attribution across midnight and zone change, a seeded property, member-name check), `:app` 69 (5 new: tone scan of every tracker string in both languages with a self-check that the scan catches bad examples, plurals ban, migration 2). The SQL of migration 2 was run by hand in the `sqlite3` CLI. **Not verified:** the upgrade from schema 1 to 2 on a device, the notification action, the screen, backup and restore (no emulator or phone).

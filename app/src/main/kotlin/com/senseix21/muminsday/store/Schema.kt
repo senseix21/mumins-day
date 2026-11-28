@@ -34,8 +34,9 @@ val alarmLogMigrations: List<Migration> = listOf(
 )
 
 /**
- * The deed days' history (G5, G34). This file is backed up, so it holds nothing about one phone's alarms. Numbered on
- * its own: version 1 here has nothing to do with version 1 of the alarm log.
+ * The backed-up user data's history (G5, G34): the deed days, then the Salah log (ADR-18). This file is backed up, so it
+ * holds nothing about one phone's alarms. Numbered on its own: version 1 here has nothing to do with version 1 of the
+ * alarm log.
  */
 val deedMigrations: List<Migration> = listOf(
     Migration(
@@ -49,6 +50,22 @@ val deedMigrations: List<Migration> = listOf(
                 content_version INTEGER NOT NULL,
                 swapped INTEGER NOT NULL,
                 done_at INTEGER
+            )
+            """.trimIndent(),
+        ),
+    ),
+    Migration(
+        version = 2,
+        statements = listOf(
+            // The Salah tracker (INV-C5, ADR-18): one row per prayer the user marked, on the local date it was prayed for.
+            // Only marked prayers have rows, so the table cannot hold anything about prayers not marked. prayed_at is
+            // epoch milliseconds, kept for the user's own record and read by no screen.
+            """
+            CREATE TABLE salah_log (
+                local_date TEXT NOT NULL,
+                salah TEXT NOT NULL,
+                prayed_at INTEGER NOT NULL,
+                PRIMARY KEY (local_date, salah)
             )
             """.trimIndent(),
         ),

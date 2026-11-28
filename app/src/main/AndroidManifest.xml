@@ -48,6 +48,7 @@
         <activity android:name=".ui.BrandStepsActivity" android:exported="false" />
         <activity android:name=".ui.DeedActivity" android:exported="false" />
         <activity android:name=".ui.QiblaActivity" android:exported="false" />
+        <activity android:name=".ui.TrackerActivity" android:exported="false" />
 
         <!--
             Not exported: only the system (protected broadcasts) and the app itself reach these. LOCKED_BOOT_COMPLETED is
@@ -67,6 +68,11 @@
 
         <receiver
             android:name=".alarm.AlarmReceiver"
+            android:exported="false" />
+
+        <!-- The "Prayed" action on a prayer notification (INV-C5). Only the app's own PendingIntent reaches it. -->
+        <receiver
+            android:name=".alarm.PrayedReceiver"
             android:exported="false" />
 
         <!--

@@ -150,9 +150,9 @@ stateDiagram-v2
 | Districts | `content/districts.json` asset: id, names (bn, en), latitude, longitude, elevation | 64 rows |
 | Adhan audio | One file in `res/raw` | License: Q5 |
 
-**Schema.** `alarm_log(id, prayer, kind, planned_utc, delivered_utc NULL, outcome)`; `deed_day(local_date PRIMARY KEY, deed_id, content_version, swapped, done_at NULL)` (was `deed_done`; one row per day the card was shown, amended 2026-11-26, G5). **Migrations.** Numbered SQL files applied in order; a test opens each historical schema and migrates to current.
+**Schema.** `alarm_log(id, prayer, kind, planned_utc, delivered_utc NULL, outcome)`; `salah_log(local_date, salah, prayed_at, PRIMARY KEY (local_date, salah))` in `deed-days.db`, migration 2 (ADR-18); `deed_day(local_date PRIMARY KEY, deed_id, content_version, swapped, done_at NULL)` (was `deed_done`; one row per day the card was shown, amended 2026-11-26, G5). **Migrations.** Numbered SQL files applied in order; a test opens each historical schema and migrates to current.
 
-**Backup.** Settings and deed completions may be included in Android's backup; the alarm log is excluded. After a restore the health check runs (failure mode 12). Exact backup-rule syntax: UNKNOWN here, take from Android docs.
+**Backup.** Settings, deed completions and the Salah log (same file, ADR-18) may be included in Android's backup; the alarm log is excluded. After a restore the health check runs (failure mode 12). Exact backup-rule syntax: UNKNOWN here, take from Android docs.
 
 **Size budget (targets).** Code and resources ≤ 6 MB, audio ≤ 2 MB, content ≤ 0.1 MB, total download ≤ 15 MB. Actuals: UNKNOWN until the first build.
 
@@ -228,9 +228,9 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
 |---|---|---|
 | Quran, tafsir, audio | A new `packs` component: download, verify hash, store, index in the existing SQLite database. Adds `INTERNET`, allowlisted to one host | Must not scatter storage across files and preferences |
 | Duas, daily hadith | Same content record shape and review gate as deeds | Must not hard-code "deed" into the gate |
-| Salah tracker | A third table; a "Prayed" action on the notification the alarm component already posts | Must not let notifications be built in more than one place |
+| Salah tracker | A table in the backed-up user-data file (`salah_log`, ADR-18); a "Prayed" action on the notification the alarm component already posts (built phase 10) | Must not let notifications be built in more than one place |
 | Hijri, ±1 day | The engine repo's `hijri` module (Apache-2.0, KNOWN) behind the `clock` interface | Must not format dates outside `l10n` |
-| Widgets | Read the planner's output | Must not let UI compute times itself |
+| Widgets | Read the planner's output (`core/widget`, built phase 10) | Must not let UI compute times itself |
 | Paid tier | A single `entitlements` interface that returns "everything" in v1 | No billing code, no stubs beyond the one interface |
 | Sync / accounts | Not planned. If ever: export/import of one file first | No account concepts in v1 |
 
@@ -387,7 +387,16 @@ Sizes: UNKNOWN until built. Verify every license from the generated dependency r
   3. **Location.** Reverses ADR-12 in phase 10 for `ACCESS_COARSE_LOCATION` only, with a new allowlist line then, read only while the "find my district" screen is open (INV-P2). Until phase 10 lands, the gate still lists seven permissions.
   4. **No dependency for any of it** is assumed: platform `AppWidgetProvider`, `SQLiteOpenHelper`, `Canvas` and `MediaPlayer` first (INV-P4). A need for one comes back as its own ADR.
   5. **Content.** Duas and hadith reuse the deed review gate, one task per kind, built when phase 13 needs the second kind (a generalisation with one user would be ceremony). The Quran has an integrity check instead of a review (INV-QT1). Claude writes none of the text; features are built on obviously fake records and the store build refuses to ship them (INV-C1, INV-C6).
-  6. **Storage.** One user-data database `user-data.db` joins `alarm-log.db` and `deed-days.db` for tracker and khatam, with its own numbered migrations (ADR-5, G34 pattern, backup decided when it exists). Bundled Quran and hadith are read-only asset databases, never written, never backed up.
+  6. **Storage.** One user-data database `user-data.db` joins `alarm-log.db` and `deed-days.db` for tracker and khatam, with its own numbered migrations (ADR-5, G34 pattern, backup decided when it exists). **Amended 2026-11-28 (ADR-18): the tracker's table joins the existing `deed-days.db` as migration 2 instead; no `user-data.db` file is created for it.** Bundled Quran and hadith are read-only asset databases, never written, never backed up.
 - **Size budget (ASSUMED until measured; target 15 MB total, INV constraint table).** Today: release APK 184,738 bytes (KNOWN, `STATE.md`). Adhan recording: not yet in. Allowances: Quran Arabic plus Bengali text 4 MB, Arabic font 1 MB, hadith 2 MB, duas 0.5 MB, one Adhan 1 MB, everything else 1 MB. Audio and tafsir are downloads and not counted. Each content phase measures its real size and updates this line.
 - **Consequences.** Three invariants and one gate row are new (INV-C5, INV-C6, INV-QT1, INV-H1, INV-Z1). The "no network" and "no location" promises stay true in every build until the phase that changes them lands, and each change is visible as a manifest and allowlist diff.
 - **Reverse.** Drop the phase; the gates were never loosened before it.
+
+### ADR-18 · The Salah log lives in `deed-days.db`, as its second migration
+
+- **Date.** 2026-11-28. Claude's decision under the founder's instruction to build phase 10; the founder may reverse it.
+- **Context.** ADR-17 item 6 planned a new `user-data.db` for the tracker and khatam. `PLAN.md` says the tracker is "backed up with deed days". Backup rules list files by name (G34), so a second backed-up file means a second `<include>` line in both rule files and a second place to forget one; renaming `deed-days.db` would orphan any backup already made (none exists yet: no release has shipped, KNOWN `STATE.md`).
+- **Options.** (a) New `user-data.db`, include it in both backup rule files. (b) `salah_log` as migration 2 of `deedMigrations` in the existing backed-up file, rules unchanged. (c) Rename the file to `user-data.db` and move the deed table.
+- **Decision.** (b). `deedMigrations` is now described as the backed-up user data's history. The file keeps its name `deed-days.db`. Khatam (phase 15) adds its own migration to the same list.
+- **Consequences.** No change to `data_extraction_rules.xml` or `full_backup_content.xml` beyond a comment; `MigrationsTest` still proves both include `deed-days.db` and exclude the alarm log. One SQLite connection serves deeds and the tracker. Only marked prayers have rows, so the table cannot hold a count of prayers not marked (INV-C5). A restored backup brings the log back; nothing else reads it. The file's name no longer says everything it holds (cosmetic).
+- **Reverse.** Move the table to a new file with a migration that copies the rows, and add the include line.

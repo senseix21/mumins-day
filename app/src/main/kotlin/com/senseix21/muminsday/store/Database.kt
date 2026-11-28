@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 /** One phone's alarm history. Never backed up: it describes this phone's alarms and no other's (G34, INV-S8). */
 const val ALARM_LOG_FILE: String = "alarm-log.db"
 
-/** The days a card was shown and done. Backed up, so a new phone keeps them (F4#4, G34). */
+/** The days a card was shown and done, and the Salah log. Backed up, so a new phone keeps them (F4#4, G34, ADR-18). */
 const val DEED_DAYS_FILE: String = "deed-days.db"
 
 /** The one file that held both tables before G34. Nothing reads it any more; [Stores] deletes it. */

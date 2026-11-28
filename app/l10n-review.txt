@@ -178,3 +178,9 @@ widget_five_label
 widget_next_description
 widget_five_description
 widget_degraded
+tracker_title
+tracker_help
+tracker_today
+tracker_prayer_open
+tracker_prayer_marked
+tracker_prayed_action
