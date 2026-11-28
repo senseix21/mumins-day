@@ -470,4 +470,18 @@
     <string name="recitation_unverified">The file did not match its check, so the pack was deleted.</string>
     <string name="recitation_cannot_play">This recitation cannot be played.</string>
 
+    <!-- Hisnul Muslim, unreviewed, debug builds only (ADR-27). -->
+    <string name="hisnul_title">Hisnul Muslim</string>
+    <string name="hisnul_opening">Opening…</string>
+    <string name="hisnul_unreviewed_banner">Not checked: no reviewer has read these duas yet. Source: the ThelightHub dua API (hisnul.workers.dev). Who made the Bengali translation is not known. The text is shown exactly as the source has it. This is in developer test builds only.</string>
+    <string name="hisnul_not_in_build">Hisnul Muslim is not in this version of the app.</string>
+    <string name="hisnul_refused">A dua file has an error, so nothing is shown.</string>
+    <string name="hisnul_search_hint">Search chapter names</string>
+    <string name="hisnul_search">Search</string>
+    <string name="hisnul_chapters">Chapters</string>
+    <string name="hisnul_no_chapters">No chapter has that in its name.</string>
+    <string name="hisnul_chapter_title">Chapter %1$s</string>
+    <string name="hisnul_dua_number">Dua %1$s</string>
+    <string name="hisnul_reference">Reference: %1$s</string>
+
 </resources>

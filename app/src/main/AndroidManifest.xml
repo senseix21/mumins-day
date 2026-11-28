@@ -66,6 +66,8 @@
         <activity android:name=".ui.QuranActivity" android:exported="false" />
         <activity android:name=".ui.SurahActivity" android:exported="false" />
         <activity android:name=".ui.KhatamActivity" android:exported="false" />
+        <activity android:name=".ui.HisnulActivity" android:exported="false" />
+        <activity android:name=".ui.HisnulChapterActivity" android:exported="false" />
         <activity android:name=".ui.PacksActivity" android:exported="false" />
         <activity android:name=".ui.RecitationActivity" android:exported="false" />
 

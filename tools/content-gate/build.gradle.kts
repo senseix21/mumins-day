@@ -160,3 +160,22 @@ val checkQuranText = tasks.register<JavaExec>("checkQuranText") {
     inputs.dir(quranDirectory).withPropertyName("quran")
 }
 tasks.check { dependsOn(checkQuranText) }
+
+/**
+ * ADR-27: Hisnul Muslim, unreviewed, kept only in the git-ignored `content/local/hisnul-muslim/`. Absent (CI, a fresh
+ * clone) passes with a notice; present, every file must have the SHA-256 recorded in `content/hisnul-muslim-SOURCES.md`
+ * and the counts there must hold. The debug build's staging depends on this task; no release build packages the files.
+ */
+val hisnulSources = rootProject.layout.projectDirectory.file("content/hisnul-muslim-SOURCES.md")
+val hisnulDirectory = rootProject.layout.projectDirectory.dir("content/local/hisnul-muslim")
+val checkHisnulMuslim = tasks.register<JavaExec>("checkHisnulMuslim") {
+    group = "verification"
+    description = "ADR-27: the local Hisnul Muslim files, when present, match their recorded SHA-256 and counts."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.HisnulMain")
+    args(hisnulSources.asFile.absolutePath, hisnulDirectory.asFile.absolutePath)
+    inputs.file(hisnulSources).withPropertyName("sources")
+    // A file tree, not inputs.dir: the folder is absent on every machine but the one that fetched it.
+    inputs.files(fileTree(hisnulDirectory)).withPropertyName("hisnulMuslim")
+}
+tasks.check { dependsOn(checkHisnulMuslim) }

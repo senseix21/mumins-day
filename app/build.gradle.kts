@@ -1,4 +1,5 @@
 import com.android.build.api.artifact.SingleArtifact
+import java.util.zip.ZipFile
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Element
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
@@ -410,6 +411,63 @@ val stageQuran = tasks.register<StageQuran>("stageQuran") {
     assets.set(layout.buildDirectory.dir("generated/quranAssets"))
 }
 
+/**
+ * Hisnul Muslim (ADR-27): unreviewed, kept only in the git-ignored `content/local/hisnul-muslim/`, copied byte for byte
+ * into `assets/hisnul-muslim/` of **debug builds only**, after its gate. Where the folder is absent (CI, a fresh clone)
+ * the output is empty and the screen says the collection is not in this build.
+ */
+abstract class StageHisnulMuslim : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val files: ConfigurableFileCollection
+
+    @get:Internal
+    abstract val source: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val assets: DirectoryProperty
+
+    @TaskAction
+    fun stage() {
+        val target = File(assets.get().asFile, "hisnul-muslim")
+        target.deleteRecursively()
+        val root = source.get().asFile
+        if (!root.isDirectory) return
+        target.mkdirs()
+        root.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }.forEach { it.copyTo(File(target, it.relativeTo(root).path)) }
+    }
+}
+
+val hisnulDirectory = rootProject.layout.projectDirectory.dir("content/local/hisnul-muslim")
+val stageHisnulMuslim = tasks.register<StageHisnulMuslim>("stageHisnulMuslim") {
+    dependsOn(":tools:content-gate:checkHisnulMuslim")
+    source.set(hisnulDirectory)
+    files.from(fileTree(hisnulDirectory))
+    assets.set(layout.buildDirectory.dir("generated/hisnulAssets"))
+}
+
+/**
+ * T-BUILD-7 (ADR-27, INV-C1, INV-C6): the release APK holds no file from `content/local/`. Reads the packaged APK, so it
+ * proves what ships, not what the build script meant.
+ */
+abstract class CheckNoLocalContent : DefaultTask() {
+    @get:InputFiles
+    abstract val apkFolder: DirectoryProperty
+
+    @TaskAction
+    fun check() {
+        val apks = apkFolder.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
+        if (apks.isEmpty()) throw GradleException("T-BUILD-7: no APK found in ${apkFolder.get().asFile}")
+        val found = apks.flatMap { apk ->
+            ZipFile(apk).use { zip -> zip.entries().toList().map { it.name }.filter { it.startsWith("assets/hisnul-muslim/") }.map { "${apk.name}: $it" } }
+        }
+        if (found.isNotEmpty()) {
+            throw GradleException("T-BUILD-7 failed: unreviewed local content in a release APK (ADR-27):\n" + found.take(10).joinToString("\n") { "  - $it" })
+        }
+        logger.lifecycle("local content gate: passed, ${apks.joinToString { it.name }} holds no assets/hisnul-muslim/ file.")
+    }
+}
+
 androidComponents {
     onVariants { variant ->
         val name = variant.name.replaceFirstChar { it.uppercase() }
@@ -442,6 +500,16 @@ androidComponents {
 
         if (variant.buildType == "release") {
             variant.sources.assets?.addGeneratedSourceDirectory(stageReleaseContent, StageContent::assets)
+            val noLocalContent = tasks.register<CheckNoLocalContent>("check${name}HasNoLocalContent") {
+                group = "verification"
+                description = "T-BUILD-7: the ${variant.name} APK holds no file from content/local/ (ADR-27)."
+                apkFolder.set(variant.artifacts.get(SingleArtifact.APK))
+            }
+            tasks.named("check") { dependsOn(noLocalContent) }
+        }
+        // ADR-27: never in a release. The debug build only, and only where the local folder exists.
+        if (variant.buildType == "debug") {
+            variant.sources.assets?.addGeneratedSourceDirectory(stageHisnulMuslim, StageHisnulMuslim::assets)
         }
 
         tasks.named("check") { dependsOn(permissions, dependencies) }

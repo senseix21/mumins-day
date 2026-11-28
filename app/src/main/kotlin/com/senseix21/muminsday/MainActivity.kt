@@ -33,6 +33,7 @@ import com.senseix21.muminsday.store.Stores
 import com.senseix21.muminsday.store.loadDistricts
 import com.senseix21.muminsday.ui.BaseActivity
 import com.senseix21.muminsday.ui.DeedActivity
+import com.senseix21.muminsday.ui.HisnulActivity
 import com.senseix21.muminsday.ui.KhatamActivity
 import com.senseix21.muminsday.ui.LicencesActivity
 import com.senseix21.muminsday.ui.NO_TIME
@@ -204,6 +205,10 @@ class MainActivity : BaseActivity() {
 
         page.addView(actionButton(getString(R.string.khatam_title), primary = false) {
             startActivity(Intent(this, KhatamActivity::class.java))
+        })
+
+        page.addView(actionButton(getString(R.string.hisnul_title), primary = false) {
+            startActivity(Intent(this, HisnulActivity::class.java))
         })
 
         page.addView(actionButton(getString(R.string.test_adhan)) { testAdhan() })

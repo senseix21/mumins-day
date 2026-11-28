@@ -484,4 +484,18 @@
     <string name="recitation_unverified">ফাইলটি যাচাইয়ে মেলেনি, তাই প্যাকটি মুছে ফেলা হয়েছে।</string>
     <string name="recitation_cannot_play">এই তিলাওয়াত চালানো যাচ্ছে না।</string>
 
+    <!-- Hisnul Muslim, unreviewed, debug builds only (ADR-27). -->
+    <string name="hisnul_title">হিসনুল মুসলিম</string>
+    <string name="hisnul_opening">খোলা হচ্ছে…</string>
+    <string name="hisnul_unreviewed_banner">যাচাই করা হয়নি: কোনো রিভিউয়ার এই দোয়াগুলো এখনো পড়ে দেখেননি। উৎস: ThelightHub-এর দোয়া এপিআই (hisnul.workers.dev)। বাংলা অনুবাদ কার, তা জানা নেই। লেখা উৎসে যেমন আছে তেমনই দেখানো হচ্ছে। এটি শুধু ডেভেলপারের পরীক্ষার সংস্করণে আছে।</string>
+    <string name="hisnul_not_in_build">অ্যাপের এই সংস্করণে হিসনুল মুসলিম নেই।</string>
+    <string name="hisnul_refused">দোয়ার ফাইলে একটি ভুল আছে, তাই কিছু দেখানো হচ্ছে না।</string>
+    <string name="hisnul_search_hint">অধ্যায়ের নামে খুঁজুন</string>
+    <string name="hisnul_search">খুঁজুন</string>
+    <string name="hisnul_chapters">অধ্যায়সমূহ</string>
+    <string name="hisnul_no_chapters">এই নামে কোনো অধ্যায় নেই।</string>
+    <string name="hisnul_chapter_title">অধ্যায় %1$s</string>
+    <string name="hisnul_dua_number">দোয়া %1$s</string>
+    <string name="hisnul_reference">সূত্র: %1$s</string>
+
 </resources>

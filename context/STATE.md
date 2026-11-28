@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 20:24 +0600
+**Last updated:** 2026-11-28 21:24 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac
-(branch `quran-bengali-translations`): 428 tests (288 `:core`, 101 `:app`, 36 content gate, 3 engine), lint clean, all gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 329 string keys in both languages, 64 real
-districts, 120 Quran files matching their recorded SHA-256 including two Bengali translations of 6236 ayahs each; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 5,440,616 bytes, unsigned, minified (900,104 before the translations, 879,473 before phase 16). **Nothing has run on a real phone; the translations have not run on any device.**
+(branch `hisnul-muslim`): 458 tests (312 `:core`, 101 `:app`, 42 content gate, 3 engine; 3 skipped where `content/local` is absent), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 342 string keys in both languages, the release APK free of local content (T-BUILD-7), 64 real
+districts, 120 Quran files matching their recorded SHA-256 including two Bengali translations of 6236 ayahs each; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 5,442,880 bytes, unsigned, minified (900,104 before the translations, 879,473 before phase 16). **Nothing has run on a real phone; the translations have not run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
 
@@ -86,6 +86,18 @@ districts, 120 Quran files matching their recorded SHA-256 including two Bengali
 - KNOWN: JVM tests and gates, the release APK's 120 Quran files have the recorded hashes, schema and search SQL on desktop
   SQLite. UNKNOWN: everything on a device, first-open time with 36 MB to hash (G66).
 
+## Hisnul Muslim, unreviewed, local and debug only (branch `hisnul-muslim`, ADR-27)
+
+- **What:** the ThelightHub dua API's Hisnul Muslim in Bengali (312 duas, 133 chapters), raw responses byte for byte in
+  git-ignored `content/local/hisnul-muslim/`. Only hashes, counts and the source are committed
+  (`content/hisnul-muslim-SOURCES.md`); the repository is public, so the text is never committed.
+- **Permission and review:** translator UNKNOWN; the founder owns the permission question (Q16); nobody has reviewed it (G67).
+- **Build:** `checkHisnulMuslim` (hashes and counts when present, notice when absent); staged into debug assets only;
+  T-BUILD-7 fails the build if the release APK holds any of it.
+- **App:** Home button, chapter list with search by Bengali name, chapter screen (Arabic in Amiri, right to left; text
+  exactly as the source); unreviewed banner on both. KNOWN: seen on the API 36 emulator (list, chapter 1), `ui.sh` PASS.
+  UNKNOWN: English UI, 200 % font, phones.
+
 ## Phase 15 built (branch `phase-15-16-khatam-packs`)
 
 - **Khatam plan, counted in ayahs** (ADR-24). `core/khatam`: `QuranLayout` from the verified metadata's surahs and its 30 juz
@@ -131,8 +143,8 @@ districts, 120 Quran files matching their recorded SHA-256 including two Bengali
 
 ## Copies and branches
 
-- On the Mac (`~/dev/mumins-day`): branch `quran-bengali-translations`, from `phase-15-16-khatam-packs` (dd179b5), pushed
-  to GitHub; not merged, no PR. Earlier notes said the cloud copy's `main` was ahead of GitHub.
+- On the Mac (`~/dev/mumins-day`): branch `hisnul-muslim`, from `quran-footnotes-display` (0221e33), pushed to GitHub;
+  not merged, no PR. `content/local/` exists only on this Mac. Earlier notes said the cloud copy's `main` was ahead of GitHub.
 - The cloud environment `mumins-day` now also allows Wikidata, Wikipedia, Open-Meteo,
   kivabe.com, the Islamic Foundation, dontkillmyapp.com, Android and Play documentation, and
   Wikimedia Commons.
@@ -165,5 +177,6 @@ districts, 120 Quran files matching their recorded SHA-256 including two Bengali
 | `<b>` tags shown literally in Zakaria's footnotes, or rendered bold | How the footnotes look | G65 |
 | Khatam unit (ayah) and the reminder riding on the deed nudge | Phase 15 built that way | Q14, G61 |
 | A pack host, and a tafsir or recitation with written permission | Phase 16 downloads nothing until then; `INTERNET` waits (ADR-25) | ADR-25, G62 |
+| Hisnul Muslim: translator and permission; a reviewer | Nothing of it can reach a release | Q16, G67, ADR-27 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |
 | Play account, support email, privacy URL | Release | G14, G15 |

@@ -334,3 +334,15 @@ quran_translation_credit
 quran_footnotes_show
 quran_footnotes_hide
 settings_quran_translation
+hisnul_title
+hisnul_opening
+hisnul_unreviewed_banner
+hisnul_not_in_build
+hisnul_refused
+hisnul_search_hint
+hisnul_search
+hisnul_chapters
+hisnul_no_chapters
+hisnul_chapter_title
+hisnul_dua_number
+hisnul_reference

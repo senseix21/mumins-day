@@ -513,6 +513,8 @@ through the same gate as deeds. Built 2026-11-28 17:41 +0600 on FAKE records onl
 - [x] Fake records in debug only, like deeds. 2026-11-28: `app/src/debug/assets/duas.json`, `hadith.json`, 30 records each, every text "TEST ..." or "পরীক্ষা ...", `test_fixture: true`; the shipping gate and a release-build loader refuse a fixture; release stages only `content/`.
 - [ ] Look at the Today screen on an emulator in both languages at 200 % font, with the fixture banner [T-UI-2, T-UI-3].
 - [ ] Reviewer: the `sources` list for each kind, the grading wording, the floor of 30, and the no-nudge decision [Q12].
+- [x] Hisnul Muslim reader, unreviewed, local and debug only (ADR-27; founder's request 2026-11-28). 2026-11-28 21:24 +0600: 313 raw API files in git-ignored `content/local/hisnul-muslim/`, only hashes and counts committed (`content/hisnul-muslim-SOURCES.md`); `core/hisnul` parses them exactly (`HisnulMuslimTest` 16 on fake fixtures, `HisnulRealFilesTest` 3, skipped without the files); `checkHisnulMuslim` gate (`HisnulGateTest` 6); debug-only staging; T-BUILD-7 reads the release APK (fails when forced to include them); `HisnulActivity` and `HisnulChapterActivity` from Home, seen on the API 36 emulator (list and chapter 1, `ui.sh` PASS, no crash). `./gradlew build --rerun-tasks` green with and without `content/local`.
+- [ ] Hisnul Muslim: who translated it and permission (Q16, founder); a reviewer's read (INV-C1, INV-C6) before it can reach any release [G67]. Not seen: English UI, 200 % font, chapters with notes only.
 
 ## Phase 14 · Quran: text offline, reader, verse search
 
