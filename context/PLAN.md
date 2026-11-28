@@ -44,6 +44,7 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 | 6 | A Qibla compass that admits doubt | JVM + phone | Built. Open: Bengali wording, a real compass test |
 | 7 | Proof on the device matrix; size and speed measured | Phones | Not started: needs phones. Release APK 184,738 bytes |
 | 8 | On Google Play | Play Console | Build side ready (signing, store script, policy read). Open: Play account, forms, Adhan audio, closed test |
+| 9–17 | Part 2: widgets, Salah tracker, Hijri, Zakat, duas, hadith, Quran, khatam, audio packs | JVM + phone | Planned; see Part 2 below |
 
 Phases 1, 2 and the pure parts of 5 and 6 need nothing but a JVM. From phase 3 on, building
 needs the Android SDK (now in the cloud environment) and proof needs phones (G13). The founder track below runs alongside everything.
@@ -372,8 +373,176 @@ Listing and rollout
 
 ---
 
-## After v1
+## Part 2 · Features after v1 (phases 9 to 17)
 
-Not planned in detail; seams are in `spec/03` "Forward path". Order suggested by the spec:
-widgets, Salah tracker, Hijri date, duas, daily hadith, Zakat, then the Quran work, which is
-the first feature to need `INTERNET` and written translation permissions.
+Written 2026-11-28 at the founder's request ("we also need to add all of these"). Same rules as the
+rest of this file: a box is ticked only when verified, ids tie items to invariants and
+decisions, and nothing here may break a v1 rule without an ADR and the founder's yes.
+
+### How the order was chosen
+
+1. **v1 ships first.** Phases 7 and 8 are not skipped. Phases 9 to 13 need no new permission
+   and almost no new people, so they can be built while v1 waits on the reviewer and phones,
+   but they ship in an update after v1, not inside it.
+2. **No network until it cannot be avoided.** Quran text, translation, duas and hadith are
+   small enough to bundle (ASSUMED sizes below; measure). Only recitation audio and long
+   tafsir are too large, so `INTERNET` arrives last, in phase 16, for one host, with its own
+   ADR, privacy page and Data safety change. If the founder prefers, phase 16 can stay a
+   separate, optional download app, keeping the main app permission-free (decide in phase 9).
+3. **One content platform, not five.** Deeds already have a review gate whose provenance
+   check knows nothing about deed text (ADR-10). Duas and hadith reuse it; the Quran gets an
+   integrity check instead, because its text must be exact and unmodified, not reviewed.
+4. **Content blocks code.** Every content feature names the licence and the person it needs
+   in the founder track below. Code without the content is built on obviously fake records,
+   as with deeds, and the store build refuses to ship fake records.
+
+| Phase | Feature(s) | Needs from people | New permission |
+|---|---|---|---|
+| 9 | Foundations: navigation, content kinds, decisions | Founder decisions | None |
+| 10 | Home-screen widgets; Salah tracker; "find my district" | Founder yes on location | Location (optional, ADR-12 reversal) |
+| 11 | Hijri date, ±1 day | Founder: which authority | None |
+| 12 | Zakat calculator (bhori, ana) | Reviewer signs the rules | None |
+| 13 | Daily duas (Hisnul Muslim); daily hadith | Text licences; reviewer | None |
+| 14 | Quran: Arabic and Bengali text offline; reader; verse search | Translation permission in writing; Arabic font licence | None |
+| 15 | Khatam planner | None | None |
+| 16 | Tafsir and recitation audio as downloadable packs | Tafsir and audio permissions; a host | `INTERNET`, one host |
+| 17 | Proof and release of the update | Phones; Play | None |
+
+---
+
+## Founder track, part 2
+
+- [ ] Decide: after v1 ships, which phases form the first update (suggested: 10 to 12).
+- [ ] Decide: is network ever allowed in the main app (phase 16), or do audio packs live in a separate app? [ADR-6]
+- [ ] Decide: bring back "find my district" with coarse location (reverses ADR-12) [INV-P2, INV-P3].
+- [ ] Hijri authority: whose announcement decides the month (ASSUMED candidates: the National Moon Sighting Committee convened by the Islamic Foundation; confirm) [G33].
+- [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [F-Zakat].
+- [ ] Duas: the source text (Hisnul Muslim, Arabic) and a Bengali translation, each with a written licence; the reviewer for selection and wording.
+- [ ] Hadith: a source collection whose terms allow offline redistribution, a Bengali translation with a licence, and the reviewer for selection and grading.
+- [ ] Quran: an Arabic text source with its terms (ASSUMED: Tanzil Uthmani, which permits verbatim redistribution with credit; fetch and confirm) and a **Bengali translation with written permission** (KNOWN from earlier research: Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit).
+- [ ] Quran: an Arabic Uthmani font with a licence that allows bundling (candidates and licences UNKNOWN; research in phase 14).
+- [ ] Tafsir: a Bengali tafsir with written permission (phase 16).
+- [ ] Recitation: at least one reciter's audio with written permission, and a host for the packs (phase 16).
+- [ ] A reviewer for every new content kind; may be the same person as for deeds (G9).
+
+---
+
+## Phase 9 · Foundations for part 2
+
+**Outcome.** The app can hold more than four features without a navigation library, and the
+content gate takes more than one kind of record.
+
+**Exit.** Decisions recorded as ADRs; the gate generalised with tests; v1 behaviour unchanged.
+
+- [ ] ADR-17: release order and the network question (founder track, first two items).
+- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested.
+- [ ] Content kinds: `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10].
+- [ ] Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships.
+- [ ] Storage plan: one SQLite database for user data (tracker, khatam); read-only bundled databases for Quran and hadith; numbered migrations continue [ADR-5].
+- [ ] Size budget per feature, measured against the 15 MB total (INV, `01` constraints).
+- [ ] New invariants written into `spec/01` before their code: tracker tone (INV-C4 extended), Quran integrity (INV-Q-text), Hijri attribution (INV-H1).
+
+## Phase 10 · Widgets, Salah tracker, "find my district"
+
+**Outcome.** The next prayer at a glance on the home screen; a private, guilt-free record of
+prayers; an optional "find my district" button.
+
+**Widgets** (platform `AppWidgetProvider`, no new dependency)
+- [ ] Next-prayer widget and a five-times widget, Bengali digits [INV-L2].
+- [ ] Read the planner and clock only; the widget computes nothing [spec 03 forward path].
+- [ ] Updated from the alarm path's replan and at each prayer, never by a polling job; no new permission [INV-P3].
+- [ ] Shows "—" and a warning state when reminders are Degraded [INV-S6, INV-T7].
+- [ ] Tests: the widget's view model as a pure function; instrumented check on an emulator.
+
+**Salah tracker**
+- [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41].
+- [ ] "Prayed" action on the prayer notification, built by the one notification builder.
+- [ ] Manual tick on the home screen for today and the past 7 days.
+- [ ] Week view like the deed's: dots only. No counts, streaks, percentages or "missed" wording anywhere [INV-C4].
+- [ ] Never prompts about a prayer not marked; never a notification about the tracker.
+- [ ] Tests: tone rules as a string check over every tracker string; date attribution across midnight and travel.
+
+**Find my district** (only with the founder's yes)
+- [ ] ADR reversing ADR-12 for `ACCESS_COARSE_LOCATION` only; allowlist edit [INV-P3].
+- [ ] Read once while the district screen is open; never in the background; nothing stored but the chosen district [INV-P2, T-INST-11].
+- [ ] Nearest district from the 64 headquarters points; outside the bounding box or more than 50 km away asks before changing [F1#6, F1#7].
+- [ ] Privacy page and Data safety draft updated.
+
+## Phase 11 · Hijri date, ±1 day
+
+**Outcome.** The Hijri date on the home screen, following Bangladesh's announcement, with a
+one-tap ±1 day correction.
+
+- [ ] Vendor the engine repository's `hijri` module (Apache-2.0, KNOWN from its POM; depends only on kotlinx-datetime, already allowed) with a MODIFICATIONS note if changed [ADR-2 pattern].
+- [ ] `clock` gains `hijriDate(localDate, adjustment)`; adjustment is -1, 0 or +1, set by the user [spec 03 forward path].
+- [ ] The Hijri day changes at Maghrib, not midnight (ASSUMED convention; reviewer confirms) [INV-H1].
+- [ ] Optional: Ramadan mode suggests itself when the Hijri month is Ramadan, but still waits for the user's tap (G33 ruling stands).
+- [ ] Formatting only in `l10n`; Bengali month names from the native speaker.
+- [ ] Tests: against a published table of Hijri month starts for Bangladesh (source to fetch), and the ±1 property.
+
+## Phase 12 · Zakat calculator
+
+**Outcome.** A pure, offline calculator in local units that shows its working.
+
+- [ ] Pure `zakat` package in core: inputs in taka, bhori, ana, ratti and grams; outputs nisab, whether it is reached, and the amount.
+- [ ] Conversions fetched from a source and recorded (ASSUMED until then: 1 bhori = 11.664 g, 1 bhori = 16 ana, 1 ana = 6 ratti) [data rule].
+- [ ] Gold and silver prices typed by the user, with the date; the app never fetches them (no network) and says so.
+- [ ] Rules exactly as the reviewer signs them; the reviewer's note committed beside the rules, like deeds [INV-C1 pattern].
+- [ ] Shows every step of the working; no rounding against the payer's obligation.
+- [ ] Property tests: unit round trips, monotonicity, nisab boundary.
+
+## Phase 13 · Daily duas and daily hadith
+
+**Outcome.** A short reviewed dua and a reviewed hadith each day, with source and grade,
+through the same gate as deeds.
+
+- [ ] Record shapes for dua (Arabic, transliteration, Bengali, English, source, occasion) and hadith (Arabic, Bengali, English, collection, number, edition, grading).
+- [ ] Gates per kind, reusing provenance; store build requires the approved files [INV-C1, INV-C3].
+- [ ] Arabic shown right-to-left inside Bengali screens with isolates [INV-L3].
+- [ ] Rotation per kind, same rules as deeds (stable for the day, no repeats within a cycle) [INV-C2].
+- [ ] Optional nudge per kind? Decide; default off, at most one notification a day across all content kinds.
+- [ ] Fake records in debug only, like deeds.
+
+## Phase 14 · Quran: text offline, reader, verse search
+
+**Outcome.** The whole Quran in Arabic with a Bengali translation, readable and searchable
+with the radio off.
+
+- [ ] Fetch the chosen Arabic text and translation; record source, version, licence and hash (founder track).
+- [ ] Bundled read-only SQLite database built at build time from the source files; the build fails if the text's hash differs from the recorded one (INV-Q-text: the Quran text is never modified).
+- [ ] Size measured against the budget (ASSUMED: text and one translation under 5 MB with an index; measure).
+- [ ] Reader: surah list, ayah view, Arabic in the licensed Uthmani font, translation below, last position remembered.
+- [ ] Verse search with SQLite FTS: Bengali and English words, Arabic with and without diacritics, surah:ayah lookup.
+- [ ] Credits and licence shown on the Licences screen and with the text as the licence requires.
+- [ ] Tests: every surah and ayah count matches the source; search finds known verses; the text round-trips byte for byte.
+
+## Phase 15 · Khatam planner
+
+**Outcome.** A plan to finish the Quran by a date the user picks, with gentle progress.
+
+- [ ] Table for the plan and progress (by juz, page or ayah: decide), one migration.
+- [ ] Daily portion computed from today to the target date; recomputed, never "behind" language [INV-C4].
+- [ ] Optional single daily reminder through the existing nudge path, off by default.
+- [ ] Opens the reader at today's portion.
+- [ ] Tests: portions sum to the whole Quran; date changes and travel; finishing early.
+
+## Phase 16 · Tafsir and recitation audio as downloadable packs
+
+**Outcome.** Optional downloads, verified and stored on the device, without weakening the
+privacy promise for anyone who never downloads.
+
+- [ ] ADR reversing ADR-6 for one host only, with the founder's yes; or the separate-app option.
+- [ ] `INTERNET` added; allowlist edit; T-BUILD-1 changed to "no host other than the pack host is ever contacted", tested [INV-P1 replaced by a written new invariant].
+- [ ] Pack manifest bundled in the app (names, sizes, SHA-256); a downloaded pack is used only if its hash matches; no other request is ever made.
+- [ ] No analytics, no identifiers in requests, no request without a user tap.
+- [ ] Downloads resume, can be cancelled, and can be deleted; storage shown in Settings.
+- [ ] Audio player for recitation with verse sync (if the source provides timings).
+- [ ] Privacy page and Data safety form updated before release (`spec/06`).
+
+## Phase 17 · Proof and release of the update
+
+- [ ] Every new invariant tested in CI; the emulator suite extended for widgets, tracker, Quran reader.
+- [ ] Device matrix pass for the new screens, including Arabic rendering on every phone [INV-L3].
+- [ ] Size, cold start and memory re-measured with the Quran database.
+- [ ] Native-speaker and reviewer passes for all new strings and content.
+- [ ] Play listing, privacy page and Data safety updated; staged rollout as for v1.

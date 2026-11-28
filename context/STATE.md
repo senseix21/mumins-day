@@ -1,6 +1,6 @@
 # State
 
-**Last updated:** 2026-11-28 15:16 +0600
+**Last updated:** 2026-11-28 16:18 +0600
 
 ## In one paragraph
 
@@ -46,6 +46,8 @@ nothing changed on 28 Nov has run on any device.**
    G51 (`USE_EXACT_ALARM`); G52 (`mediaPlayback`); G33 and G35 rulings; an Adhan recording (Q5).
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
+5. **Part 2** (phases 9 to 17 in `PLAN.md`): the nine later features, planned. Phases 9 to 13 need
+   no new permission and can be built while v1 waits; they ship in an update after v1.
 
 ## Waiting on the founder
 

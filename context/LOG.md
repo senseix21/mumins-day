@@ -526,3 +526,18 @@ CI result: see the next entry.
 **Verified.** GitHub Actions run 46130286929 on `a24be0a`: completed, success. `main` builds and passes every test and gate on JDK 17 with R8 on.
 
 **Not done / follow-up.** None.
+
+## 2026-11-28 16:18 +0600 · Plan for the nine later features
+
+**Did.** At the founder's request, replaced the plan's short "After v1" note with Part 2:
+phases 9 to 17 with checklists (widgets, Salah tracker, "find my district", Hijri, Zakat, duas,
+hadith, Quran text and search, khatam, tafsir and audio packs, proof and release) and a second
+founder track listing every licence and decision they need. Order: no-network features first;
+`INTERNET` only in phase 16, for one host, with its own ADR, or in a separate app.
+
+**Verified.** Nothing built. Facts used: the upstream `hijri` module's POM says Apache-2.0 and it
+depends only on kotlinx-datetime (read in `dev/upstream/open-prayer-times/hijri/build.gradle.kts`).
+Sizes, unit conversions, the Quran text licence and the Hijri authority are marked ASSUMED in
+the plan until fetched.
+
+**Not done / follow-up.** Founder decisions at the top of Part 2's founder track.
