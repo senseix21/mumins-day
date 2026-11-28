@@ -1,5 +1,7 @@
 package com.senseix21.muminsday.alarm
 
+import com.senseix21.muminsday.deed.DayCard
+import com.senseix21.muminsday.deed.DeedId
 import com.senseix21.muminsday.planner.AlarmId
 import com.senseix21.muminsday.planner.AlarmSpec
 import com.senseix21.muminsday.planner.Reminder
@@ -14,6 +16,7 @@ import com.senseix21.muminsday.store.defaultSettings
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -31,6 +34,34 @@ class TriggerTest {
         assertEquals(Method.ExactWhileIdle, methodFor(prayer(RingMode.Silent)))
         assertEquals(Method.ExactWhileIdle, methodFor(AlarmSpec.PreReminderAlarm(AlarmId.preReminder(date, Salah.Asr), at.minusSeconds(60), Salah.Asr, at)))
         assertEquals(Method.ExactWhileIdle, methodFor(AlarmSpec.Replan(AlarmId.replan(date), at)))
+        assertEquals(Method.ExactWhileIdle, methodFor(AlarmSpec.DeedNudge(AlarmId.deedNudge(date), at)))
+    }
+
+    @Test
+    fun `the nudge keeps the queue alive on its own but is not a prayer reminder`() {
+        val nudgeOnly = defaultSettings.copy(deedNudge = LocalTime.of(9, 0))
+        assertEquals(false, alarmsNeeded(defaultSettings))
+        assertEquals(true, alarmsNeeded(nudgeOnly))
+        assertEquals(false, remindersEnabled(nudgeOnly), "the home screen still says prayer reminders are off")
+        val one = defaultSettings.copy(reminders = Reminders.allOff.with(Salah.Isha, Reminder(ReminderMode.Silent)))
+        assertEquals(true, alarmsNeeded(one))
+    }
+
+    @Test
+    fun `a nudge's extras read back as a nudge, and it is not a logged reminder`() {
+        val spec = AlarmSpec.DeedNudge(AlarmId.deedNudge(date), at)
+        val extras = extrasFor(spec)
+        assertEquals(Trigger.Nudge, parseTrigger(extras.kind, extras.salah, extras.plannedAtMillis))
+        assertEquals(KIND_NUDGE, extras.kind)
+        assertEquals(null, extras.salah)
+    }
+
+    @Test
+    fun `the nudge is posted unless today's card is done, and a day with no card is not done`() {
+        val card = DayCard(date, DeedId.of("test-1")!!, contentVersion = 1, swapped = false, doneAt = null)
+        assertEquals(true, nudgeNeeded(null))
+        assertEquals(true, nudgeNeeded(card))
+        assertEquals(false, nudgeNeeded(card.copy(doneAt = at)))
     }
 
     @Test

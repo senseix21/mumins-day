@@ -4,6 +4,7 @@ import com.senseix21.muminsday.clock.ClockSettings
 import com.senseix21.muminsday.clock.Place
 import com.senseix21.muminsday.clock.Prayer
 import java.time.Duration
+import java.time.LocalTime
 
 /** The five prayers that can ring. Sehri end and sunrise are not prayers to call, so they are not representable here. */
 public enum class Salah(public val prayer: Prayer) {
@@ -56,4 +57,13 @@ public class Reminders private constructor(private val bySalah: List<Reminder>) 
     }
 }
 
-public data class PlannerSettings(val place: Place, val clock: ClockSettings, val reminders: Reminders)
+/**
+ * [deedNudge] is the local time of day for the optional daily deed nudge (F4, G35); null means off, which is the default.
+ * It is independent of [reminders]: the nudge is planned whether every prayer is Off or not.
+ */
+public data class PlannerSettings(
+    val place: Place,
+    val clock: ClockSettings,
+    val reminders: Reminders,
+    val deedNudge: LocalTime? = null,
+)

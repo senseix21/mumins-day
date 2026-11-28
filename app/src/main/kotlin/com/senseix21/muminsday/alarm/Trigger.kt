@@ -1,5 +1,6 @@
 package com.senseix21.muminsday.alarm
 
+import com.senseix21.muminsday.deed.DayCard
 import com.senseix21.muminsday.planner.AlarmSpec
 import com.senseix21.muminsday.planner.Delivery
 import com.senseix21.muminsday.planner.PlannerSettings
@@ -28,16 +29,30 @@ fun methodFor(spec: AlarmSpec): Method = when (spec) {
         RingMode.Tone, RingMode.Silent -> Method.ExactWhileIdle
     }
     is AlarmSpec.PreReminderAlarm -> Method.ExactWhileIdle
+    // The same API as the silent and pre-reminder alarms: a nudge is a notification, never audio, so it needs no more.
+    is AlarmSpec.DeedNudge -> Method.ExactWhileIdle
     is AlarmSpec.Replan -> Method.ExactWhileIdle
 }
 
-/** The planner always adds a replan alarm; with every prayer Off there is nothing to wake for, so nothing is set. */
+/** Whether any prayer rings or notifies. The home screen says "reminders are off" when this is false. */
 fun remindersEnabled(settings: PlannerSettings): Boolean =
     Salah.entries.any { settings.reminders[it].mode != ReminderMode.Off }
+
+/**
+ * The planner always adds a replan alarm; with every prayer Off and no nudge there is nothing to wake for, so nothing is
+ * set. The nudge needs the queue on its own (G35), which is why this is not [remindersEnabled].
+ */
+fun alarmsNeeded(settings: PlannerSettings): Boolean = remindersEnabled(settings) || settings.deedNudge != null
+
+/** F4: the nudge is for a card not yet done. A day with no card recorded is not done. Never a reason to repeat. */
+fun nudgeNeeded(today: DayCard?): Boolean = today?.doneAt == null
 
 /** What a delivered alarm turned out to be, read from its intent. */
 sealed interface Trigger {
     data object Replan : Trigger
+
+    /** The daily deed nudge. Not a prayer alarm, so it is not logged and `assessHealth` never sees it (G35). */
+    data object Nudge : Trigger
 
     /** A planned reminder; it is logged. */
     data class Reminder(val alarm: LoggedAlarm) : Trigger
@@ -51,17 +66,23 @@ sealed interface Trigger {
 
 const val KIND_REPLAN: String = "Replan"
 const val KIND_TEST: String = "Test"
+const val KIND_NUDGE: String = "DeedNudge"
 
 /** The three plain values an alarm's intent carries. */
 class TriggerExtras(val kind: String, val salah: String?, val plannedAtMillis: Long)
 
-fun extrasFor(spec: AlarmSpec): TriggerExtras = when (val logged = LoggedAlarm.of(spec)) {
-    null -> TriggerExtras(KIND_REPLAN, null, spec.at.toEpochMilli())
-    else -> TriggerExtras(logged.kind.name, logged.salah.name, logged.plannedAt.toEpochMilli())
+fun extrasFor(spec: AlarmSpec): TriggerExtras = when (spec) {
+    is AlarmSpec.DeedNudge -> TriggerExtras(KIND_NUDGE, null, spec.at.toEpochMilli())
+    is AlarmSpec.Replan -> TriggerExtras(KIND_REPLAN, null, spec.at.toEpochMilli())
+    is AlarmSpec.PrayerAlarm, is AlarmSpec.PreReminderAlarm -> {
+        val logged = checkNotNull(LoggedAlarm.of(spec)) { "a prayer or pre-reminder alarm is always logged" }
+        TriggerExtras(logged.kind.name, logged.salah.name, logged.plannedAt.toEpochMilli())
+    }
 }
 
 fun parseTrigger(kind: String?, salah: String?, plannedAtMillis: Long?): Trigger {
     if (kind == KIND_REPLAN) return Trigger.Replan
+    if (kind == KIND_NUDGE) return Trigger.Nudge
     val plannedAt = plannedAtMillis?.let(Instant::ofEpochMilli) ?: return Trigger.Unreadable
     if (kind == KIND_TEST) return Trigger.Test(plannedAt)
     val alarmKind = AlarmKind.entries.firstOrNull { it.name == kind } ?: return Trigger.Unreadable

@@ -10,6 +10,7 @@ import com.senseix21.muminsday.planner.Reminder
 import com.senseix21.muminsday.planner.ReminderMode
 import com.senseix21.muminsday.planner.Reminders
 import com.senseix21.muminsday.planner.Salah
+import java.time.LocalTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -29,6 +30,32 @@ class SettingsTest {
     @Test
     fun `nothing stored gives the defaults`() {
         assertEquals(defaultSettings, parseSettings(emptyMap<String, String>()))
+    }
+
+    @Test
+    fun `the deed nudge is off by default and round trips as HH-mm`() {
+        assertEquals(null, defaultSettings.deedNudge)
+        assertEquals(null, parseSettings(emptyMap<String, String>()).deedNudge)
+        val nudged = chosen.copy(deedNudge = LocalTime.of(7, 5))
+        assertEquals("07:05", encodeSettings(nudged)["v1.deedNudge"])
+        assertEquals(nudged, parseSettings(encodeSettings(nudged)))
+        assertEquals(LocalTime.of(0, 0), parseSettings(encodeSettings(chosen.copy(deedNudge = LocalTime.MIDNIGHT))).deedNudge)
+        assertEquals(LocalTime.of(23, 59), parseSettings(encodeSettings(chosen.copy(deedNudge = LocalTime.of(23, 59)))).deedNudge)
+    }
+
+    @Test
+    fun `a damaged nudge time is off, never a wrong hour, and the rest survives`() {
+        for (bad in listOf("", "9:00", "24:00", "07:60", "07:05:30", "seven", "-1:00", "\u0000")) {
+            val parsed = parseSettings(encodeSettings(chosen) + ("v1.deedNudge" to bad))
+            assertEquals(chosen, parsed, "'$bad'")
+        }
+        assertEquals(chosen, parseSettings(encodeSettings(chosen) + ("v1.deedNudge" to 700)))
+    }
+
+    @Test
+    fun `turning the nudge off removes its key`() {
+        val on = encodeSettings(chosen.copy(deedNudge = LocalTime.of(9, 0))).keys
+        assertEquals(setOf("v1.deedNudge"), settingsEdits(on, chosen).remove)
     }
 
     @Test

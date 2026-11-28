@@ -5,6 +5,9 @@ import com.senseix21.muminsday.clock.PrayerClock
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * How far ahead alarms are held. 48 h so that losing the replan (a killed app, a missed trigger) still leaves a full
@@ -63,6 +66,15 @@ public class Planner(private val clock: PrayerClock) {
             date = date.plusDays(1)
         }
 
+        settings.deedNudge?.let { time ->
+            var nudgeDate = firstDate
+            while (!nudgeDate.isAfter(lastDate)) {
+                val nudgeAt = nudgeInstant(nudgeDate, time, zone)
+                if (nudgeAt.isInWindow(now, windowEnd)) alarms += AlarmSpec.DeedNudge(AlarmId.deedNudge(nudgeDate), nudgeAt)
+                nudgeDate = nudgeDate.plusDays(1)
+            }
+        }
+
         // Always present, even when every reminder is Off: whether reminders are enabled at all is the shell's
         // decision, and it simply does not register a plan then.
         alarms += replan(now, firstDate, settings)
@@ -78,6 +90,14 @@ public class Planner(private val clock: PrayerClock) {
      * twice (INV-S5). The end is inclusive.
      */
     private fun Instant.isInWindow(now: Instant, windowEnd: Instant): Boolean = this > now && this <= windowEnd
+
+    /**
+     * [time] on [date] in [zone]. `ZonedDateTime.of` is total: in a daylight-saving gap (the wall time does not exist)
+     * it moves the time forward by the length of the gap, so 02:30 in a spring-forward hour rings at 03:30; in an
+     * overlap (the wall time happens twice) it takes the earlier instant. One nudge per date either way.
+     */
+    private fun nudgeInstant(date: LocalDate, time: LocalTime, zone: ZoneId): Instant =
+        ZonedDateTime.of(date, time, zone).toInstant()
 
     /** 00:05 local today if that is still ahead, else tomorrow's. `atStartOfDay(zone)` is correct across DST gaps. */
     private fun replan(now: Instant, today: LocalDate, settings: PlannerSettings): AlarmSpec.Replan {

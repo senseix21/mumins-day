@@ -1,16 +1,20 @@
 package com.senseix21.muminsday.ui
 
+import android.app.TimePickerDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.format.DateFormat
+import android.util.TypedValue
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import com.senseix21.muminsday.BuildConfig
@@ -28,6 +32,7 @@ import com.senseix21.muminsday.store.MAX_OFFSET_MINUTES
 import com.senseix21.muminsday.store.SilentMode
 import com.senseix21.muminsday.store.Stores
 import java.time.Instant
+import java.time.LocalTime
 
 /**
  * Settings. Every change is saved the moment it is made and plans again through [saveSettings] or [saveApp]; there is
@@ -68,6 +73,18 @@ class SettingsActivity : BaseActivity() {
             ) { chosen -> saveApp(this, Stores.settings(this).readApp().copy(silentMode = chosen)) },
         )
 
+        page.addView(heading(getString(R.string.settings_ramadan)))
+        page.addView(body(getString(R.string.settings_ramadan_help), muted = true))
+        page.addView(
+            switchRow(getString(R.string.settings_ramadan_on), prefs.ramadanMode) { on ->
+                saveApp(this, Stores.settings(this).readApp().copy(ramadanMode = on))
+            },
+        )
+
+        page.addView(heading(getString(R.string.settings_nudge)))
+        page.addView(body(getString(R.string.settings_nudge_help), muted = true))
+        page.addView(nudgeSection(texts))
+
         page.addView(heading(getString(R.string.settings_district)))
         page.addView(actionButton(getString(R.string.settings_district_change), primary = false) {
             startActivity(Intent(this, DistrictActivity::class.java))
@@ -102,6 +119,55 @@ class SettingsActivity : BaseActivity() {
         page.addView(body(getString(R.string.report_help), muted = true))
         page.addView(actionButton(getString(R.string.settings_report)) { sendReport() })
         show(page)
+    }
+
+    /** A platform switch of at least 48 dp; [onChanged] is called only when the user flips it. */
+    private fun switchRow(label: String, checked: Boolean, onChanged: (Boolean) -> Unit): Switch = Switch(this).apply {
+        text = label
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+        setTextColor(Palette.ink)
+        minHeight = dp(MIN_TARGET_DP)
+        minimumHeight = dp(MIN_TARGET_DP)
+        isChecked = checked
+        setOnCheckedChangeListener { _, isOn -> onChanged(isOn) }
+    }
+
+    /**
+     * F4: off by default; on needs a time the user picks, so turning it on opens the picker and cancelling it leaves
+     * the nudge off. There is no default hour that we chose for them.
+     */
+    private fun nudgeSection(texts: Texts): View {
+        val box = column()
+        val chosen = Stores.settings(this).read().deedNudge
+        box.addView(
+            switchRow(getString(R.string.settings_nudge_on), chosen != null) { on ->
+                if (on) pickNudgeTime(LocalTime.of(DEFAULT_PICKER_HOUR, 0)) else saveNudge(null)
+            },
+        )
+        if (chosen != null) {
+            box.addView(actionButton(getString(R.string.settings_nudge_time, texts.timeOfDay(chosen)), primary = false) {
+                pickNudgeTime(chosen)
+            })
+        }
+        return box
+    }
+
+    private fun pickNudgeTime(initial: LocalTime) {
+        val dialog = TimePickerDialog(
+            this,
+            { _, hour, minute -> saveNudge(LocalTime.of(hour, minute)) },
+            initial.hour,
+            initial.minute,
+            DateFormat.is24HourFormat(this),
+        )
+        dialog.setOnCancelListener { render() }
+        dialog.show()
+    }
+
+    private fun saveNudge(time: LocalTime?) {
+        val settings = Stores.settings(this).read()
+        saveSettings(this, settings.copy(deedNudge = time))
+        render()
     }
 
     private fun prayerSection(salah: Salah, texts: Texts): View {
@@ -237,6 +303,9 @@ class SettingsActivity : BaseActivity() {
     private companion object {
         /** Offered in the pre-reminder list; a stored value outside it is added so it is never silently changed. */
         val PRE_REMINDER_CHOICES = listOf(5, 10, 15, 20, 30, 60)
+
+        /** Where the picker opens when the nudge is first turned on; nothing is saved until the user confirms. */
+        const val DEFAULT_PICKER_HOUR = 9
         const val REPORT_SUBJECT = "Mu'mins DAY report"
     }
 }

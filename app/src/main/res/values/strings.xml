@@ -235,4 +235,17 @@
     <string name="qibla_no_sensor_hint">ওপরের সংখ্যাটি অন্য কোনো কম্পাসে মিলিয়ে নিন, অথবা এমন কোনো জায়গার দিক ধরুন যার কিবলা আপনার জানা আছে।</string>
     <string name="qibla_needle_desc">কিবলার নির্দেশক: ফোনের মাথা থেকে ঘড়ির কাঁটার দিকে %1$s ডিগ্রি ঘুরলে কিবলা</string>
     <string name="qibla_needle_desc_unsure">কিবলার নির্দেশক, নির্ভরযোগ্য নয়: ফোনের মাথা থেকে ঘড়ির কাঁটার দিকে %1$s ডিগ্রি</string>
+
+    <!-- Ramadan mode (G33) and the daily deed nudge (G35). -->
+    <string name="notification_nudge">আজকের একটি ভালো কাজ দেখে নিন।</string>
+    <string name="fast_sehri_end">সেহরির শেষ সময়</string>
+    <string name="fast_iftar">ইফতার</string>
+    <string name="home_next_fast_unknown">সেহরির শেষ ও ইফতারের সময় জানা যাচ্ছে না।</string>
+    <string name="settings_ramadan">রমজান মোড</string>
+    <string name="settings_ramadan_help">চালু থাকলে হোম স্ক্রিনে সেহরির শেষ সময় ও ইফতার সবচেয়ে বড় করে দেখানো হবে। রমজান কবে শুরু, অ্যাপ তা হিসাব করে না; আপনি নিজে চালু ও বন্ধ করুন।</string>
+    <string name="settings_ramadan_on">রমজান মোড চালু</string>
+    <string name="settings_nudge">দৈনিক ভালো কাজের স্মরণ</string>
+    <string name="settings_nudge_help">আপনার বেছে নেওয়া সময়ে দিনে একবার একটি নীরব বিজ্ঞপ্তি আসবে। না দেখলে আবার আসবে না।</string>
+    <string name="settings_nudge_on">স্মরণ চালু</string>
+    <string name="settings_nudge_time">সময়: %1$s</string>
 </resources>

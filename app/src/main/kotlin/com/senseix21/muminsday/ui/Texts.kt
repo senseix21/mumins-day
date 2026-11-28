@@ -6,11 +6,13 @@ import com.senseix21.muminsday.bearing.Bearing
 import com.senseix21.muminsday.bearing.Cardinal
 import com.senseix21.muminsday.bearing.CompassPoint
 import com.senseix21.muminsday.clock.Countdown
+import com.senseix21.muminsday.clock.FastingTime
 import com.senseix21.muminsday.l10n.ClockStyle
 import com.senseix21.muminsday.l10n.Language
 import com.senseix21.muminsday.l10n.Words
 import com.senseix21.muminsday.l10n.dateText
 import com.senseix21.muminsday.l10n.numberText
+import com.senseix21.muminsday.l10n.timeOfDayText
 import com.senseix21.muminsday.l10n.timeText
 import com.senseix21.muminsday.l10n.toBengaliDigits
 import com.senseix21.muminsday.l10n.wordsFor
@@ -18,6 +20,7 @@ import com.senseix21.muminsday.planner.ReminderMode
 import com.senseix21.muminsday.planner.Salah
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 
 /** What a time cannot be computed shows as (F2 #4). Not a time, so no digit and nothing to translate. */
@@ -51,6 +54,16 @@ class Texts(private val context: Context, val language: Language) {
             Salah.Isha -> R.string.prayer_isha
         },
     )
+
+    fun fastingTime(time: FastingTime): String = context.getString(
+        when (time) {
+            FastingTime.SehriEnd -> R.string.fast_sehri_end
+            FastingTime.Iftar -> R.string.fast_iftar
+        },
+    )
+
+    /** A time of day the user chose, such as the deed nudge. */
+    fun timeOfDay(time: LocalTime): String = timeOfDayText(time, ClockStyle.Hour12, words)
 
     fun mode(mode: ReminderMode): String = context.getString(
         when (mode) {

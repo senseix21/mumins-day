@@ -1,6 +1,7 @@
 package com.senseix21.muminsday.l10n
 
 import java.time.Instant
+import java.time.LocalTime
 import java.time.ZoneId
 
 public enum class ClockStyle { Hour12, Hour24 }
@@ -23,10 +24,13 @@ internal fun dayPartOf(hour: Int): DayPart = when (hour) {
  * clock's job, INV-T5). Bengali: `সকাল ৬:০৫` or `০৬:০৫`; English: `6:05 am` or `06:05`. Digits are Bengali for
  * Bengali and never Latin (INV-L2). Nothing here reads the default zone or locale (INV-T3).
  */
-public fun timeText(instant: Instant, zone: ZoneId, style: ClockStyle, words: Words): String {
-    val local = instant.atZone(zone)
-    val hour = local.hour
-    val minute = local.minute.toString().padStart(2, '0')
+public fun timeText(instant: Instant, zone: ZoneId, style: ClockStyle, words: Words): String =
+    timeOfDayText(instant.atZone(zone).toLocalTime(), style, words)
+
+/** The same text for a time of day that belongs to no instant, such as the time the user chose for the deed nudge. */
+public fun timeOfDayText(time: LocalTime, style: ClockStyle, words: Words): String {
+    val hour = time.hour
+    val minute = time.minute.toString().padStart(2, '0')
     val text = when (style) {
         ClockStyle.Hour24 -> "${hour.toString().padStart(2, '0')}:$minute"
         ClockStyle.Hour12 -> {

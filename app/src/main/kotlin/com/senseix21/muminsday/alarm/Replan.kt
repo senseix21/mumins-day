@@ -10,7 +10,7 @@ import java.time.Instant
 const val LOG_TAG: String = "Mumins"
 
 sealed interface ReplanResult {
-    /** Every prayer is Off: nothing is registered, and everything that was is cancelled. */
+    /** Every prayer is Off and there is no nudge: nothing is registered, and everything that was is cancelled. */
     data object NothingEnabled : ReplanResult
 
     data class Armed(val registered: Int, val daysWithoutTimes: Int) : ReplanResult
@@ -35,7 +35,7 @@ fun replan(context: Context, now: Instant): ReplanResult {
     log.deleteNotYetDue(now)
     log.trim(now)
 
-    if (!remindersEnabled(settings)) {
+    if (!alarmsNeeded(settings)) {
         scheduler.cancelAll()
         Log.i(LOG_TAG, "replan: nothing enabled")
         return ReplanResult.NothingEnabled
