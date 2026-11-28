@@ -33,6 +33,18 @@ class AppPrefsTest {
     }
 
     @Test
+    fun `the Hijri adjustment defaults to none, survives a round trip and ignores anything but -1, 0 and 1`() {
+        assertEquals(com.senseix21.muminsday.hijri.HijriAdjustment.None, AppPrefs().hijriAdjustment)
+        for (adjustment in com.senseix21.muminsday.hijri.HijriAdjustment.entries) {
+            val prefs = chosen.copy(hijriAdjustment = adjustment)
+            assertEquals(prefs, parseAppPrefs(encodeAppPrefs(prefs)))
+        }
+        for (bad in listOf("", "2", "-2", "x", "1.0")) {
+            assertEquals(com.senseix21.muminsday.hijri.HijriAdjustment.None, parseAppPrefs(mapOf("app.hijriAdjustment" to bad)).hijriAdjustment, bad)
+        }
+    }
+
+    @Test
     fun `what is written reads back the same`() {
         assertEquals(chosen, parseAppPrefs(encodeAppPrefs(chosen)))
     }

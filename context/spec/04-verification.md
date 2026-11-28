@@ -36,7 +36,7 @@ This file defines what "done" means. A result other than **Not run** names where
 | Tracker never judges (phase 10) | INV-C5 | T-UI-2, T-UNIT | No missed count or streak in any tracker type or string | JVM part pass 2026-11-28: `TrackerTest` (no count, streak, percent or miss in any member name of the tracker types; window and date attribution across midnight and a zone change) and `TrackerStringsTest` (every `tracker_` string in both languages free of judging words, digits, percent signs and plurals). Reviewer's and native speaker's read (T-UI-2): Not run |
 | Later content kinds pass the gate (phase 13) | INV-C6 | T-BUILD-4 per kind | Fake or unreviewed record fails the build | Not built |
 | Quran text unmodified (phase 14) | INV-QT1 | T-BUILD-6 | Hash of each bundled text equals the recorded hash | Not built |
-| Hijri date names its rule, ±1 day (phase 11) | INV-H1 | T-UNIT | Every rendered date carries its rule | Not built |
+| Hijri date names its rule, ±1 day (phase 11) | INV-H1 | T-UNIT | Every rendered date carries its rule | Pure part built 2026-11-28 (`HijriTest`, `./gradlew build` green); the screen is not run on a device (T-UI-2 open) |
 | Zakat rules come from a signed file (phase 12) | INV-Z1 | T-BUILD-4, T-UNIT | No rule number in code | Not built |
 | Bengali digits | INV-L2 | T-UNIT-9 | All ten digits map; screenshot test finds no Latin digit | Digit mapping: pass on JVM, 2026-11-26. Screenshot part: not run |
 | Arabic in Bengali | INV-L3 | T-UI-3 | Screenshot review on the matrix | Not run |

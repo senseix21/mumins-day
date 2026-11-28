@@ -194,3 +194,16 @@ find_use
 find_outside
 find_far
 find_use_anyway
+hijri_months
+hijri_line
+hijri_rule_calculated
+hijri_rule_earlier
+hijri_rule_later
+hijri_rule_change_hint
+settings_hijri
+settings_hijri_help
+hijri_adjust_earlier
+hijri_adjust_none
+hijri_adjust_later
+ramadan_suggest
+ramadan_suggest_on

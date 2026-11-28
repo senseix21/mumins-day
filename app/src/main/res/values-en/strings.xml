@@ -304,4 +304,33 @@
     <string name="find_outside">You seem to be outside Bangladesh. The nearest district is %1$s, about %2$s km away. Prayer times would be worked out for %1$s, not for where you are.</string>
     <string name="find_far">No district is close to you. The nearest is %1$s, about %2$s km away.</string>
     <string name="find_use_anyway">Use %1$s anyway</string>
+
+    <!-- Hijri date (phase 11, INV-H1). -->
+    <string-array name="hijri_months">
+        <item>Muharram</item>
+        <item>Safar</item>
+        <item>Rabi al-Awwal</item>
+        <item>Rabi al-Akhir</item>
+        <item>Jumada al-Ula</item>
+        <item>Jumada al-Akhira</item>
+        <item>Rajab</item>
+        <item>Shaban</item>
+        <item>Ramadan</item>
+        <item>Shawwal</item>
+        <item>Dhu al-Qadah</item>
+        <item>Dhu al-Hijjah</item>
+    </string-array>
+    <string name="hijri_line">Hijri: %1$s</string>
+    <string name="hijri_rule_calculated">Calculated by a fixed rule. It is not a moon-sighting announcement and can differ from the announced date by a day.</string>
+    <string name="hijri_rule_earlier">Calculated by a fixed rule, then moved one day earlier by you. It is not a moon-sighting announcement.</string>
+    <string name="hijri_rule_later">Calculated by a fixed rule, then moved one day later by you. It is not a moon-sighting announcement.</string>
+    <string name="hijri_rule_change_hint">You can move it a day earlier or later in Settings.</string>
+    <string name="settings_hijri">Hijri date</string>
+    <string name="settings_hijri_help">The calculated date can differ from the announced date by a day. Move it a day earlier or later if you need to. The Hijri date changes at Maghrib.</string>
+    <string name="hijri_adjust_earlier">One day earlier</string>
+    <string name="hijri_adjust_none">Calculated date</string>
+    <string name="hijri_adjust_later">One day later</string>
+    <string name="ramadan_suggest">By the calculated date this is the month of Ramadan. Turn on Ramadan mode?</string>
+    <string name="ramadan_suggest_on">Turn on Ramadan mode</string>
+
 </resources>

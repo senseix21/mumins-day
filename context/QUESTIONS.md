@@ -15,6 +15,7 @@ spec**. Replace it with the original text if that file exists.
 | Q7 | Not referenced anywhere in the five documents. Unknown what it was | Founder | Unknown | none | Open |
 | Q8 | Bangladesh device facts: brand and Android-version shares, the minimum device, and the exact models for the test matrix | Founder | Device matrix, minSdk | `01`, `04` | Open |
 | Q9 | How many approved deeds at launch, and the minimum the build should accept (floor is 4; 30 gives a month without a repeat). Opened 2026-11-26 with the G4/G5 proposal | Founder, reviewer | Phase 5 build gate | `GAPS.md` G5 | **Closed 2026-11-26.** Founder: 30 deeds at launch; the build refuses fewer than 30 approved |
+| Q10 | Whose announcement decides the Hijri month in Bangladesh (candidate, read in a press report: the National Moon Sighting Committee at the Islamic Foundation), whether the app should ever hold announced dates, and whether the Hijri day changes at Maghrib. Opened 2026-11-28 17:15 +0600 | Founder, reviewer | Phase 11 beyond a calculated date | `PLAN` phase 11, G54, ADR-20 | Open |
 
 **Leads found by web search, 2026-11-27 (none is an answer yet; every licence below was read on its page but not checked by a lawyer).**
 

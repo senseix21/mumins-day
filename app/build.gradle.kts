@@ -224,7 +224,7 @@ abstract class CheckStrings : DefaultTask() {
             val en = english.getValue(key)
             if (bn.size != en.size) problems += "\"$key\" has ${bn.size} items in Bengali and ${en.size} in English"
         }
-        for ((key, expected) in mapOf("months" to 12, "weekdays" to 7)) {
+        for ((key, expected) in mapOf("months" to 12, "weekdays" to 7, "hijri_months" to 12)) {
             for ((language, resources) in mapOf("Bengali" to bengali, "English" to english)) {
                 val actual = resources[key]?.size
                 if (actual != expected) problems += "\"$key\" must have $expected items in $language, found ${actual ?: "none"}"

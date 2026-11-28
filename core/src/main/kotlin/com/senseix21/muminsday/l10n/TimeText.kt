@@ -52,6 +52,10 @@ public fun dateText(instant: Instant, zone: ZoneId, words: Words): String {
     return digits("$weekday, ${local.dayOfMonth} $month ${local.year}", words.language)
 }
 
+/** `১৪ রজব ১৪৪৭` / `14 Rajab 1447`. The rule behind the date is named by the caller (INV-H1). */
+public fun hijriDateText(date: com.senseix21.muminsday.hijri.HijriDate, words: Words): String =
+    digits("${date.day} ${words.hijriMonths[date.month.ordinal]} ${date.year}", words.language)
+
 /** A whole number as the user reads it. */
 public fun numberText(count: Int, language: Language): String = digits(count.toString(), language)
 

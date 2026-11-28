@@ -40,9 +40,12 @@ public data class Words(
     val pm: String,
     val months: List<String>,
     val weekdays: List<String>,
+    /** The twelve Hijri months, Muharram first. */
+    val hijriMonths: List<String>,
 ) {
     init {
         require(months.size == 12) { "months needs 12 names, got ${months.size}" }
+        require(hijriMonths.size == 12) { "hijriMonths needs 12 names, got ${hijriMonths.size}" }
         require(weekdays.size == 7) { "weekdays needs 7 names, got ${weekdays.size}" }
     }
 }

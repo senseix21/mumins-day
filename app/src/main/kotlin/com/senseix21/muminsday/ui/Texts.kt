@@ -11,7 +11,11 @@ import com.senseix21.muminsday.clock.FastingTime
 import com.senseix21.muminsday.l10n.ClockStyle
 import com.senseix21.muminsday.l10n.Language
 import com.senseix21.muminsday.l10n.Words
+import com.senseix21.muminsday.hijri.HijriAdjustment
+import com.senseix21.muminsday.hijri.HijriReading
+import com.senseix21.muminsday.hijri.HijriRule
 import com.senseix21.muminsday.l10n.dateText
+import com.senseix21.muminsday.l10n.hijriDateText
 import com.senseix21.muminsday.l10n.numberText
 import com.senseix21.muminsday.l10n.timeOfDayText
 import com.senseix21.muminsday.l10n.timeText
@@ -48,6 +52,20 @@ class Texts(private val context: Context, val language: Language) {
     fun time(instant: Instant, zone: ZoneId): String = timeText(instant, zone, ClockStyle.Hour12, words)
 
     fun date(instant: Instant, zone: ZoneId): String = dateText(instant, zone, words)
+
+    /** "Hijri: 14 Rajab 1447". The rule that produced it is [hijriRule], always shown with it (INV-H1). */
+    fun hijri(reading: HijriReading): String = context.getString(R.string.hijri_line, hijriDateText(reading.date, words))
+
+    /** Names the rule behind a Hijri date, and says if the user moved it. Never reads as an announcement. */
+    fun hijriRule(reading: HijriReading): String = context.getString(
+        when (reading.rule) {
+            HijriRule.CalculatedTabular -> when (reading.adjustment) {
+                HijriAdjustment.None -> R.string.hijri_rule_calculated
+                HijriAdjustment.DayEarlier -> R.string.hijri_rule_earlier
+                HijriAdjustment.DayLater -> R.string.hijri_rule_later
+            }
+        },
+    )
 
     /** Monday to Sunday, as the language's own word. */
     fun weekday(date: LocalDate): String = words.weekdays[date.dayOfWeek.value - 1]

@@ -24,6 +24,8 @@ import com.senseix21.muminsday.clock.countdown
 import com.senseix21.muminsday.clock.upcomingFast
 import com.senseix21.muminsday.clock.upcomingSalah
 import com.senseix21.muminsday.health.Health
+import com.senseix21.muminsday.hijri.hijriReadingAt
+import com.senseix21.muminsday.hijri.suggestsRamadanMode
 import com.senseix21.muminsday.l10n.Language
 import com.senseix21.muminsday.planner.Salah
 import com.senseix21.muminsday.store.DistrictsLoad
@@ -41,6 +43,7 @@ import com.senseix21.muminsday.ui.SettingsActivity
 import com.senseix21.muminsday.ui.Texts
 import com.senseix21.muminsday.ui.TrackerActivity
 import com.senseix21.muminsday.ui.actionButton
+import com.senseix21.muminsday.ui.saveApp
 import com.senseix21.muminsday.ui.body
 import com.senseix21.muminsday.ui.column
 import com.senseix21.muminsday.ui.dp
@@ -103,6 +106,10 @@ class MainActivity : BaseActivity() {
         val texts = Texts(this, language)
         val zone = settings.place.zone
         val clock = CalcTimesClock()
+        val today = clock.dayTimes(now.atZone(zone).toLocalDate(), settings.place, settings.clock)
+        // INV-T7: if Maghrib cannot be computed no time is invented; the Hijri day then changes at midnight.
+        val maghrib = (today as? ClockResult.Computed)?.times?.get(Prayer.Maghrib)
+        val hijri = hijriReadingAt(now, zone, maghrib, prefs.hijriAdjustment)
         val districtName = prefs.districtId?.let { id -> districtName(id.value, texts) }
 
         val page = column()
@@ -111,6 +118,21 @@ class MainActivity : BaseActivity() {
         if (PlaybackService.isPlaying()) page.addView(actionButton(getString(R.string.action_stop)) { PlaybackService.stop(this) })
         if (districtName != null) page.addView(body(districtName, muted = true))
         page.addView(body(texts.date(now, zone), muted = true))
+        // INV-H1: a Hijri date is never shown without the rule that produced it.
+        page.addView(body(texts.hijri(hijri), muted = true))
+        page.addView(body(texts.hijriRule(hijri) + " " + getString(R.string.hijri_rule_change_hint), muted = true).apply { textSize = 14f })
+        // G33: the calculated month may suggest Ramadan mode, never turn it on. Only the user's tap does.
+        if (suggestsRamadanMode(hijri, prefs.ramadanMode)) {
+            page.addView(
+                panel().apply {
+                    addView(body(getString(R.string.ramadan_suggest)))
+                    addView(actionButton(getString(R.string.ramadan_suggest_on)) {
+                        saveApp(this@MainActivity, Stores.settings(this@MainActivity).readApp().copy(ramadanMode = true))
+                        render()
+                    })
+                },
+            )
+        }
 
         // Health first: if a reminder cannot be promised, that is the most important thing on the screen (INV-S6).
         page.addView(healthView(now, remindersEnabled(settings), texts))
@@ -129,7 +151,6 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        val today = clock.dayTimes(now.atZone(zone).toLocalDate(), settings.place, settings.clock)
         fun timeText(prayer: Prayer): String = when (today) {
             is ClockResult.Computed -> texts.time(today.times[prayer], zone)
             is ClockResult.NotComputable -> NO_TIME

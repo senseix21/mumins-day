@@ -415,7 +415,7 @@ decisions, and nothing here may break a v1 rule without an ADR and the founder's
 - [x] Decide: after v1 ships, which phases form the first update (suggested: 10 to 12). Founder said "All" 2026-11-28: build all of 9 to 17; ship order is decided at release (ADR-17).
 - [x] Decide: is network ever allowed in the main app (phase 16)? Yes, one host, packs only (founder, 2026-11-28, ADR-17).
 - [x] Decide: bring back "find my district" with coarse location: yes (founder, 2026-11-28, ADR-17). The manifest changes in phase 10, not before.
-- [ ] Hijri authority: whose announcement decides the month (ASSUMED candidates: the National Moon Sighting Committee convened by the Islamic Foundation; confirm) [G33].
+- [ ] Hijri authority: whose announcement decides the month (KNOWN from one press report: the National Moon Sighting Committee at the Islamic Foundation announced Ramadan 1447; confirm it is the app's source) [Q10, G54]. Phase 11 shipped calculated-only meanwhile.
 - [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [F-Zakat].
 - [ ] Duas: the source text (Hisnul Muslim, Arabic) and a Bengali translation, each with a written licence; the reviewer for selection and wording.
 - [ ] Hadith: a source collection whose terms allow offline redistribution, a Bengali translation with a licence, and the reviewer for selection and grading.
@@ -472,15 +472,17 @@ prayers; an optional "find my district" button.
 
 ## Phase 11 · Hijri date, ±1 day
 
-**Outcome.** The Hijri date on the home screen, following Bangladesh's announcement, with a
-one-tap ±1 day correction.
+**Outcome.** The Hijri date on the home screen, labelled with its rule, with a one-day correction. Built 2026-11-28 17:15 +0600 as a **calculated** date only; the authority is open (Q10, G54, ADR-20). Not run on an emulator or phone.
 
-- [ ] Vendor the engine repository's `hijri` module (Apache-2.0, KNOWN from its POM; depends only on kotlinx-datetime, already allowed) with a MODIFICATIONS note if changed [ADR-2 pattern].
-- [ ] `clock` gains `hijriDate(localDate, adjustment)`; adjustment is -1, 0 or +1, set by the user [spec 03 forward path].
-- [ ] The Hijri day changes at Maghrib, not midnight (ASSUMED convention; reviewer confirms) [INV-H1].
-- [ ] Optional: Ramadan mode suggests itself when the Hijri month is Ramadan, but still waits for the user's tap (G33 ruling stands).
-- [ ] Formatting only in `l10n`; Bengali month names from the native speaker.
-- [ ] Tests: against a published table of Hijri month starts for Bangladesh (source to fetch), and the ±1 property.
+- [x] ~~Vendor the engine repository's `hijri` module~~ Read line by line (cloned, 5 Kotlin files and `hijri.tsv`); **not vendored**: its table is Turkey's Diyanet and its other mode is the JDK calendar. A 60-line pure implementation of the tabular rule instead, source cited (ADR-20). `NOTICE` unchanged, nothing to modify.
+- [x] `core/hijri`: `calculatedHijri`, `gregorianOf`, `hijriReading(date, afterMaghrib, adjustment)`; the adjustment is a closed enum of -1, 0, +1 (2026-11-28, `HijriTest`). (Not on `clock`: a package of its own, as the plan allowed.)
+- [x] The Hijri day changes at Maghrib (ASSUMED convention; reviewer confirms, Q10); midnight where Maghrib cannot be computed. Tested with an instant either side of a Maghrib.
+- [x] Ramadan mode suggests itself in the calculated month of Ramadan and waits for the tap (`suggestsRamadanMode`, tested over 400 days).
+- [x] Formatting only in `l10n` (`hijriDateText`) and `Texts`; 13 Bengali strings drafted by Claude, all in `app/l10n-review.txt` (month names too).
+- [x] Tests: month length 29 or 30, the 30-year leap pattern and the 10,631-day cycle, both round trips (700 years weekly; every valid date 1300 to 1500 AH), the ±1 property over 1,500 days, Maghrib shift, independence of the default zone, the Umm al-Qura gap (worst 2 days over 1980 to 2070), one announced Bangladesh month start (press report; calculated is 1 day early). **No published table of Bangladesh month starts was found**, so there is no table test.
+- [ ] Reviewer: confirm the Maghrib day change, the rule wording and the Bengali month names [Q10].
+- [ ] Founder: which authority, and whether announced dates should ever be shipped [Q10, G54].
+- [ ] Look at Home and Settings on an emulator in both languages at 200 % font; tap the Ramadan suggestion [T-UI-2].
 
 ## Phase 12 · Zakat calculator
 

@@ -23,6 +23,7 @@ import com.senseix21.muminsday.alarm.currentHealth
 import com.senseix21.muminsday.clock.AsrConvention
 import com.senseix21.muminsday.clock.Minutes
 import com.senseix21.muminsday.health.HEALTH_LOOKBACK
+import com.senseix21.muminsday.hijri.HijriAdjustment
 import com.senseix21.muminsday.l10n.Language
 import com.senseix21.muminsday.planner.PreReminder
 import com.senseix21.muminsday.planner.Reminder
@@ -79,6 +80,19 @@ class SettingsActivity : BaseActivity() {
             switchRow(getString(R.string.settings_ramadan_on), prefs.ramadanMode) { on ->
                 saveApp(this, Stores.settings(this).readApp().copy(ramadanMode = on))
             },
+        )
+
+        page.addView(heading(getString(R.string.settings_hijri)))
+        page.addView(body(getString(R.string.settings_hijri_help), muted = true))
+        page.addView(
+            choices(
+                listOf(
+                    getString(R.string.hijri_adjust_earlier) to HijriAdjustment.DayEarlier,
+                    getString(R.string.hijri_adjust_none) to HijriAdjustment.None,
+                    getString(R.string.hijri_adjust_later) to HijriAdjustment.DayLater,
+                ),
+                prefs.hijriAdjustment,
+            ) { chosen -> saveApp(this, Stores.settings(this).readApp().copy(hijriAdjustment = chosen)) },
         )
 
         page.addView(heading(getString(R.string.settings_nudge)))

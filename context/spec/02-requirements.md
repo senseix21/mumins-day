@@ -191,5 +191,5 @@ Design seams for these are in `03-architecture.md`. None is built in v1.
 | Salah tracker | Help staying consistent (Sheet #11) | None technical. Tone rules of INV-C4 apply | Local table; "Prayed" action on the Adhan notification |
 | Khatam planner | Few finish (Sheet #6) | Depends on Quran | Local table |
 | Zakat with bhori/ana | Local units (Sheet #7) | Reviewer sign-off on the calculation rules | Pure calculator, no data |
-| Hijri calendar, ±1 day | Moon sighting differs by country (Sheet #12) | Which authority's announcement to follow | `hijri` engine module is Apache-2.0 (KNOWN) |
+| Hijri calendar, ±1 day | Moon sighting differs by country (Sheet #12) | Which authority's announcement to follow (Q10, G54) | **Built 2026-11-28 as a calculated date only** (ADR-20): tabular rule, user moves it a day, rule named on screen. The upstream `hijri` module was read and not vendored |
 | Widgets | Next prayer at a glance (Sheet #1) | None | Reads the same planner output |
