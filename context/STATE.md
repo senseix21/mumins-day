@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 17:24 +0600
+**Last updated:** 2026-11-28 17:43 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
-without a native speaker and without a Play account. `./gradlew build` is green in the cloud:
-311 tests (219 `:core`, 70 `:app`, 19 content gate, 3 engine), lint clean, all gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 239 string keys in both languages, 64 real
-districts, Zakat rules absent so passed with a notice). The release APK is 224,726 bytes, minified (184,738 before phase 10). **Nothing has run on a real phone, and
+without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac:
+339 tests (240 `:core`, 70 `:app`, 26 content gate, 3 engine), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 248 string keys in both languages, 64 real
+districts; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 233,370 bytes, unsigned, minified (184,738 before phase 10). **Nothing has run on a real phone, and
 nothing changed on 28 Nov has run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
@@ -47,6 +47,17 @@ nothing changed on 28 Nov has run on any device.**
 - **Open:** Q11 (reviewer signs every rule), G55 (conversions have only a secondary, unattributed lead: 11.664 g, 16 ana,
   6 ratti; in no file or code). KNOWN: build green; UNKNOWN: how it looks on a device.
 
+## Phase 13 built (branch `phase-13-14-content-quran`)
+
+- **Daily dua and daily hadith on FAKE records** (ADR-22). One provenance check (`checkProvenanceOf`) now serves deeds, duas and
+  hadith; the deed gate and its tests are unchanged. `core/content` holds the kinds, one key table both parsers read, `checkKind`
+  and the shared rotation (`pickForDay`, also behind `deedFor`). The books a kind may cite are the reviewer's `sources` list in
+  each file; no book name is in code. Gates `checkDuaContent` and `checkHadithContent` pass with a notice while the files are
+  absent (`-PduasRequired`, `-PhadithRequired` make absence fail) and refuse a `test_fixture` file. `TodayActivity` (Home button)
+  shows the day's dua and hadith, Arabic right to left in an isolate (`l10n.rightToLeft`), source and grading as written.
+- **No new notification:** the deed nudge stays the only content notification (ADR-22 item 5, to confirm, Q12). The day's record
+  is not stored (G56). KNOWN: build green. UNKNOWN: how the screen looks on a device.
+
 ## What changed on 28 Nov 2026
 
 - **Real districts (Q4).** `content/districts.json`: all 64, Wikidata (CC0) checked against
@@ -83,7 +94,7 @@ nothing changed on 28 Nov has run on any device.**
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
 5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); phases 11 (calculated date; authority open, Q10) and 12 (Zakat on a fake
-   rules file; Q11) are built; next is phase 13 (duas and hadith). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
+   rules file; Q11) and 13 (duas and hadith on fake records; Q12) are built; next is phase 14 (Quran). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
 
 ## Waiting on the founder
 
@@ -96,5 +107,6 @@ nothing changed on 28 Nov has run on any device.**
 | An Adhan recording | Release | Q5 |
 | Which authority decides the Hijri month; the Maghrib day change | Phase 11 shows a calculated date only | Q10, G54 |
 | Reviewer signs the Zakat rules | Phase 12 calculates nothing in a release without them | Q11, G55 |
+| Reviewer: books, texts and licences for duas and hadith; the no-nudge decision | Phase 13 shows nothing in a release without them | Q12, G56 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |
 | Play account, support email, privacy URL | Release | G14, G15 |

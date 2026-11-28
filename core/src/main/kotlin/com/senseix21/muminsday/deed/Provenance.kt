@@ -55,10 +55,25 @@ internal data class RawProvenance(
     val retiredIn: String?,
 )
 
-/** Provenance that passed the gate. [id] is non-blank. */
+/** A deed's provenance that passed the gate. [id] is non-blank. */
 internal data class Provenance(
     val id: String,
     val source: Source,
+    val review: Review,
+    val status: Status,
+    val addedIn: Int,
+    val retiredIn: Int?,
+)
+
+/**
+ * Provenance of any kind that passed the gate. [id] is non-blank. [book] is whatever the kind's own list of allowed
+ * books produced: the deed enum, or a book named in the reviewer's list for duas and hadith (ADR-22).
+ */
+internal data class KindProvenance<B>(
+    val id: String,
+    val book: B,
+    val number: String,
+    val edition: String,
     val review: Review,
     val status: Status,
     val addedIn: Int,
@@ -74,9 +89,10 @@ internal sealed interface Checked<out T> {
 
 /**
  * INV-C1 and INV-C3 for any kind of reviewed content: source, grading, reviewer, review date, status and versions. It
- * knows nothing about deed text, so duas and daily hadith can reuse it. Collects every problem; never stops at the first.
+ * knows nothing about deed text, so duas and daily hadith reuse it (INV-C6). [book] turns the record's book into the
+ * kind's own type, or null when that book is not allowed for the kind. Collects every problem; never stops at the first.
  */
-internal fun checkProvenance(version: Int, raw: RawProvenance): Checked<Provenance> {
+internal fun <B : Any> checkProvenanceOf(version: Int, raw: RawProvenance, book: (String) -> B?): Checked<KindProvenance<B>> {
     val problems = mutableListOf<FieldProblem>()
     fun report(field: Field, kind: ProblemKind) {
         problems += FieldProblem(field, kind)
@@ -112,9 +128,7 @@ internal fun checkProvenance(version: Int, raw: RawProvenance): Checked<Provenan
     // retiredIn may be absent; a blank value counts as absent. Whether that is allowed depends on the status.
     val retiredText = raw.retiredIn?.takeUnless { it.isBlank() }
 
-    val book = bookText?.let { text ->
-        SourceBook.entries.firstOrNull { it.name == text } ?: null.also { report(Field.SourceBook, ProblemKind.Invalid) }
-    }
+    val allowedBook = bookText?.let { text -> book(text) ?: null.also { report(Field.SourceBook, ProblemKind.Invalid) } }
     val date = dateText?.let { text ->
         try {
             LocalDate.parse(text)
@@ -142,12 +156,21 @@ internal fun checkProvenance(version: Int, raw: RawProvenance): Checked<Provenan
         null -> Unit
     }
 
-    if (problems.isNotEmpty() || id == null || book == null || number == null || edition == null || grading == null ||
+    if (problems.isNotEmpty() || id == null || allowedBook == null || number == null || edition == null || grading == null ||
         reviewer == null || date == null || status == null || added == null
     ) {
         return Checked.Bad(problems)
     }
     return Checked.Ok(
-        Provenance(id, Source(book, number, edition), Review(reviewer, date, grading), status, added, retired),
+        KindProvenance(id, allowedBook, number, edition, Review(reviewer, date, grading), status, added, retired),
     )
 }
+
+/** The deed's use of the one check: v1's closed list of books (F4 data model). */
+internal fun checkProvenance(version: Int, raw: RawProvenance): Checked<Provenance> =
+    when (val checked = checkProvenanceOf(version, raw) { text -> SourceBook.entries.firstOrNull { it.name == text } }) {
+        is Checked.Bad -> checked
+        is Checked.Ok -> with(checked.value) {
+            Checked.Ok(Provenance(id, Source(book, number, edition), review, status, addedIn, retiredIn))
+        }
+    }

@@ -41,6 +41,7 @@ import com.senseix21.muminsday.ui.Palette
 import com.senseix21.muminsday.ui.ReminderHealthActivity
 import com.senseix21.muminsday.ui.SettingsActivity
 import com.senseix21.muminsday.ui.Texts
+import com.senseix21.muminsday.ui.TodayActivity
 import com.senseix21.muminsday.ui.TrackerActivity
 import com.senseix21.muminsday.ui.ZakatActivity
 import com.senseix21.muminsday.ui.actionButton
@@ -189,6 +190,10 @@ class MainActivity : BaseActivity() {
 
         page.addView(actionButton(getString(R.string.zakat_title), primary = false) {
             startActivity(Intent(this, ZakatActivity::class.java))
+        })
+
+        page.addView(actionButton(getString(R.string.today_title), primary = false) {
+            startActivity(Intent(this, TodayActivity::class.java))
         })
 
         page.addView(actionButton(getString(R.string.test_adhan)) { testAdhan() })

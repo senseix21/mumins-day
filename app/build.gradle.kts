@@ -361,14 +361,14 @@ tasks.named("check") { dependsOn(checkStrings, reportL10nReview) }
 // must set both. deedsRequired stays off by default because content/deeds.json cannot exist until the reviewer delivers
 // it (G9): turning it on now would fail every build. What a release without the file does: the app shows no deed and
 // says so in a neutral message, it never falls back to anything else (INV-C1).
-val contentFiles = listOf("districts.json", "deeds.json", "zakat-rules.json").map { rootProject.layout.projectDirectory.file("content/$it") }
+val contentFiles = listOf("districts.json", "deeds.json", "zakat-rules.json", "duas.json", "hadith.json").map { rootProject.layout.projectDirectory.file("content/$it") }
 val stageReleaseContent = tasks.register<StageContent>("stageReleaseContent") {
     files.from(contentFiles)
     assets.set(layout.buildDirectory.dir("generated/releaseContent"))
     // Said in the build output so nobody ships a release and finds out from a user.
     val missing = contentFiles.filter { !it.asFile.isFile }.map { "content/" + it.asFile.name }
     doFirst {
-        missing.forEach { logger.lifecycle("release content: $it is missing, so this release build ships without it. A store build must pass the gate with -PdeedsRequired=true -PdistrictsRequired=true -PzakatRulesRequired=true.") }
+        missing.forEach { logger.lifecycle("release content: $it is missing, so this release build ships without it. A store build must pass the gate with -PdeedsRequired=true -PdistrictsRequired=true -PzakatRulesRequired=true, and -PduasRequired=true -PhadithRequired=true for each kind it ships.") }
     }
 }
 

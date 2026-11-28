@@ -106,4 +106,38 @@ val checkDebugZakatRules = tasks.register<JavaExec>("checkDebugZakatRules") {
     inputs.files(debugZakatRulesFile).withPropertyName("debugZakatRules")
 }
 
+/**
+ * T-BUILD-4 for duas and hadith (INV-C1, INV-C6, ADR-22): one task per kind, the same core gate, the deed's provenance
+ * check. Until the reviewer delivers `content/duas.json` or `content/hadith.json` its absence passes with a notice;
+ * `-PduasRequired=true` and `-PhadithRequired=true` make absence a failure, and a store build that ships the Today
+ * screen must set the one for each kind it ships. The real file is refused if it says `test_fixture: true`.
+ */
+fun registerKindGates(kind: String, fileName: String, requiredProperty: String): List<TaskProvider<JavaExec>> {
+    val realFile = rootProject.layout.projectDirectory.file("content/$fileName")
+    val real = tasks.register<JavaExec>("check${kind}Content") {
+        group = "verification"
+        description = "Runs the review gate over content/$fileName."
+        classpath = sourceSets.main.get().runtimeClasspath
+        mainClass.set("com.senseix21.muminsday.tools.gate.KindMain")
+        val required = providers.gradleProperty(requiredProperty).orElse("false")
+        args(kind, realFile.asFile.absolutePath, required.get(), "false")
+        inputs.files(realFile).optional().withPropertyName("content")
+        inputs.property("required", required)
+    }
+    // The FAKE debug fixture goes through the same gate with test fixtures allowed, so it cannot rot.
+    val debugFile = rootProject.layout.projectDirectory.file("app/src/debug/assets/$fileName")
+    val debug = tasks.register<JavaExec>("checkDebug${kind}Content") {
+        group = "verification"
+        description = "Runs the review gate over the debug fixture app/src/debug/assets/$fileName."
+        classpath = sourceSets.main.get().runtimeClasspath
+        mainClass.set("com.senseix21.muminsday.tools.gate.KindMain")
+        args(kind, debugFile.asFile.absolutePath, "true", "true")
+        inputs.files(debugFile).withPropertyName("debugContent")
+    }
+    return listOf(real, debug)
+}
+
+val kindGates = registerKindGates("Dua", "duas.json", "duasRequired") + registerKindGates("Hadith", "hadith.json", "hadithRequired")
+
 tasks.check { dependsOn(checkDeedContent, checkDistricts, checkDebugDistricts, checkDebugDeeds, checkZakatRules, checkDebugZakatRules) }
+tasks.check { dependsOn(kindGates) }

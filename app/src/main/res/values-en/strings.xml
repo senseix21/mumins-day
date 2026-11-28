@@ -371,4 +371,15 @@
     <string name="zakat_amount">Amount: %1$s taka</string>
     <string name="zakat_rounding_note">The amount is rounded up to the paisa; the nisab\'s value is rounded down.</string>
 
+    <!-- Phase 13: today's dua and hadith (ADR-22). -->
+    <string name="today_title">Today\'s dua and hadith</string>
+    <string name="today_dua">Today\'s dua</string>
+    <string name="today_hadith">Today\'s hadith</string>
+    <string name="today_source">Source: %1$s, number %2$s (%3$s)</string>
+    <string name="today_grading">Grading, as the reviewer wrote it: %1$s</string>
+    <string name="today_occasion">When to read it: %1$s</string>
+    <string name="today_unavailable">This is not in this version of the app yet.</string>
+    <string name="today_rejected">The list has an error, so nothing is shown.</string>
+    <string name="today_fixture_banner">TEST TEXT: these records are made up, only to try the app. They are not a dua or a hadith.</string>
+
 </resources>

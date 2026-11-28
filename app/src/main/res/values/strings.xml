@@ -385,4 +385,15 @@
     <string name="zakat_amount">পরিমাণ: %1$s টাকা</string>
     <string name="zakat_rounding_note">পরিমাণ পয়সা পর্যন্ত ওপরের দিকে পূর্ণ করা হয়েছে; নিসাবের মূল্য নিচের দিকে।</string>
 
+    <!-- Phase 13: today's dua and hadith (ADR-22). -->
+    <string name="today_title">আজকের দোয়া ও হাদিস</string>
+    <string name="today_dua">আজকের দোয়া</string>
+    <string name="today_hadith">আজকের হাদিস</string>
+    <string name="today_source">সূত্র: %1$s, নম্বর %2$s (%3$s)</string>
+    <string name="today_grading">মান, রিভিউয়ার যেভাবে লিখেছেন: %1$s</string>
+    <string name="today_occasion">কখন পড়বেন: %1$s</string>
+    <string name="today_unavailable">অ্যাপের এই সংস্করণে এটি এখনো নেই।</string>
+    <string name="today_rejected">তালিকায় একটি ভুল আছে, তাই কিছু দেখানো হচ্ছে না।</string>
+    <string name="today_fixture_banner">পরীক্ষার লেখা: এগুলো বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এগুলো দোয়া বা হাদিস নয়।</string>
+
 </resources>

@@ -6,8 +6,19 @@ import java.lang.Character.UnicodeScript
 public const val FIRST_STRONG_ISOLATE: Char = '⁨'
 public const val POP_DIRECTIONAL_ISOLATE: Char = '⁩'
 
+/** U+2067 RIGHT-TO-LEFT ISOLATE (INV-L3). */
+public const val RIGHT_TO_LEFT_ISOLATE: Char = '\u2067'
+
 /** [text] shielded from its surroundings: its direction cannot reorder the neighbouring text, digits or punctuation. */
 public fun isolate(text: String): String = "$FIRST_STRONG_ISOLATE$text$POP_DIRECTIONAL_ISOLATE"
+
+/**
+ * A whole Arabic text (a dua, a hadith, an ayah) for a Bengali or English screen: right to left whatever its first
+ * letter is, and sealed off so it cannot reorder the digits and punctuation around it (INV-L3). The text itself is not
+ * touched; the content gates refuse a text that carries direction controls of its own, so nothing inside can close
+ * the isolate early.
+ */
+public fun rightToLeft(text: String): String = "$RIGHT_TO_LEFT_ISOLATE$text$POP_DIRECTIONAL_ISOLATE"
 
 /**
  * Wraps every run of Arabic-script text in [text] in an isolate (INV-L3). A run is Arabic letters, plus the spaces and

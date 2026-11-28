@@ -436,8 +436,8 @@ content gate takes more than one kind of record.
 
 - [x] ADR-17: release order, network, location, storage, size budget (2026-11-28, `spec/03`).
 - [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested. Deferred to phase 10, the first phase with a new screen; an entry list with no entries would be a stub. Phase 10 added the smallest entry: one button on Home to the tracker (2026-11-28); the system back button is the whole back behaviour (BaseActivity). Back behaviour is not tested; stays open.
-- [ ] Content kinds (deferred to phase 13, the second kind; ADR-17 item 5): `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10].
-- [ ] (phase 13) Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships.
+- [x] Content kinds (deferred to phase 13, the second kind; ADR-17 item 5): `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10]. 2026-11-28 (ADR-22): `checkProvenanceOf` is the one check, the deed's `checkProvenance` wraps it; `content/pickForDay` is the one rotation; no deed test file was edited and all pass.
+- [x] (phase 13) Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships. 2026-11-28: `checkDuaContent`, `checkHadithContent` (and the debug twins); `-PduasRequired=true` / `-PhadithRequired=true`; seen failing with `-PhadithRequired=true` and no file. `tools/release.sh` does not pass them yet: the founder decides which kinds ship.
 - [x] Storage plan: `user-data.db` for tracker and khatam; read-only asset databases for Quran and hadith; numbered migrations continue [ADR-5, ADR-17 item 6]. Plan only; nothing built.
 - [x] Size budget per feature written in ADR-17 (allowances, ASSUMED); each content phase must measure its real size.
 - [x] New invariants written into `spec/01` before their code 2026-11-28: INV-C5 (tracker), INV-C6 (content kinds), INV-QT1 (Quran), INV-H1 (Hijri), INV-Z1 (Zakat); rows added to `spec/04`.
@@ -501,14 +501,16 @@ prayers; an optional "find my district" button.
 ## Phase 13 · Daily duas and daily hadith
 
 **Outcome.** A short reviewed dua and a reviewed hadith each day, with source and grade,
-through the same gate as deeds.
+through the same gate as deeds. Built 2026-11-28 17:41 +0600 on FAKE records only (ADR-22); no real dua or hadith exists in the repository. Not run on an emulator or phone.
 
-- [ ] Record shapes for dua (Arabic, transliteration, Bengali, English, source, occasion) and hadith (Arabic, Bengali, English, collection, number, edition, grading).
-- [ ] Gates per kind, reusing provenance; store build requires the approved files [INV-C1, INV-C3].
-- [ ] Arabic shown right-to-left inside Bengali screens with isolates [INV-L3].
-- [ ] Rotation per kind, same rules as deeds (stable for the day, no repeats within a cycle) [INV-C2].
-- [ ] Optional nudge per kind? Decide; default off, at most one notification a day across all content kinds.
-- [ ] Fake records in debug only, like deeds.
+- [x] Record shapes for dua (Arabic, transliteration, Bengali, English, source, occasion) and hadith (Arabic, Bengali, English, collection, number, edition, grading). 2026-11-28 (ADR-22): `core/content/Kinds.kt`, one key table for both parsers; a dua also carries number, edition and grading (INV-C6); `KindGateTest.INV_C6_record_shapes_follow_the_plan`.
+- [ ] Gates per kind, reusing provenance; store build requires the approved files [INV-C1, INV-C3]. Gates built and tested 2026-11-28 (22 tests over both kinds, fixtures refused by the shipping gate); the allowed books are the reviewer's `sources` list in each file (Q12). Open: `tools/release.sh` does not set `-PduasRequired`/`-PhadithRequired` until the founder decides the kinds ship.
+- [ ] Arabic shown right-to-left inside Bengali screens with isolates [INV-L3]. Built 2026-11-28: `l10n.rightToLeft` (RLI ... PDI), tested with `java.text.Bidi` (`RightToLeftTest`: contents at an RTL level even for ASCII fixtures, neighbours stay at level 0); the gate refuses direction controls inside texts. Open: T-UI-3, a look on an emulator and phones.
+- [x] Rotation per kind, same rules as deeds (stable for the day, no repeats within a cycle) [INV-C2]. 2026-11-28: `content/RotationTest` (window of N shows each once, repeats after N, alternate differs from neighbours, deeds, duas and hadith pick the same index for 300 random dates). The shown record is not stored (G56).
+- [x] Optional nudge per kind? Decide; default off, at most one notification a day across all content kinds. Decided 2026-11-28 (Claude, reviewer and founder to confirm, ADR-22 item 5, Q12): no per-kind nudge; the deed nudge stays the only content notification. Nothing was added to the alarm path.
+- [x] Fake records in debug only, like deeds. 2026-11-28: `app/src/debug/assets/duas.json`, `hadith.json`, 30 records each, every text "TEST ..." or "পরীক্ষা ...", `test_fixture: true`; the shipping gate and a release-build loader refuse a fixture; release stages only `content/`.
+- [ ] Look at the Today screen on an emulator in both languages at 200 % font, with the fixture banner [T-UI-2, T-UI-3].
+- [ ] Reviewer: the `sources` list for each kind, the grading wording, the floor of 30, and the no-nudge decision [Q12].
 
 ## Phase 14 · Quran: text offline, reader, verse search
 

@@ -243,3 +243,12 @@ zakat_below_nisab
 zakat_hawl_pending
 zakat_amount
 zakat_rounding_note
+today_title
+today_dua
+today_hadith
+today_source
+today_grading
+today_occasion
+today_unavailable
+today_rejected
+today_fixture_banner
