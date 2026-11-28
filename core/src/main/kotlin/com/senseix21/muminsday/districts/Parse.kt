@@ -6,7 +6,15 @@ import com.senseix21.muminsday.clock.Meters
 
 /** Bangladesh's bounding box in degrees, a little generous (ASSUMED from general knowledge, not checked against a source). */
 public val BANGLADESH_LATITUDES: ClosedFloatingPointRange<Double> = 20.5..26.7
-public val BANGLADESH_LONGITUDES: ClosedFloatingPointRange<Double> = 88.0..92.8
+public val BANGLADESH_LONGITUDES: ClosedFloatingPointRange<Double> = 88.0..92.7
+
+/**
+ * Whether a coordinate lies in the rectangle above, edges included. A bounding box is not the border: it contains
+ * stretches of India, Myanmar and the Bay of Bengal, so "true" means "plausibly Bangladesh", never "in Bangladesh".
+ * It catches a swapped latitude and longitude or a typo in a district record (F1 #6).
+ */
+public fun isInsideBangladeshBoundingBox(latitude: Latitude, longitude: Longitude): Boolean =
+    latitude.degrees in BANGLADESH_LATITUDES && longitude.degrees in BANGLADESH_LONGITUDES
 
 /** Above this a district elevation is a typo, not a hill (ASSUMED: Bangladesh's highest point is about 1,000 m). */
 public const val MAX_ELEVATION_METERS: Double = 1100.0
