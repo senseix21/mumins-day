@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "reviewer": "TEST REVIEWER",
+  "review_date": "2000-01-01",
+  "status": "approved",
+  "test_fixture": true,
+  "nisab_basis": "gold",
+  "nisab_gold_grams": "100",
+  "nisab_silver_grams": "700",
+  "rate_percent": "10",
+  "grams_per_bhori": "10",
+  "ana_per_bhori": "20",
+  "ratti_per_ana": "5",
+  "conversion_source": "TEST SOURCE",
+  "wealth_counted": ["cash", "gold", "silver", "other"],
+  "deduct_debts": true,
+  "requires_hawl": false,
+  "notes": "FAKE RULES FOR DEVELOPMENT. Every number here is invented so the screen can be tried. It is not a ruling and must never ship."
+}

@@ -5,6 +5,7 @@ import android.util.Log
 import com.senseix21.muminsday.clock.CalcTimesClock
 import com.senseix21.muminsday.planner.Planner
 import com.senseix21.muminsday.store.Stores
+import com.senseix21.muminsday.widget.refreshWidgets
 import java.time.Instant
 
 const val LOG_TAG: String = "Mumins"
@@ -27,6 +28,13 @@ sealed interface ReplanResult {
  * Plain and synchronous: the planner's target is 50 ms (F1), well inside what a receiver may do.
  */
 fun replan(context: Context, now: Instant): ReplanResult {
+    val result = planAndApply(context, now)
+    // Last, so the widgets show what this replan decided; it never throws into the reminder path.
+    refreshWidgets(context, now)
+    return result
+}
+
+private fun planAndApply(context: Context, now: Instant): ReplanResult {
     val settings = Stores.settings(context).read()
     val log = Stores.alarmLog(context)
     val scheduler = AlarmScheduler(context)

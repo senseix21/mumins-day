@@ -23,11 +23,14 @@ import com.senseix21.muminsday.alarm.currentHealth
 import com.senseix21.muminsday.clock.AsrConvention
 import com.senseix21.muminsday.clock.Minutes
 import com.senseix21.muminsday.health.HEALTH_LOOKBACK
+import com.senseix21.muminsday.hijri.HijriAdjustment
 import com.senseix21.muminsday.l10n.Language
+import com.senseix21.muminsday.packs.packFiles
 import com.senseix21.muminsday.planner.PreReminder
 import com.senseix21.muminsday.planner.Reminder
 import com.senseix21.muminsday.planner.ReminderMode
 import com.senseix21.muminsday.planner.Salah
+import com.senseix21.muminsday.quran.Edition
 import com.senseix21.muminsday.store.MAX_OFFSET_MINUTES
 import com.senseix21.muminsday.store.SilentMode
 import com.senseix21.muminsday.store.Stores
@@ -81,9 +84,39 @@ class SettingsActivity : BaseActivity() {
             },
         )
 
+        page.addView(heading(getString(R.string.settings_hijri)))
+        page.addView(body(getString(R.string.settings_hijri_help), muted = true))
+        page.addView(
+            choices(
+                listOf(
+                    getString(R.string.hijri_adjust_earlier) to HijriAdjustment.DayEarlier,
+                    getString(R.string.hijri_adjust_none) to HijriAdjustment.None,
+                    getString(R.string.hijri_adjust_later) to HijriAdjustment.DayLater,
+                ),
+                prefs.hijriAdjustment,
+            ) { chosen -> saveApp(this, Stores.settings(this).readApp().copy(hijriAdjustment = chosen)) },
+        )
+
+        // ADR-26: which of the two bundled translations the reader shows. Nothing is ticked until the user picks one.
+        page.addView(heading(getString(R.string.settings_quran_translation)))
+        page.addView(body(getString(R.string.quran_translation_choose_help), muted = true))
+        page.addView(
+            choices<Edition?>(Edition.entries.map { editionTitle(this, it) to it }, prefs.quranTranslation) { chosen ->
+                val settings = Stores.settings(this)
+                settings.writeApp(settings.readApp().copy(quranTranslation = chosen))
+            },
+        )
+
         page.addView(heading(getString(R.string.settings_nudge)))
         page.addView(body(getString(R.string.settings_nudge_help), muted = true))
         page.addView(nudgeSection(texts))
+
+        // ADR-25: what downloaded packs take on the phone, finished and partial. Zero in every build today.
+        page.addView(heading(getString(R.string.packs_settings_heading)))
+        page.addView(body(getString(R.string.packs_settings_used, mb(texts, packFiles(this).used()))))
+        page.addView(actionButton(getString(R.string.packs_title), primary = false) {
+            startActivity(Intent(this, PacksActivity::class.java))
+        })
 
         page.addView(heading(getString(R.string.settings_district)))
         page.addView(actionButton(getString(R.string.settings_district_change), primary = false) {
@@ -148,6 +181,13 @@ class SettingsActivity : BaseActivity() {
             box.addView(actionButton(getString(R.string.settings_nudge_time, texts.timeOfDay(chosen)), primary = false) {
                 pickNudgeTime(chosen)
             })
+            // ADR-24: the khatam portion rides on this one notification; there is no second one to turn on.
+            box.addView(
+                switchRow(getString(R.string.khatam_settings_nudge), Stores.settings(this).readApp().khatamInNudge) { on ->
+                    saveApp(this, Stores.settings(this).readApp().copy(khatamInNudge = on))
+                },
+            )
+            box.addView(body(getString(R.string.khatam_settings_nudge_help), muted = true))
         }
         return box
     }

@@ -97,6 +97,7 @@ core/      plain Kotlin, no Android on the classpath; a test also bans clock and
   l10n/      Bengali digits, time and date text
   districts/ parse and check the district list
   health/    facts about the phone -> Armed | Degraded(reasons)
+  widget/    next prayer and five times as plain values for the home-screen widgets
 tools/content-gate/   build-only: fails the build on unreviewed deeds or a bad district list (ADR-10)
 tools/release.sh      the store build: signed, both content files required
 app/       Android only
@@ -105,6 +106,7 @@ app/       Android only
   sensors/   compass
   store/     SharedPreferences settings + one SQLite database
   health/    permission and OEM checks -> Degraded reasons
+  widget/    the two AppWidgetProviders and their one refresh alarm (draw what core/widget says)
 content/   districts.json + districts-SOURCES.md (real); deeds.json and the reviewer's note (not yet)
 ```
 

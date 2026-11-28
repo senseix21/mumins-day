@@ -291,4 +291,211 @@
     <string name="settings_nudge_help">আপনার বেছে নেওয়া সময়ে দিনে একবার একটি নীরব বিজ্ঞপ্তি আসবে। না দেখলে আবার আসবে না।</string>
     <string name="settings_nudge_on">স্মরণ চালু</string>
     <string name="settings_nudge_time">সময়: %1$s</string>
+
+    <!-- Home-screen widgets (phase 10). Bengali drafted by Claude, native review pending. -->
+    <string name="widget_next_label">পরবর্তী নামাজ</string>
+    <string name="widget_five_label">পাঁচ ওয়াক্তের সময়</string>
+    <string name="widget_next_description">পরবর্তী নামাজের সময় এক নজরে।</string>
+    <string name="widget_five_description">আজকের পাঁচ ওয়াক্তের সময়।</string>
+    <string name="widget_degraded">অনুস্মারক নাও বাজতে পারে। অ্যাপ খুলুন।</string>
+
+    <!-- Salah tracker (phase 10, INV-C5). Every tracker string has the prefix tracker_ so a test can scan them all. No digits, no counts, no judgement. Bengali drafted by Claude, native review pending. -->
+    <string name="tracker_title">নামাজের খাতা</string>
+    <string name="tracker_help">নামাজ পড়ার পর ছুঁয়ে দাগ দিন। এটি শুধু আপনার ফোনে থাকে, আর কেউ দেখে না।</string>
+    <string name="tracker_today">আজ</string>
+    <string name="tracker_prayer_open">%1$s, %2$s। পড়লে ছুঁয়ে দাগ দিন</string>
+    <string name="tracker_prayer_marked">%1$s, %2$s: পড়েছি। ছুঁলে দাগ উঠে যাবে</string>
+    <string name="tracker_prayed_action">পড়েছি</string>
+
+    <!-- Find my district (phase 10, ADR-19). Bengali drafted by Claude, native review pending. -->
+    <string name="find_button">আমার জেলা খুঁজুন</string>
+    <string name="find_privacy">আপনার অবস্থান শুধু এই পর্দা খোলা থাকলে একবার পড়া হয়। এটি সংরক্ষণ করা হয় না, কোথাও পাঠানোও হয় না। শুধু আপনার বেছে নেওয়া জেলা রাখা হয়।</string>
+    <string name="find_reading">আপনার অবস্থান খোঁজা হচ্ছে…</string>
+    <string name="find_denied">লোকেশনের অনুমতি দেওয়া হয়নি, তাই কিছু পড়া হয়নি। নিচ থেকে হাতে জেলা বেছে নিতে পারেন।</string>
+    <string name="find_unavailable">আপনার অবস্থান পাওয়া যায়নি। লোকেশন বন্ধ থাকতে পারে, অথবা ফোন বুঝতে পারেনি। নিচ থেকে হাতে জেলা বেছে নিতে পারেন।</string>
+    <string name="find_near">সবচেয়ে কাছের জেলা %1$s, প্রায় %2$s কিমি দূরে।</string>
+    <string name="find_use">%1$s বেছে নিন</string>
+    <string name="find_outside">আপনি বাংলাদেশের বাইরে আছেন মনে হচ্ছে। সবচেয়ে কাছের জেলা %1$s, প্রায় %2$s কিমি দূরে। নামাজের সময় আপনি যেখানে আছেন সেখানকার নয়, %1$s জেলার হিসাবে হবে।</string>
+    <string name="find_far">আপনার কাছাকাছি কোনো জেলা নেই। সবচেয়ে কাছের জেলা %1$s, প্রায় %2$s কিমি দূরে।</string>
+    <string name="find_use_anyway">তবুও %1$s বেছে নিন</string>
+
+    <!-- Hijri date (phase 11, INV-H1). Bengali drafted by Claude, native review pending. The month names and the rule sentences are the reviewer's to confirm. -->
+    <string-array name="hijri_months">
+        <item>মুহাররম</item>
+        <item>সফর</item>
+        <item>রবিউল আউয়াল</item>
+        <item>রবিউস সানি</item>
+        <item>জমাদিউল আউয়াল</item>
+        <item>জমাদিউস সানি</item>
+        <item>রজব</item>
+        <item>শাবান</item>
+        <item>রমজান</item>
+        <item>শাওয়াল</item>
+        <item>জিলকদ</item>
+        <item>জিলহজ</item>
+    </string-array>
+    <string name="hijri_line">হিজরি: %1$s</string>
+    <string name="hijri_rule_calculated">নির্দিষ্ট নিয়মে হিসাব করা তারিখ। এটি চাঁদ দেখার ঘোষণা নয়, ঘোষণার তারিখ থেকে এক দিন আলাদা হতে পারে।</string>
+    <string name="hijri_rule_earlier">নির্দিষ্ট নিয়মে হিসাব করা তারিখ, আপনি এক দিন আগে সরিয়েছেন। এটি চাঁদ দেখার ঘোষণা নয়।</string>
+    <string name="hijri_rule_later">নির্দিষ্ট নিয়মে হিসাব করা তারিখ, আপনি এক দিন পরে সরিয়েছেন। এটি চাঁদ দেখার ঘোষণা নয়।</string>
+    <string name="hijri_rule_change_hint">সেটিংসে এক দিন আগে বা পরে সরানো যায়।</string>
+    <string name="settings_hijri">হিজরি তারিখ</string>
+    <string name="settings_hijri_help">হিসাব করা তারিখ ঘোষণার তারিখ থেকে এক দিন আলাদা হতে পারে। প্রয়োজনে এক দিন আগে বা পরে সরান। হিজরি তারিখ মাগরিবে বদলায়।</string>
+    <string name="hijri_adjust_earlier">এক দিন আগে</string>
+    <string name="hijri_adjust_none">হিসাব করা তারিখ</string>
+    <string name="hijri_adjust_later">এক দিন পরে</string>
+    <string name="ramadan_suggest">হিসাব অনুযায়ী এখন রমজান মাস। রমজান মোড চালু করবেন?</string>
+    <string name="ramadan_suggest_on">রমজান মোড চালু করুন</string>
+
+    <!-- Zakat calculator (phase 12, INV-Z1). Every rule comes from the reviewer's signed file; these are labels only and rule nothing. Bengali drafted by Claude, native review pending. -->
+    <string name="zakat_title">যাকাতের হিসাব</string>
+    <string name="zakat_help">রিভিউয়ার যে নিয়ম সই করেছেন সেই নিয়মে নিসাব ও পরিমাণ হিসাব করে, প্রতিটি ধাপ দেখায়। আপনি যা লেখেন তা সংরক্ষিত বা কোথাও পাঠানো হয় না।</string>
+    <string name="zakat_no_rules">এখনো কোনো সই করা নিয়ম নেই, তাই হিসাব করা যাচ্ছে না।</string>
+    <string name="zakat_rules_rejected">নিয়মের ফাইলটি অসম্পূর্ণ, তাই হিসাব করা যাচ্ছে না।</string>
+    <string name="zakat_fixture_banner">পরীক্ষার নিয়ম: এখানকার সংখ্যাগুলো বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এই ফলাফল ব্যবহার করবেন না।</string>
+    <string name="zakat_cash">নগদ টাকা (টাকা)</string>
+    <string name="zakat_other">অন্যান্য সম্পদ (টাকা)</string>
+    <string name="zakat_debts">ঋণ (টাকা)</string>
+    <string name="zakat_gold">সোনা</string>
+    <string name="zakat_silver">রুপা</string>
+    <string name="zakat_unit_bhori">ভরি</string>
+    <string name="zakat_unit_ana">আনা</string>
+    <string name="zakat_unit_ratti">রতি</string>
+    <string name="zakat_unit_grams">গ্রাম</string>
+    <string name="zakat_price_note">দাম আপনি নিজে লিখবেন। অ্যাপ কখনো দাম আনে না, কারণ এতে ইন্টারনেট নেই।</string>
+    <string name="zakat_price_gold">সোনার দাম, প্রতি ভরি (টাকা)</string>
+    <string name="zakat_price_silver">রুপার দাম, প্রতি ভরি (টাকা)</string>
+    <string name="zakat_price_date">দামের তারিখ: %1$s</string>
+    <string name="zakat_hawl">সম্পদ পূর্ণ এক বছর আমার কাছে আছে</string>
+    <string name="zakat_calculate">হিসাব করুন</string>
+    <string name="zakat_bad_number">%1$s: সংখ্যা নয়</string>
+    <string name="zakat_missing_price">%1$s-র দাম লিখুন, দাম ছাড়া হিসাব করা যায় না।</string>
+    <string name="zakat_working_title">হিসাবের ধাপ</string>
+    <string name="zakat_step_weight">%1$s গ্রামে: %2$s</string>
+    <string name="zakat_step_line">%1$s: %2$s টাকা</string>
+    <string name="zakat_step_not_counted">(নিয়মে ধরা হয়নি)</string>
+    <string name="zakat_step_debts">বাদ গেছে ঋণ: %1$s টাকা</string>
+    <string name="zakat_step_net">ধরা সম্পদ: %1$s টাকা</string>
+    <string name="zakat_step_nisab">নিসাব: %2$s %1$s গ্রাম, %4$s তারিখের দামে %3$s টাকা</string>
+    <string name="zakat_step_rate">হার: %1$s শতাংশ</string>
+    <string name="zakat_reached_yes">সম্পদ নিসাবে পৌঁছেছে।</string>
+    <string name="zakat_reached_no">সম্পদ নিসাবে পৌঁছায়নি।</string>
+    <string name="zakat_below_nisab">নিসাবের কম, কোনো পরিমাণ নেই।</string>
+    <string name="zakat_hawl_pending">নিয়ম অনুযায়ী পূর্ণ এক বছর লাগে, আপনি বলেছেন এখনো হয়নি।</string>
+    <string name="zakat_amount">পরিমাণ: %1$s টাকা</string>
+    <string name="zakat_rounding_note">পরিমাণ পয়সা পর্যন্ত ওপরের দিকে পূর্ণ করা হয়েছে; নিসাবের মূল্য নিচের দিকে।</string>
+
+    <!-- Phase 13: today's dua and hadith (ADR-22). -->
+    <string name="today_title">আজকের দোয়া ও হাদিস</string>
+    <string name="today_dua">আজকের দোয়া</string>
+    <string name="today_hadith">আজকের হাদিস</string>
+    <string name="today_source">সূত্র: %1$s, নম্বর %2$s (%3$s)</string>
+    <string name="today_grading">মান, রিভিউয়ার যেভাবে লিখেছেন: %1$s</string>
+    <string name="today_occasion">কখন পড়বেন: %1$s</string>
+    <string name="today_unavailable">অ্যাপের এই সংস্করণে এটি এখনো নেই।</string>
+    <string name="today_rejected">তালিকায় একটি ভুল আছে, তাই কিছু দেখানো হচ্ছে না।</string>
+    <string name="today_fixture_banner">পরীক্ষার লেখা: এগুলো বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এগুলো দোয়া বা হাদিস নয়।</string>
+
+    <!-- Phase 14: the Quran reader and search (ADR-23). -->
+    <string name="quran_title">কুরআন</string>
+    <string name="quran_preparing">কুরআনের পাঠ যাচাই করে সাজানো হচ্ছে। প্রথমবার কয়েক সেকেন্ড লাগতে পারে।</string>
+    <string name="quran_missing">অ্যাপের এই সংস্করণে কুরআনের পাঠ নেই।</string>
+    <string name="quran_unverified">কুরআনের পাঠ যাচাই করা যায়নি, তাই দেখানো হচ্ছে না। অ্যাপটি আবার ইনস্টল করে দেখুন।</string>
+    <string name="quran_credit">আরবি পাঠ: Tanzil Project (tanzil.net), কোনো পরিবর্তন ছাড়া। বিস্তারিত ওপেন-সোর্স লাইসেন্স পাতায়।</string>
+    <string name="quran_continue">যেখানে ছিলেন: সূরা %1$s, আয়াত %2$s</string>
+    <string name="quran_search_hint">আরবি বা বাংলা শব্দ, অথবা সূরা:আয়াত যেমন ২:২৫৫</string>
+    <string name="quran_search">খুঁজুন</string>
+    <string name="quran_results">যেসব আয়াতে পাওয়া গেছে</string>
+    <string name="quran_no_results">কিছু পাওয়া যায়নি।</string>
+    <string name="quran_no_such_verse">এই নম্বরের কোনো সূরা বা আয়াত নেই।</string>
+    <string name="quran_results_capped">শুধু প্রথম দিকের আয়াতগুলো দেখানো হলো। আরও শব্দ লিখলে খোঁজা ছোট হবে।</string>
+    <string name="quran_search_arabic_only">কোনো অনুবাদ বেছে নেওয়া হয়নি, তাই শুধু আরবিতে খোঁজা হলো।</string>
+    <string name="quran_surahs">সূরাসমূহ</string>
+    <string name="quran_surah_title">সূরা %1$s</string>
+    <string name="quran_ayah_number">আয়াত %1$s</string>
+    <string name="quran_translation_choose_title">বাংলা অনুবাদ বেছে নিন</string>
+    <string name="quran_translation_choose_help">দুটি অনুবাদই QuranEnc.com থেকে নেওয়া, কোনো পরিবর্তন ছাড়া। অ্যাপ নিজে থেকে কোনোটি বেছে দেয় না। বেছে নেওয়ার আগে শুধু আরবি দেখানো হয়। পরে সেটিংসে বদলাতে পারবেন।</string>
+    <string name="quran_translation_credit">অনুবাদ: %1$s। উৎস ও প্রকাশক: QuranEnc.com, সংস্করণ %2$s, কোনো পরিবর্তন ছাড়া।</string>
+    <string name="quran_footnotes_show">টীকা দেখুন</string>
+    <string name="quran_footnotes_hide">টীকা লুকান</string>
+    <string name="quran_edition_zakaria">বাংলা ভাষায় অনুবাদ- ড. আবূ বকর মুহাম্মাদ যাকারিয়া</string>
+    <string name="quran_edition_rwwad">বাংলা ভাষায় অনুবাদ - রুওয়াদ অনুবাদ</string>
+    <string name="settings_quran_translation">কুরআনের অনুবাদ</string>
+
+    <!-- Phase 15: the khatam plan (ADR-24). Every key starts with khatam_ and is scanned by KhatamStringsTest. -->
+    <string name="khatam_title">খতম পরিকল্পনা</string>
+    <string name="khatam_help">যে তারিখের মধ্যে কুরআন শেষ করতে চান, সেটি বেছে নিন। প্রতিদিন অ্যাপ সেই তারিখ পর্যন্ত দিনগুলোর জন্য আজকের অংশ নতুন করে হিসাব করে।</string>
+    <string name="khatam_none">কোনো পরিকল্পনা নেই।</string>
+    <string name="khatam_start">শেষ করার তারিখ বেছে নিন</string>
+    <string name="khatam_target">শেষ করার তারিখ: %1$s</string>
+    <string name="khatam_today">আজকের অংশ</string>
+    <string name="khatam_range">সূরা %1$s, আয়াত %2$s থেকে সূরা %3$s, আয়াত %4$s পর্যন্ত</string>
+    <string name="khatam_juz">পারা %1$s থেকে শুরু</string>
+    <string name="khatam_open">আজকের অংশ খুলুন</string>
+    <string name="khatam_mark_read">পড়েছি</string>
+    <string name="khatam_today_read">আজকের অংশ পড়া হয়েছে।</string>
+    <string name="khatam_more_help">আরও পড়তে চাইলে, পরের অংশ এখানে। তাহলে কালকের অংশ ছোট হবে।</string>
+    <string name="khatam_open_more">পরের অংশ খুলুন</string>
+    <string name="khatam_mark_more">এটিও পড়েছি</string>
+    <string name="khatam_undo">আজকের চিহ্ন তুলে নিন</string>
+    <string name="khatam_complete">এই পরিকল্পনায় আপনি পুরো কুরআন পড়েছেন।</string>
+    <string name="khatam_start_again">নতুন পরিকল্পনা শুরু করুন</string>
+    <string name="khatam_new_date">আপনার বেছে নেওয়া তারিখ পেরিয়ে গেছে। প্রতিদিনের অংশ দেখতে নতুন তারিখ বেছে নিন।</string>
+    <string name="khatam_open_where">যেখানে থেমেছিলেন সেখানে খুলুন</string>
+    <string name="khatam_change_date">শেষ করার তারিখ বদলান</string>
+    <string name="khatam_end_plan">এই পরিকল্পনা মুছে ফেলুন</string>
+    <string name="khatam_end_confirm">পরিকল্পনাটি মুছে ফেলবেন? কোথা পর্যন্ত পড়েছেন, তা ফোন থেকে মুছে যাবে।</string>
+    <string name="khatam_end_yes">মুছে ফেলুন</string>
+    <string name="khatam_end_no">রেখে দিন</string>
+    <string name="khatam_nudge_portion">আজকের কুরআনের অংশ খোলার জন্য তৈরি।</string>
+    <string name="khatam_nudge_both">আজকের ভালো কাজ আর কুরআনের অংশ দেখার জন্য তৈরি।</string>
+    <string name="khatam_settings_nudge">আজকের কুরআনের অংশের কথাও বলুন</string>
+    <string name="khatam_settings_nudge_help">শুধু যেদিন খতম পরিকল্পনায় আজকের অংশ থাকে। তখনও দিনে একটাই নোটিফিকেশন, একই সময়ে।</string>
+
+    <!-- Phase 16: downloadable packs and the recitation player (ADR-25). No pack exists; the host is empty. -->
+    <string name="packs_title">ডাউনলোড করার প্যাক</string>
+    <string name="packs_not_available">প্যাক এখনো পাওয়া যায় না। অ্যাপের এই সংস্করণ কিছুই ডাউনলোড করে না, আর এর ইন্টারনেট ব্যবহারের অনুমতি নেই।</string>
+    <string name="packs_privacy">আপনি ট্যাপ করলে তবেই ডাউনলোড শুরু হয়। অ্যাপ একটি সার্ভার থেকে ফাইলটি চায়, আপনার বা আপনার ফোনের কোনো তথ্য পাঠায় না।</string>
+    <string name="packs_none">এখনো কোনো প্যাক দেওয়া হয়নি।</string>
+    <string name="packs_manifest_refused">প্যাকের তালিকায় ভুল আছে, তাই কিছুই দেওয়া হচ্ছে না।</string>
+    <string name="packs_kind_tafsir">তাফসির</string>
+    <string name="packs_kind_audio">তিলাওয়াত</string>
+    <string name="packs_size">আকার: %1$s মেগাবাইট</string>
+    <string name="packs_download">ডাউনলোড করুন</string>
+    <string name="packs_resume">ডাউনলোড চালিয়ে যান</string>
+    <string name="packs_cancel">থামান</string>
+    <string name="packs_delete">ফোন থেকে মুছে ফেলুন</string>
+    <string name="packs_listen">শুনুন</string>
+    <string name="packs_downloading">ডাউনলোড হচ্ছে: %2$s মেগাবাইটের মধ্যে %1$s</string>
+    <string name="packs_stopped">%2$s মেগাবাইটের মধ্যে %1$s এ থেমেছে। চালিয়ে যেতে পারেন।</string>
+    <string name="packs_verifying">ফাইলটি যাচাই করা হচ্ছে।</string>
+    <string name="packs_ready">ডাউনলোড ও যাচাই হয়েছে।</string>
+    <string name="packs_failed_network">সংযোগ চলে যাওয়ায় ডাউনলোড থেমে গেছে। চালিয়ে যেতে পারেন।</string>
+    <string name="packs_failed_refused">সার্ভার প্যাকটি পাঠায়নি। আবার চেষ্টা করতে পারেন।</string>
+    <string name="packs_failed_large">সার্ভার প্যাকের আকারের চেয়ে বেশি পাঠিয়েছে, তাই ফাইলটি মুছে ফেলা হয়েছে।</string>
+    <string name="packs_failed_hash">ফাইলটি যাচাইয়ে মেলেনি, তাই মুছে ফেলা হয়েছে। আবার ডাউনলোড করতে পারেন।</string>
+    <string name="packs_settings_heading">ডাউনলোড করা প্যাক</string>
+    <string name="packs_settings_used">ব্যবহৃত জায়গা: %1$s মেগাবাইট</string>
+    <string name="recitation_title">তিলাওয়াত</string>
+    <string name="recitation_play">চালান</string>
+    <string name="recitation_pause">থামান</string>
+    <string name="recitation_ayah">এখন: সূরা %1$s, আয়াত %2$s</string>
+    <string name="recitation_no_timings">এই প্যাকে আয়াতের সময় নেই, তাই কোন আয়াত চলছে তা দেখানো হয় না।</string>
+    <string name="recitation_unverified">ফাইলটি যাচাইয়ে মেলেনি, তাই প্যাকটি মুছে ফেলা হয়েছে।</string>
+    <string name="recitation_cannot_play">এই তিলাওয়াত চালানো যাচ্ছে না।</string>
+
+    <!-- Hisnul Muslim, unreviewed, debug builds only (ADR-27). -->
+    <string name="hisnul_title">হিসনুল মুসলিম</string>
+    <string name="hisnul_opening">খোলা হচ্ছে…</string>
+    <string name="hisnul_unreviewed_banner">যাচাই করা হয়নি: কোনো রিভিউয়ার এই দোয়াগুলো এখনো পড়ে দেখেননি। উৎস: ThelightHub-এর দোয়া এপিআই (hisnul.workers.dev)। বাংলা অনুবাদ কার, তা জানা নেই। লেখা উৎসে যেমন আছে তেমনই দেখানো হচ্ছে। এটি শুধু ডেভেলপারের পরীক্ষার সংস্করণে আছে।</string>
+    <string name="hisnul_not_in_build">অ্যাপের এই সংস্করণে হিসনুল মুসলিম নেই।</string>
+    <string name="hisnul_refused">দোয়ার ফাইলে একটি ভুল আছে, তাই কিছু দেখানো হচ্ছে না।</string>
+    <string name="hisnul_search_hint">অধ্যায়ের নামে খুঁজুন</string>
+    <string name="hisnul_search">খুঁজুন</string>
+    <string name="hisnul_chapters">অধ্যায়সমূহ</string>
+    <string name="hisnul_no_chapters">এই নামে কোনো অধ্যায় নেই।</string>
+    <string name="hisnul_chapter_title">অধ্যায় %1$s</string>
+    <string name="hisnul_dua_number">দোয়া %1$s</string>
+    <string name="hisnul_reference">সূত্র: %1$s</string>
+
 </resources>

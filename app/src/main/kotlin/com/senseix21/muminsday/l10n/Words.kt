@@ -28,5 +28,6 @@ fun wordsFor(context: Context, language: Language): Words {
         pm = resources.getString(R.string.time_pm),
         months = resources.getStringArray(R.array.months).toList(),
         weekdays = resources.getStringArray(R.array.weekdays).toList(),
+        hijriMonths = resources.getStringArray(R.array.hijri_months).toList(),
     )
 }

@@ -22,3 +22,6 @@ keystore.properties
 
 # Agent worktrees
 .claude/worktrees/
+
+# Content kept on this machine only, never committed (ADR-27): unreviewed text whose permission is the founder's to settle.
+content/local/

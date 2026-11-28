@@ -8,7 +8,10 @@ import android.content.Context
 import android.content.Intent
 import com.senseix21.muminsday.MainActivity
 import com.senseix21.muminsday.R
+import com.senseix21.muminsday.planner.Salah
 import com.senseix21.muminsday.ui.DeedActivity
+import com.senseix21.muminsday.ui.KhatamActivity
+import java.time.Instant
 
 /**
  * The only place a notification is built or a channel defined. Both channels are low importance: the Adhan is audio
@@ -25,6 +28,9 @@ object Notifications {
 
     /** Above every notice id (100 plus a notice code of at most 60). */
     private const val NUDGE_NOTIFICATION_ID = 200
+
+    /** Request codes of the "Prayed" actions, clear of the notice and nudge ids. */
+    private const val PRAYED_REQUEST_BASE = 2000
 
     private fun ensureChannels(context: Context) {
         val manager = checkNotNull(context.getSystemService(NotificationManager::class.java))
@@ -50,53 +56,77 @@ object Notifications {
             .build()
     }
 
-    /** A reminder that makes no sound: silent mode, a pre-reminder, a late alarm, a call in progress, a failed start. */
-    fun post(context: Context, notice: Notice, requestCode: Int) {
+    /**
+     * A reminder that makes no sound: silent mode, a pre-reminder, a late alarm, a call in progress, a failed start.
+     * [prayed] adds the tracker's one "Prayed" action (INV-C5): a tap the user chooses to make, never a prompt.
+     */
+    fun post(context: Context, notice: Notice, requestCode: Int, prayed: PrayedTarget? = null) {
         ensureChannels(context)
         val text = when (notice) {
             Notice.Reminder -> R.string.notification_reminder
             Notice.Missed -> R.string.notification_late
         }
         val manager = checkNotNull(context.getSystemService(NotificationManager::class.java))
-        manager.notify(
-            NOTICE_BASE_ID + requestCode,
-            Notification.Builder(context, NOTICE_CHANNEL)
-                .setSmallIcon(R.drawable.ic_placeholder)
-                .setContentTitle(context.getString(text))
-                .setCategory(Notification.CATEGORY_REMINDER)
-                .setAutoCancel(true)
-                .setContentIntent(openApp(context))
-                .build(),
-        )
+        val builder = Notification.Builder(context, NOTICE_CHANNEL)
+            .setSmallIcon(R.drawable.ic_placeholder)
+            .setContentTitle(context.getString(text))
+            .setCategory(Notification.CATEGORY_REMINDER)
+            .setAutoCancel(true)
+            .setContentIntent(openApp(context))
+        if (prayed != null) {
+            val notificationId = NOTICE_BASE_ID + requestCode
+            val intent = Intent(context, PrayedReceiver::class.java)
+                .setAction(ACTION_PRAYED)
+                .putExtra(EXTRA_PRAYED_SALAH, prayed.salah.name)
+                .putExtra(EXTRA_PRAYED_AT, prayed.prayerAt.toEpochMilli())
+                .putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+            // One request code per notice, so two prayers' actions never share a PendingIntent.
+            val operation = PendingIntent.getBroadcast(
+                context,
+                PRAYED_REQUEST_BASE + requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+            builder.addAction(Notification.Action.Builder(null, context.getString(R.string.tracker_prayed_action), operation).build())
+        }
+        manager.notify(NOTICE_BASE_ID + requestCode, builder.build())
+    }
+
+    /** Takes a notice down once the user has answered it. */
+    fun dismiss(context: Context, notificationId: Int) {
+        checkNotNull(context.getSystemService(NotificationManager::class.java)).cancel(notificationId)
     }
 
     /**
-     * The daily deed nudge (F4): one quiet notification whose tap opens the deed card. A fixed id, so even a second
-     * call could only replace it, never stack. It carries no count and no word about days missed (INV-C4).
+     * The daily nudge (F4): one quiet notification whose tap opens what it names: the deed card, the khatam plan
+     * (ADR-24), or the home screen when it names both. A fixed id, so even a second call could only replace it, never
+     * stack. It carries no count and no word about days missed (INV-C4).
      */
-    fun postNudge(context: Context) {
+    fun postNudge(context: Context, nudge: Nudge) {
+        val (text, open) = when (nudge) {
+            Nudge.Nothing -> return
+            Nudge.Deed -> R.string.notification_nudge to DeedActivity::class.java
+            Nudge.Portion -> R.string.khatam_nudge_portion to KhatamActivity::class.java
+            Nudge.DeedAndPortion -> R.string.khatam_nudge_both to MainActivity::class.java
+        }
         ensureChannels(context)
         val manager = checkNotNull(context.getSystemService(NotificationManager::class.java))
         manager.notify(
             NUDGE_NOTIFICATION_ID,
             Notification.Builder(context, NOTICE_CHANNEL)
                 .setSmallIcon(R.drawable.ic_placeholder)
-                .setContentTitle(context.getString(R.string.notification_nudge))
+                .setContentTitle(context.getString(text))
                 .setCategory(Notification.CATEGORY_REMINDER)
                 .setAutoCancel(true)
-                .setContentIntent(openDeed(context))
+                .setContentIntent(PendingIntent.getActivity(context, 1, Intent(context, open), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
                 .build(),
         )
     }
 
     enum class Notice { Reminder, Missed }
 
-    private fun openDeed(context: Context): PendingIntent = PendingIntent.getActivity(
-        context,
-        1,
-        Intent(context, DeedActivity::class.java),
-        PendingIntent.FLAG_IMMUTABLE,
-    )
+    /** The prayer a notification is about, for its "Prayed" action. [prayerAt] decides which date the mark belongs to. */
+    class PrayedTarget(val salah: Salah, val prayerAt: Instant)
 
     private fun openApp(context: Context): PendingIntent = PendingIntent.getActivity(
         context,

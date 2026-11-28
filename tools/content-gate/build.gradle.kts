@@ -76,4 +76,106 @@ val checkDebugDeeds = tasks.register<JavaExec>("checkDebugDeeds") {
     inputs.files(debugDeedsFile).withPropertyName("debugDeeds")
 }
 
-tasks.check { dependsOn(checkDeedContent, checkDistricts, checkDebugDistricts, checkDebugDeeds) }
+val zakatRulesFile = rootProject.layout.projectDirectory.file("content/zakat-rules.json")
+
+/**
+ * T-BUILD-4 for the Zakat rules (INV-Z1). Until the reviewer signs rules the file does not exist and its absence passes
+ * with a notice; once it exists it must be complete, signed, and not a test fixture. `-PzakatRulesRequired=true` makes
+ * absence a failure, and a store build that ships the Zakat screen must set it.
+ */
+val checkZakatRules = tasks.register<JavaExec>("checkZakatRules") {
+    group = "verification"
+    description = "Runs the Zakat rules gate over content/zakat-rules.json."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.ZakatMain")
+    val required = providers.gradleProperty("zakatRulesRequired").orElse("false")
+    args(zakatRulesFile.asFile.absolutePath, required.get(), "false")
+    inputs.files(zakatRulesFile).optional().withPropertyName("zakatRules")
+    inputs.property("required", required)
+}
+
+// The development fixture (FAKE numbers, test_fixture true) goes through the same gate, so it cannot rot.
+val debugZakatRulesFile = rootProject.layout.projectDirectory.file("app/src/debug/assets/zakat-rules.json")
+
+val checkDebugZakatRules = tasks.register<JavaExec>("checkDebugZakatRules") {
+    group = "verification"
+    description = "Runs the Zakat rules gate over the debug fixture app/src/debug/assets/zakat-rules.json."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.ZakatMain")
+    args(debugZakatRulesFile.asFile.absolutePath, "true", "true")
+    inputs.files(debugZakatRulesFile).withPropertyName("debugZakatRules")
+}
+
+/**
+ * T-BUILD-4 for duas and hadith (INV-C1, INV-C6, ADR-22): one task per kind, the same core gate, the deed's provenance
+ * check. Until the reviewer delivers `content/duas.json` or `content/hadith.json` its absence passes with a notice;
+ * `-PduasRequired=true` and `-PhadithRequired=true` make absence a failure, and a store build that ships the Today
+ * screen must set the one for each kind it ships. The real file is refused if it says `test_fixture: true`.
+ */
+fun registerKindGates(kind: String, fileName: String, requiredProperty: String): List<TaskProvider<JavaExec>> {
+    val realFile = rootProject.layout.projectDirectory.file("content/$fileName")
+    val real = tasks.register<JavaExec>("check${kind}Content") {
+        group = "verification"
+        description = "Runs the review gate over content/$fileName."
+        classpath = sourceSets.main.get().runtimeClasspath
+        mainClass.set("com.senseix21.muminsday.tools.gate.KindMain")
+        val required = providers.gradleProperty(requiredProperty).orElse("false")
+        args(kind, realFile.asFile.absolutePath, required.get(), "false")
+        inputs.files(realFile).optional().withPropertyName("content")
+        inputs.property("required", required)
+    }
+    // The FAKE debug fixture goes through the same gate with test fixtures allowed, so it cannot rot.
+    val debugFile = rootProject.layout.projectDirectory.file("app/src/debug/assets/$fileName")
+    val debug = tasks.register<JavaExec>("checkDebug${kind}Content") {
+        group = "verification"
+        description = "Runs the review gate over the debug fixture app/src/debug/assets/$fileName."
+        classpath = sourceSets.main.get().runtimeClasspath
+        mainClass.set("com.senseix21.muminsday.tools.gate.KindMain")
+        args(kind, debugFile.asFile.absolutePath, "true", "true")
+        inputs.files(debugFile).withPropertyName("debugContent")
+    }
+    return listOf(real, debug)
+}
+
+val kindGates = registerKindGates("Dua", "duas.json", "duasRequired") + registerKindGates("Hadith", "hadith.json", "hadithRequired")
+
+tasks.check { dependsOn(checkDeedContent, checkDistricts, checkDebugDistricts, checkDebugDeeds, checkZakatRules, checkDebugZakatRules) }
+tasks.check { dependsOn(kindGates) }
+
+/**
+ * T-BUILD-6 (INV-QT1): every file in `content/quran/` must have the SHA-256 recorded in `content/quran-SOURCES.md`,
+ * nothing unrecorded may be there, a translation needs its written permission recorded, and the text, search text and
+ * metadata must describe the same 114 surahs. The app's asset staging depends on this task, so no build that packages
+ * the Quran can skip it.
+ */
+val quranSources = rootProject.layout.projectDirectory.file("content/quran-SOURCES.md")
+val quranDirectory = rootProject.layout.projectDirectory.dir("content/quran")
+val checkQuranText = tasks.register<JavaExec>("checkQuranText") {
+    group = "verification"
+    description = "T-BUILD-6: the bundled Quran files match their recorded SHA-256 and describe 114 surahs."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.QuranMain")
+    args(quranSources.asFile.absolutePath, quranDirectory.asFile.absolutePath, rootProject.layout.projectDirectory.dir("content").asFile.absolutePath)
+    inputs.file(quranSources).withPropertyName("sources")
+    inputs.dir(quranDirectory).withPropertyName("quran")
+}
+tasks.check { dependsOn(checkQuranText) }
+
+/**
+ * ADR-27: Hisnul Muslim, unreviewed, kept only in the git-ignored `content/local/hisnul-muslim/`. Absent (CI, a fresh
+ * clone) passes with a notice; present, every file must have the SHA-256 recorded in `content/hisnul-muslim-SOURCES.md`
+ * and the counts there must hold. The debug build's staging depends on this task; no release build packages the files.
+ */
+val hisnulSources = rootProject.layout.projectDirectory.file("content/hisnul-muslim-SOURCES.md")
+val hisnulDirectory = rootProject.layout.projectDirectory.dir("content/local/hisnul-muslim")
+val checkHisnulMuslim = tasks.register<JavaExec>("checkHisnulMuslim") {
+    group = "verification"
+    description = "ADR-27: the local Hisnul Muslim files, when present, match their recorded SHA-256 and counts."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.HisnulMain")
+    args(hisnulSources.asFile.absolutePath, hisnulDirectory.asFile.absolutePath)
+    inputs.file(hisnulSources).withPropertyName("sources")
+    // A file tree, not inputs.dir: the folder is absent on every machine but the one that fetched it.
+    inputs.files(fileTree(hisnulDirectory)).withPropertyName("hisnulMuslim")
+}
+tasks.check { dependsOn(checkHisnulMuslim) }

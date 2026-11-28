@@ -1,7 +1,11 @@
 package com.senseix21.muminsday.store
 
 import com.senseix21.muminsday.districts.DistrictId
+import com.senseix21.muminsday.hijri.HijriAdjustment
 import com.senseix21.muminsday.l10n.Language
+import com.senseix21.muminsday.quran.Edition
+import com.senseix21.muminsday.quran.SurahNumber
+import com.senseix21.muminsday.quran.VerseRef
 
 /** F1 #15: whether the Adhan sounds when the phone is on silent or vibrate. */
 enum class SilentMode { RespectSilent, AlwaysRing }
@@ -19,10 +23,21 @@ data class AppPrefs(
     /** Which district the place came from, so the settings screen can name it. Null until one is picked. */
     val districtId: DistrictId? = null,
     /**
-     * Ramadan mode (F2 #5, G33). The user turns it on and off; the app computes no Hijri date, because the first day
-     * follows the national moon-sighting announcement and a computed date can be a day out. Off by default.
+     * Ramadan mode (F2 #5, G33). The user turns it on and off. When the calculated Hijri month is Ramadan the home
+     * screen offers it, but only a tap turns it on, because the calculated date can be a day out. Off by default.
      */
     val ramadanMode: Boolean = false,
+    /** The user's move of the calculated Hijri date, one day either way (INV-H1). */
+    val hijriAdjustment: HijriAdjustment = HijriAdjustment.None,
+    /** Where the Quran reader was left (phase 14). Backed up with the settings, so a new phone opens at the same ayah. */
+    val quranPosition: VerseRef? = null,
+    /** The daily nudge also mentions a waiting khatam portion (ADR-24). Off by default; it adds no notification. */
+    val khatamInNudge: Boolean = false,
+    /**
+     * The Bengali translation shown under each ayah and searched (ADR-26). Null until the user picks one: the app never
+     * picks a translation for them, so the Quran screen asks, and until then shows the Arabic alone.
+     */
+    val quranTranslation: Edition? = null,
 )
 
 private const val A = "app."
@@ -37,6 +52,10 @@ fun parseAppPrefs(stored: Map<String, *>): AppPrefs {
         onboarded = text("onboarded") == "true",
         districtId = text("districtId")?.let(DistrictId::of),
         ramadanMode = text("ramadanMode") == "true",
+        hijriAdjustment = HijriAdjustment.ofDays(text("hijriAdjustment")?.toIntOrNull() ?: 0),
+        quranPosition = text("quranPosition")?.let(::parseVerseRef),
+        khatamInNudge = text("khatamInNudge") == "true",
+        quranTranslation = text("quranTranslation")?.let(Edition::ofKey),
     )
 }
 
@@ -45,11 +64,28 @@ fun encodeAppPrefs(prefs: AppPrefs): Map<String, String> = buildMap {
     put(A + "silentMode", prefs.silentMode.name)
     put(A + "onboarded", prefs.onboarded.toString())
     put(A + "ramadanMode", prefs.ramadanMode.toString())
+    put(A + "hijriAdjustment", prefs.hijriAdjustment.days.toString())
+    put(A + "khatamInNudge", prefs.khatamInNudge.toString())
     prefs.districtId?.let { put(A + "districtId", it.value) }
+    prefs.quranPosition?.let { put(A + "quranPosition", "${it.surah.value}:${it.ayah}") }
+    prefs.quranTranslation?.let { put(A + "quranTranslation", it.key) }
 }
 
-/** The keys [encodeAppPrefs] can write, so a write removes a district that is no longer chosen. */
-fun appPrefKeys(): Set<String> = encodeAppPrefs(AppPrefs(districtId = DistrictId.of("x"))).keys
+/** "2:255" back to a position; anything else is no position. Whether the ayah exists is checked when the reader opens. */
+private fun parseVerseRef(text: String): VerseRef? {
+    val surah = text.substringBefore(':').toIntOrNull()?.let(SurahNumber::of) ?: return null
+    val ayah = text.substringAfter(':', "").toIntOrNull()?.takeIf { it >= 1 } ?: return null
+    return VerseRef(surah, ayah)
+}
+
+/** The keys [encodeAppPrefs] can write, so a write removes a district or a position that is no longer set. */
+fun appPrefKeys(): Set<String> = encodeAppPrefs(
+    AppPrefs(
+        districtId = DistrictId.of("x"),
+        quranPosition = SurahNumber.of(1)?.let { VerseRef(it, 1) },
+        quranTranslation = Edition.entries.first(),
+    ),
+).keys
 
 /** What one write does to the settings file: every key to put, and the stale keys to remove. Nothing else is touched. */
 class Edits(val remove: Set<String>, val put: Map<String, String>)

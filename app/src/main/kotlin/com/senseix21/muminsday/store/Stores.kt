@@ -4,11 +4,12 @@ import android.content.Context
 
 /**
  * One database helper per file and one settings reader per process. Receivers, the service and the activities all ask
- * here, so none of them opens its own SQLite connection (ADR-5). Not a DI container: a few functions and two fields.
+ * here, so none of them opens its own SQLite connection (ADR-5). Not a DI container: a few functions and their fields.
  */
 object Stores {
     private var alarmLogDatabase: Database? = null
     private var deedDaysDatabase: Database? = null
+    private var quranHelper: Database? = null
     private var legacyRemoved = false
 
     fun alarmLog(context: Context): AlarmLog = AlarmLog(
@@ -17,11 +18,22 @@ object Stores {
         },
     )
 
-    fun deedDays(context: Context): DeedDays = DeedDays(
-        synchronized(this) {
-            deedDaysDatabase ?: open(context, DEED_DAYS_FILE, deedMigrations).also { deedDaysDatabase = it }
-        },
-    )
+    fun deedDays(context: Context): DeedDays = DeedDays(userDataDatabase(context))
+
+    /** Shares the deed days' file: one backed-up database for everything the user records (ADR-18). */
+    fun salahLog(context: Context): SalahLog = SalahLog(userDataDatabase(context))
+
+    /** The khatam plan, in the same backed-up file (ADR-24). */
+    fun khatam(context: Context): KhatamStore = KhatamStore(userDataDatabase(context))
+
+    /** The Quran search database (ADR-23). One instance, so the reader and the search share one connection. */
+    fun quranDatabase(context: Context): Database = synchronized(this) {
+        quranHelper ?: Database(context.applicationContext, QURAN_FILE, quranMigrations).also { quranHelper = it }
+    }
+
+    private fun userDataDatabase(context: Context): Database = synchronized(this) {
+        deedDaysDatabase ?: open(context, DEED_DAYS_FILE, deedMigrations).also { deedDaysDatabase = it }
+    }
 
     private fun open(context: Context, file: String, history: List<Migration>): Database {
         removeLegacyDatabase(context.applicationContext)

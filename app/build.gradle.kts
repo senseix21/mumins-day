@@ -1,4 +1,5 @@
 import com.android.build.api.artifact.SingleArtifact
+import java.util.zip.ZipFile
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Element
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
@@ -6,6 +7,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
+}
+
+/** `name=sha256,...` from the `sha256 <hex> <file>` lines of `content/quran-SOURCES.md`, the record T-BUILD-6 reads. */
+fun recordedQuranHashes(): String {
+    val sources = rootProject.file("content/quran-SOURCES.md")
+    if (!sources.isFile) return ""
+    return Regex("^sha256 ([0-9a-f]{64}) (\\S+)$", RegexOption.MULTILINE).findAll(sources.readText())
+        .joinToString(",") { "${it.groupValues[2]}=${it.groupValues[1]}" }
 }
 
 android {
@@ -19,6 +28,8 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "0.1.0"
+        // INV-QT1 on the phone: the hashes T-BUILD-6 checks, so the app can check its own assets the same way (ADR-23).
+        buildConfigField("String", "QURAN_HASHES", "\"${recordedQuranHashes()}\"")
     }
 
     compileOptions {
@@ -224,7 +235,7 @@ abstract class CheckStrings : DefaultTask() {
             val en = english.getValue(key)
             if (bn.size != en.size) problems += "\"$key\" has ${bn.size} items in Bengali and ${en.size} in English"
         }
-        for ((key, expected) in mapOf("months" to 12, "weekdays" to 7)) {
+        for ((key, expected) in mapOf("months" to 12, "weekdays" to 7, "hijri_months" to 12)) {
             for ((language, resources) in mapOf("Bengali" to bengali, "English" to english)) {
                 val actual = resources[key]?.size
                 if (actual != expected) problems += "\"$key\" must have $expected items in $language, found ${actual ?: "none"}"
@@ -361,14 +372,99 @@ tasks.named("check") { dependsOn(checkStrings, reportL10nReview) }
 // must set both. deedsRequired stays off by default because content/deeds.json cannot exist until the reviewer delivers
 // it (G9): turning it on now would fail every build. What a release without the file does: the app shows no deed and
 // says so in a neutral message, it never falls back to anything else (INV-C1).
-val contentFiles = listOf("districts.json", "deeds.json").map { rootProject.layout.projectDirectory.file("content/$it") }
+val contentFiles = listOf("districts.json", "deeds.json", "zakat-rules.json", "duas.json", "hadith.json").map { rootProject.layout.projectDirectory.file("content/$it") }
 val stageReleaseContent = tasks.register<StageContent>("stageReleaseContent") {
     files.from(contentFiles)
     assets.set(layout.buildDirectory.dir("generated/releaseContent"))
     // Said in the build output so nobody ships a release and finds out from a user.
     val missing = contentFiles.filter { !it.asFile.isFile }.map { "content/" + it.asFile.name }
     doFirst {
-        missing.forEach { logger.lifecycle("release content: $it is missing, so this release build ships without it. A store build must pass the gate with -PdeedsRequired=true -PdistrictsRequired=true.") }
+        missing.forEach { logger.lifecycle("release content: $it is missing, so this release build ships without it. A store build must pass the gate with -PdeedsRequired=true -PdistrictsRequired=true -PzakatRulesRequired=true, and -PduasRequired=true -PhadithRequired=true for each kind it ships.") }
+    }
+}
+
+/**
+ * The Quran assets (ADR-23, ADR-26): every recorded file of `content/quran/`, its `translations/` folders included, into
+ * `assets/quran/`, byte for byte, in every build. T-BUILD-6 runs first, so a build that packages the text cannot skip the
+ * hash check (INV-QT1). Hidden files (a Finder `.DS_Store`) are not content and are neither staged nor checked.
+ */
+abstract class StageQuran : DefaultTask() {
+    @get:InputDirectory
+    abstract val source: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val assets: DirectoryProperty
+
+    @TaskAction
+    fun stage() {
+        val target = File(assets.get().asFile, "quran")
+        target.deleteRecursively()
+        target.mkdirs()
+        val root = source.get().asFile
+        root.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }.forEach { it.copyTo(File(target, it.relativeTo(root).path)) }
+    }
+}
+
+val stageQuran = tasks.register<StageQuran>("stageQuran") {
+    dependsOn(":tools:content-gate:checkQuranText")
+    source.set(rootProject.layout.projectDirectory.dir("content/quran"))
+    assets.set(layout.buildDirectory.dir("generated/quranAssets"))
+}
+
+/**
+ * Hisnul Muslim (ADR-27): unreviewed, kept only in the git-ignored `content/local/hisnul-muslim/`, copied byte for byte
+ * into `assets/hisnul-muslim/` of **debug builds only**, after its gate. Where the folder is absent (CI, a fresh clone)
+ * the output is empty and the screen says the collection is not in this build.
+ */
+abstract class StageHisnulMuslim : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val files: ConfigurableFileCollection
+
+    @get:Internal
+    abstract val source: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val assets: DirectoryProperty
+
+    @TaskAction
+    fun stage() {
+        val target = File(assets.get().asFile, "hisnul-muslim")
+        target.deleteRecursively()
+        val root = source.get().asFile
+        if (!root.isDirectory) return
+        target.mkdirs()
+        root.walkTopDown().filter { it.isFile && !it.name.startsWith(".") }.forEach { it.copyTo(File(target, it.relativeTo(root).path)) }
+    }
+}
+
+val hisnulDirectory = rootProject.layout.projectDirectory.dir("content/local/hisnul-muslim")
+val stageHisnulMuslim = tasks.register<StageHisnulMuslim>("stageHisnulMuslim") {
+    dependsOn(":tools:content-gate:checkHisnulMuslim")
+    source.set(hisnulDirectory)
+    files.from(fileTree(hisnulDirectory))
+    assets.set(layout.buildDirectory.dir("generated/hisnulAssets"))
+}
+
+/**
+ * T-BUILD-7 (ADR-27, INV-C1, INV-C6): the release APK holds no file from `content/local/`. Reads the packaged APK, so it
+ * proves what ships, not what the build script meant.
+ */
+abstract class CheckNoLocalContent : DefaultTask() {
+    @get:InputFiles
+    abstract val apkFolder: DirectoryProperty
+
+    @TaskAction
+    fun check() {
+        val apks = apkFolder.get().asFile.walkTopDown().filter { it.isFile && it.extension == "apk" }.toList()
+        if (apks.isEmpty()) throw GradleException("T-BUILD-7: no APK found in ${apkFolder.get().asFile}")
+        val found = apks.flatMap { apk ->
+            ZipFile(apk).use { zip -> zip.entries().toList().map { it.name }.filter { it.startsWith("assets/hisnul-muslim/") }.map { "${apk.name}: $it" } }
+        }
+        if (found.isNotEmpty()) {
+            throw GradleException("T-BUILD-7 failed: unreviewed local content in a release APK (ADR-27):\n" + found.take(10).joinToString("\n") { "  - $it" })
+        }
+        logger.lifecycle("local content gate: passed, ${apks.joinToString { it.name }} holds no assets/hisnul-muslim/ file.")
     }
 }
 
@@ -400,9 +496,20 @@ androidComponents {
         }
 
         variant.sources.assets?.addGeneratedSourceDirectory(stageLicenceTexts, StageLicenceTexts::assets)
+        variant.sources.assets?.addGeneratedSourceDirectory(stageQuran, StageQuran::assets)
 
         if (variant.buildType == "release") {
             variant.sources.assets?.addGeneratedSourceDirectory(stageReleaseContent, StageContent::assets)
+            val noLocalContent = tasks.register<CheckNoLocalContent>("check${name}HasNoLocalContent") {
+                group = "verification"
+                description = "T-BUILD-7: the ${variant.name} APK holds no file from content/local/ (ADR-27)."
+                apkFolder.set(variant.artifacts.get(SingleArtifact.APK))
+            }
+            tasks.named("check") { dependsOn(noLocalContent) }
+        }
+        // ADR-27: never in a release. The debug build only, and only where the local folder exists.
+        if (variant.buildType == "debug") {
+            variant.sources.assets?.addGeneratedSourceDirectory(stageHisnulMuslim, StageHisnulMuslim::assets)
         }
 
         tasks.named("check") { dependsOn(permissions, dependencies) }

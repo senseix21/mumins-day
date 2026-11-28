@@ -7,7 +7,9 @@ import android.util.Log
 import com.senseix21.muminsday.store.AlarmKind
 import com.senseix21.muminsday.store.LoggedAlarm
 import com.senseix21.muminsday.store.Outcome
+import com.senseix21.muminsday.store.StoredKhatam
 import com.senseix21.muminsday.store.Stores
+import com.senseix21.muminsday.khatam.portionWaits
 import java.time.Instant
 
 /**
@@ -21,40 +23,58 @@ fun deliver(context: Context, trigger: Trigger, now: Instant) {
         Trigger.Nudge -> nudge(context, now)
         is Trigger.Reminder -> {
             val alarm = trigger.alarm
-            val outcome = act(context, alarm.kind, alarm.plannedAt, now, noticeCode = alarm.noticeCode())
+            // A pre-reminder comes before the prayer, so it has nothing to mark yet.
+            val prayed = if (alarm.kind == AlarmKind.PreReminder) null else Notifications.PrayedTarget(alarm.salah, alarm.plannedAt)
+            val outcome = act(context, alarm.kind, alarm.plannedAt, now, noticeCode = alarm.noticeCode(), prayed = prayed)
             Stores.alarmLog(context).recordDelivered(alarm, now, outcome)
         }
         // Not logged: a test must not colour the reliability history.
-        is Trigger.Test -> act(context, AlarmKind.Adhan, trigger.plannedAt, now, noticeCode = TEST_NOTICE_CODE)
+        is Trigger.Test -> act(context, AlarmKind.Adhan, trigger.plannedAt, now, noticeCode = TEST_NOTICE_CODE, prayed = null)
     }
 }
 
 private const val TEST_NOTICE_CODE = 60
 
 /**
- * F4: one notification, and none when today's card is already done. Posted once per delivery and never again: nothing
- * schedules a second one, and the next day's nudge is a separate alarm the planner puts there.
+ * F4: one notification, and none when there is nothing to say. Posted once per delivery and never again: nothing
+ * schedules a second one, and the next day's nudge is a separate alarm the planner puts there. ADR-24: if the user
+ * asked, the same notification mentions a khatam portion waiting today.
  */
 private fun nudge(context: Context, now: Instant) {
-    val zone = Stores.settings(context).read().place.zone
-    if (nudgeNeeded(Stores.deedDays(context).get(now.atZone(zone).toLocalDate()))) Notifications.postNudge(context)
+    val store = Stores.settings(context)
+    val today = now.atZone(store.read().place.zone).toLocalDate()
+    val portionWaits = store.readApp().khatamInNudge &&
+        when (val stored = Stores.khatam(context).read()) {
+            is StoredKhatam.Plan -> portionWaits(stored.khatam, today)
+            StoredKhatam.NoPlan -> false
+        }
+    val nudge = nudgeFor(Stores.deedDays(context).get(today), portionWaits)
+    if (nudge != Nudge.Nothing) Notifications.postNudge(context, nudge)
 }
 
 private fun LoggedAlarm.noticeCode(): Int = salah.ordinal * AlarmKind.entries.size + kind.ordinal
 
-private fun act(context: Context, kind: AlarmKind, plannedAt: Instant, now: Instant, noticeCode: Int): Outcome {
+private fun act(context: Context, kind: AlarmKind, plannedAt: Instant, now: Instant, noticeCode: Int, prayed: Notifications.PrayedTarget?): Outcome {
     val silentMode = Stores.settings(context).readApp().silentMode
-    return act(context, kind, plannedAt, now, noticeCode, silentMode)
+    return act(context, kind, plannedAt, now, noticeCode, silentMode, prayed)
 }
 
-private fun act(context: Context, kind: AlarmKind, plannedAt: Instant, now: Instant, noticeCode: Int, silentMode: SilentMode): Outcome =
+private fun act(
+    context: Context,
+    kind: AlarmKind,
+    plannedAt: Instant,
+    now: Instant,
+    noticeCode: Int,
+    silentMode: SilentMode,
+    prayed: Notifications.PrayedTarget?,
+): Outcome =
     when (val action = chooseAction(kind, plannedAt, now, phoneBusy(context), muted(context, silentMode))) {
         is Action.Notify -> {
             val notice = when (action.reason) {
                 NoticeReason.TooLate -> Notifications.Notice.Missed
                 NoticeReason.Silent, NoticeReason.PreReminder, NoticeReason.PhoneBusy, NoticeReason.SilentMode -> Notifications.Notice.Reminder
             }
-            Notifications.post(context, notice, noticeCode)
+            Notifications.post(context, notice, noticeCode, prayed)
             Outcome.SilentNotification
         }
         is Action.Ring -> try {
@@ -65,11 +85,11 @@ private fun act(context: Context, kind: AlarmKind, plannedAt: Instant, now: Inst
         } catch (e: IllegalStateException) {
             // Includes ForegroundServiceStartNotAllowedException (API 31). Never silent (INV-S6): log it, tell the user.
             Log.e(LOG_TAG, "deliver: playback could not start", e)
-            Notifications.post(context, Notifications.Notice.Reminder, noticeCode)
+            Notifications.post(context, Notifications.Notice.Reminder, noticeCode, prayed)
             Outcome.RingFailed
         } catch (e: SecurityException) {
             Log.e(LOG_TAG, "deliver: playback not permitted", e)
-            Notifications.post(context, Notifications.Notice.Reminder, noticeCode)
+            Notifications.post(context, Notifications.Notice.Reminder, noticeCode, prayed)
             Outcome.RingFailed
         }
     }

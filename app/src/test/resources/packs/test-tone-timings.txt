@@ -1,0 +1,4 @@
+# TEST PACK timings: made up, for the tests only. surah|ayah|start_ms|end_ms
+1|1|0|400
+1|2|400|900
+1|3|1000|1500

@@ -12,10 +12,11 @@ Placeholders you must fill: `[COMPANY OR DEVELOPER NAME]`, `[SUPPORT EMAIL]`, `[
 
 | Fact | Label | Where |
 |---|---|---|
-| The manifest requests seven permissions and not `INTERNET` (ADR-12) | KNOWN | `app/src/main/AndroidManifest.xml`; gate output "permission gate: passed, 7 permissions, no INTERNET." (2026-11-27 build) |
+| The manifest requests eight permissions and not `INTERNET` (ADR-19 added `ACCESS_COARSE_LOCATION` to the seven of ADR-12) | KNOWN | `app/src/main/AndroidManifest.xml`; gate output "permission gate: passed, 8 permissions, no INTERNET." (2026-11-28 build) |
 | No code makes a network request: no `INTERNET`, no HTTP client, no socket code found | KNOWN for the search; ASSUMED complete | `grep -rn -i "http" app/src/main/kotlin` found one hit, a documentation URL in a comment (`sensors/Declination.kt`); without `INTERNET` a normal app cannot open a socket (ASSUMED platform behaviour) |
 | No analytics, ads, crash SDK or account: the only libraries are Kotlin and kotlinx-datetime (desugaring removed, ADR-14) | KNOWN | `05-licences.md` section 1; gate "4 libraries" |
-| **Location is never read, and no location permission is declared** (removed, ADR-12). The district is picked by hand | KNOWN | `grep -rn -i "location\|COARSE" app/src/main/kotlin` hits only two comments saying location is not used (`ui/OnboardingActivity.kt`, `ui/QiblaActivity.kt`) |
+| **Location is read only if the user taps "Find my district", once, only while the district screen is open; it is never stored and never sent.** Permission declared: `ACCESS_COARSE_LOCATION` only (ADR-19, reversing ADR-12). The district can always be picked by hand | KNOWN from the code; the on-device behaviour is not run | `app/.../ui/OneShotLocation.kt` (one `LocationManager` call; `stop()` from `DistrictActivity.onPause`), `ui/Districts.kt` (only the nearest district and a distance are kept in a field, never the position), `core/.../districts/Nearest.kt`; `grep -rn -i "LocationManager\|requestLocationUpdates" app/src/main/kotlin` finds only `OneShotLocation.kt` |
+| While the phone works out a position for the app, the phone's own location service may use the network. That is the operating system, not this app, which has no `INTERNET` permission | ASSUMED (general Android behaviour; not tested) | Platform documentation not re-read here |
 | **Vibration is never used, and `VIBRATE` is not declared** (removed, ADR-12) | KNOWN | `grep -rn -i "vibrator\|VibrationEffect"` found nothing |
 | Stored on the phone, in the app's private storage: planner settings and preferences (language, silent-mode choice, onboarded flag, chosen district id, the place coordinates and zone, asr convention, offsets, sehri margin, per-prayer reminder modes and pre-reminder minutes) | KNOWN | `store/Settings.kt`, `store/AppPrefs.kt`; file `settings` (`SharedPreferences`, `MODE_PRIVATE`) |
 | Stored: one flag "I did the brand's battery steps" | KNOWN | `store/Settings.kt` (`DeviceStore`, file `device`) |
@@ -39,11 +40,11 @@ Placeholders you must fill: `[COMPANY OR DEVELOPER NAME]`, `[SUPPORT EMAIL]`, `[
 > by itself.
 >
 > **What stays on your phone.** The app saves your choices on your phone only: your language, your district, your prayer-time
-> settings, which reminders are on, and the days you were shown or marked a daily deed. It also keeps a list of the last 30 days
+> settings, which reminders are on, and the days you were shown or marked a daily deed, and the prayers you mark in the Salah tracker. It also keeps a list of the last 30 days
 > of prayer reminders, with the time each one was planned and the time it arrived, so that the "Reminder health" screen can tell
 > you whether reminders are reliable. This is stored in the app's private storage and is removed when you uninstall the app or clear its data.
 >
-> **Your location.** The app does not read your location and has no permission to. You choose your district yourself.
+> **Your location.** The app asks for your approximate location only if you tap "Find my district", and only then. It reads your position once, while that screen is open, picks the nearest district on your phone, and forgets the position at once. It is never saved and never sent anywhere; the app has no internet permission. The only thing kept is the district you choose. If you do not allow it, you choose your district from a list and everything works the same. [REVIEW: wording by the founder and, for Bengali, a native speaker.]
 >
 > **Sending a report.** In Settings, "Send a report" opens your own email app with a message already written. You can read and change
 > it before sending, and you choose whether to send it. It contains the app version, your Android version, your phone's make and model, the
@@ -81,7 +82,7 @@ general knowledge: **ASSUMED**. The only KNOWN Play facts are the ones in `01-co
 | Does the app collect or share any of the required user data types? | **No** (draft) | The app sends nothing: no `INTERNET` permission (KNOWN). The only outbound path is a draft email the user sends themselves (section A). ASSUMED that a user-composed email through another app is not "collection by the developer"; UNKNOWN how Play's definitions treat the report email |
 | Is all of the user data encrypted in transit? | Not applicable if "no data collected" | ASSUMED the question is skipped when nothing is collected |
 | Can users request that data be deleted? | Not applicable / data is only on the device and removed by uninstall or "Clear data" | ASSUMED |
-| Location | Not collected (draft) | Never read and no permission declared (KNOWN, grep above; ADR-12) |
+| Location | Not collected (draft). If the form asks about approximate location: processed only on the device, not transmitted, not stored | Read once on a user's tap, kept in memory for the duration of one function and discarded; the app has no `INTERNET` (KNOWN from the code and manifest). Whether Play's definition of "collected" excludes data that never leaves the device: UNKNOWN until read in the live form (Play's help page on Data safety says data processed only on the device is not collected, ASSUMED from general knowledge, not fetched here) |
 | Backup | Android Auto Backup of settings and deed days to the user's Google account stays on and is disclosed (G41). Whether it counts against "no data collected" in Play's form: UNKNOWN until read there | Disclosed in the privacy page |
 | Privacy policy URL | `[PRIVACY PAGE URL]` | G15 |
 
@@ -125,7 +126,7 @@ Not KNOWN to be accepted: UNKNOWN until submitted.
 ## D. UNKNOWNs and decisions for the founder or a lawyer
 
 1. **Backup.** DECIDED (G41): kept and disclosed. The manifest has `allowBackup="true"` with rules that back up settings and deed days (KNOWN).
-2. DECIDED: `ACCESS_COARSE_LOCATION` and `VIBRATE` removed (ADR-12).
+2. DECIDED: `VIBRATE` removed (ADR-12). `ACCESS_COARSE_LOCATION` was removed there and came back on 2026-11-28 for "find my district" only (ADR-17 item 3, ADR-19). Play's permission declaration for location (when it applies, and whether a prominent in-app disclosure is required before the system prompt): UNKNOWN, to read in the live form; the screen already says what is read and what is kept before the button.
 3. Support email, privacy page URL, company or developer name, last-updated date (G15, G14). Founder.
 4. Whether the report email's retention, reader and purpose must be stated more fully, and by what law. Lawyer.
 5. Whether Bangladeshi, Play, or other rules require any further statement (data-controller identity, a data-protection act). **UNKNOWN; for a lawyer.** Nothing here is legal advice.
@@ -153,4 +154,48 @@ Searched Wikimedia Commons by its API (`list=search` in the File namespace for a
 | `File:Oldest_recording_of_the_Quran_1885.oga` | Public domain | 1885 recording | 1 min 30 s | Historic; too poor for a phone alarm |
 
 No short notification tone was searched for; the app's tone can be a synthesised beep made for it.
+
+## F. When `INTERNET` lands for packs (ADR-25): drafts that do not apply yet
+
+**Not in force.** Today the app has no `INTERNET` permission, `PACK_HOST` is empty and the pack manifest is empty
+(KNOWN: `app/src/main/AndroidManifest.xml`, `app/.../packs/PackHost.kt`, `app/src/main/assets/packs/manifest.txt`,
+`NetworkSurfaceTest`, 2026-11-28). Sections A to C above stay true until the one commit ADR-25 describes. Then these
+replace the matching parts. `[HOST]` is the founder's to fill; nothing here names a host.
+
+**F1. Facts the drafts would rest on** (KNOWN from the code as built 2026-11-28; on a phone: not run)
+
+| Fact | Where |
+|---|---|
+| A request is made only after a tap on Download or Continue on the "Downloadable packs" screen; nothing downloads in the background or on a schedule | `PacksActivity` is the only caller of `PackDownloads.start` (`NetworkSurfaceTest`) |
+| Requests go only to `[HOST]`, over https, for files listed in the manifest bundled in the app; redirects are not followed; plain http is refused by the code and by the network security config | `fetchFile`, `packUrl`, `network_security_config.xml` |
+| A request carries the file's path, `User-Agent: packs`, `Accept-Encoding: identity`, and `Range` when continuing; no identifier, cookie, account or query string | `fetchFile`, `DownloaderTest` |
+| The server necessarily sees the phone's IP address and the time of the request (ASSUMED: true of any internet request; what `[HOST]` logs and keeps is the host's policy, UNKNOWN) | — |
+| Downloaded packs are stored in the app's private files, are not backed up, are deleted by "Delete from the phone", by "Clear data" or by uninstalling | `PackFiles`, backup rules exclude the `file` domain |
+| A pack is used only if every file's SHA-256 matches the manifest; otherwise it is deleted and the screen says so | `PackFiles.accept`, `PackFiles.verified` |
+
+**F2. Privacy page, replacing "The short version" and adding a section (draft)**
+
+> **The short version.** Mu'mins DAY does not collect your information. It does not need an account, does not show ads,
+> and does not use analytics or crash-reporting services. Everything works without the internet. The app uses the
+> internet for one thing only: if you tap Download on the "Downloadable packs" screen, it downloads that pack from
+> [HOST].
+>
+> **Downloadable packs.** A download starts only when you tap. The app asks [HOST] for the pack's files and sends
+> nothing about you: no name, no account, no identifier of your phone. Like any server, [HOST] can see your internet
+> address and when you downloaded. [REVIEW: what [HOST] logs and how long it keeps it, from the host's own terms.] Packs
+> stay on your phone, are not backed up, and are removed when you delete them in the app, clear its data or uninstall
+> it. If you never tap Download, the app never connects to the internet.
+
+The Permissions paragraph gains: "internet, only to download a pack you chose".
+
+**F3. Data safety form (draft; Play's live form not read, G14)**
+
+| Question (as ASSUMED) | Draft answer | Reasoning |
+|---|---|---|
+| Does the app collect or share user data? | **No** (draft) | Requests carry no user data; the IP address reaching a server is a property of any connection. UNKNOWN whether Play counts a download server's access logs as collection by the developer; read the live form's definitions |
+| Is data encrypted in transit? | Yes | https only, cleartext refused (ADR-25) |
+| Does the app use the internet? | Yes, for optional downloads the user starts | |
+
+**F4. Open before that commit:** the host and who runs it (`[HOST]`); its logging policy; the pack's written permission
+in `content/`; the founder's yes recorded in the ADR; Play's live form re-read; the Bengali page by a native speaker.
 

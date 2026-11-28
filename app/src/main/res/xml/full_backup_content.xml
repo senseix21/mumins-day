@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 8 to 11. The same rule as data_extraction_rules.xml: the settings file and deed-days.db are in; the alarm log (alarm-log.db) and the device file (brand steps) are out because only listed paths are backed up (G34). -->
+<!-- Android 8 to 11. The same rule as data_extraction_rules.xml: the settings file and deed-days.db (deed days and the Salah log, ADR-18) are in; the alarm log (alarm-log.db) and the device file (brand steps) are out because only listed paths are backed up (G34). -->
 <full-backup-content>
     <include domain="sharedpref" path="settings.xml" />
     <include domain="database" path="deed-days.db" />

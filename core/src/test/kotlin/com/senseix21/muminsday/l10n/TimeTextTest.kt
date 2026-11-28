@@ -19,6 +19,7 @@ class TimeTextTest {
         pm = "PM",
         months = (1..12).map { "MONTH${"ABCDEFGHIJKL"[it - 1]}" },
         weekdays = (1..7).map { "DAY${"ABCDEFG"[it - 1]}" },
+        hijriMonths = (1..12).map { "HIJRI${"ABCDEFGHIJKL"[it - 1]}" },
     )
     private val english = bengali.copy(language = Language.English)
     private val dhaka = ZoneId.of("Asia/Dhaka")

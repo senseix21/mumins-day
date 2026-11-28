@@ -48,6 +48,16 @@ Each one is written so a test can fail it. Test ids refer to `04-verification.md
 | INV-C2 | The deed first computed for a calendar date is a pure function of that date and the content version: same date, same deed, offline, on every phone. Once a card has been shown it stays for that day, whatever updates arrive, unless its deed is retired. Within one content version the daily deed never repeats inside a cycle. "Show me another" gives the deed half a cycle away. (Reworded 2026-11-26: founder accepted the G4 and G5 proposals.) | T-PROP-8 |
 | INV-C3 | Every deed shows its source book and number. No reward, grading or quotation appears that is not in the reviewed record. | T-BUILD-4 |
 | INV-C4 | No screen, notification or widget ever shows a missed-day count, a broken streak, or wording that blames the user. | T-UI-2 (manual review) |
+| INV-C5 | The Salah tracker (phase 10) is private and never judges. It shows only what the user marked, never a count of prayers not marked, never a streak, never a comparison with another person or another day, and it never sends a notification about itself. Extends INV-C4; nothing it stores is read by any screen except the tracker. Added 2026-11-28 (ADR-17). | T-UI-2, T-UNIT (tracker view model has no field for a missed count) |
+| INV-C6 | Every content kind shipped after deeds (dua, hadith) passes the same gate as deeds: source, edition and number, grading as the reviewer wrote it, named reviewer, review date, status approved. Test fixtures are obviously fake and the store build refuses to ship them. Added 2026-11-28 (ADR-17). | T-BUILD-4 (one task per kind) |
+
+### Quran, Hijri and Zakat (added 2026-11-28, ADR-17)
+
+| Id | Invariant | Test |
+|---|---|---|
+| INV-QT1 | The Quran text, Arabic and any translation, is shipped byte for byte as its source published it. No code edits, normalises, truncates or reorders it. The build checks a hash of each bundled text file against the hash recorded with its licence, and fails on a mismatch. A translation is bundled only with its permission in writing recorded in `content/`; a publisher's published re-publishing terms, quoted exactly with URL and fetch time, count as that writing (founder, 2026-11-28, ADR-26). Footnotes are part of the text. Normalisation is allowed only for the search index, never for what is shown. | T-BUILD-6 (new) |
+| INV-H1 | Every Hijri date shown names the rule that produced it (for example "calculated" or "announced by X") and can be moved one day either way by the user. The app never presents a calculated date as an announcement. | T-UNIT (Hijri), T-UI-2 |
+| INV-Z1 | The Zakat calculator takes every rule (nisab basis, rate, unit conversions) from a file the reviewer signed. Claude's code contains none of those numbers except in test fixtures marked fake. It stores no amount the user typed unless the user taps save (built: there is no save, so nothing typed is stored). A rules file marked `test_fixture` cannot ship: the gate refuses it for `content/zakat-rules.json`. Amounts owed round up and the nisab's value rounds down (ADR-21). | T-BUILD-4 (rules file), T-UNIT |
 
 ### Localization
 

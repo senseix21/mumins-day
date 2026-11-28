@@ -412,15 +412,17 @@ decisions, and nothing here may break a v1 rule without an ADR and the founder's
 
 ## Founder track, part 2
 
-- [ ] Decide: after v1 ships, which phases form the first update (suggested: 10 to 12).
-- [ ] Decide: is network ever allowed in the main app (phase 16), or do audio packs live in a separate app? [ADR-6]
-- [ ] Decide: bring back "find my district" with coarse location (reverses ADR-12) [INV-P2, INV-P3].
-- [ ] Hijri authority: whose announcement decides the month (ASSUMED candidates: the National Moon Sighting Committee convened by the Islamic Foundation; confirm) [G33].
-- [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [F-Zakat].
+- [x] Decide: after v1 ships, which phases form the first update (suggested: 10 to 12). Founder said "All" 2026-11-28: build all of 9 to 17; ship order is decided at release (ADR-17).
+- [x] Decide: is network ever allowed in the main app (phase 16)? Yes, one host, packs only (founder, 2026-11-28, ADR-17).
+- [x] Decide: bring back "find my district" with coarse location: yes (founder, 2026-11-28, ADR-17). The manifest changes in phase 10, not before.
+- [ ] Hijri authority: whose announcement decides the month (KNOWN from one press report: the National Moon Sighting Committee at the Islamic Foundation announced Ramadan 1447; confirm it is the app's source) [Q10, G54]. Phase 11 shipped calculated-only meanwhile.
+- [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [Q11, G55]. The file format and gate are built (ADR-21); only the reviewer's file is missing.
 - [ ] Duas: the source text (Hisnul Muslim, Arabic) and a Bengali translation, each with a written licence; the reviewer for selection and wording.
 - [ ] Hadith: a source collection whose terms allow offline redistribution, a Bengali translation with a licence, and the reviewer for selection and grading.
-- [ ] Quran: an Arabic text source with its terms (ASSUMED: Tanzil Uthmani, which permits verbatim redistribution with credit; fetch and confirm) and a **Bengali translation with written permission** (KNOWN from earlier research: Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit).
-- [ ] Quran: an Arabic Uthmani font with a licence that allows bundling (candidates and licences UNKNOWN; research in phase 14).
+- [ ] Quran: an Arabic text source with its terms (ASSUMED: Tanzil Uthmani, which permits verbatim redistribution with credit; fetch and confirm) and a **Bengali translation with written permission** (KNOWN from earlier research: Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit). **Arabic half done 2026-11-28:** Tanzil v1.1 fetched, its terms read and quoted ("Permission is granted to copy and distribute verbatim copies of this text, but CHANGING IT IS NOT ALLOWED", source indicated, link to tanzil.net), bundled (`content/quran-SOURCES.md`, ADR-23). Translation half done 2026-11-28 (ADR-26, founder's decision): QuranEnc's Zakaria and Rowwad Bengali translations, bundled under QuranEnc's published terms. Open: the founder's read of "a link is made" offline (Q13).
+- [ ] Founder: QuranEnc condition 5, "Notifying the source (QuranEnc.com) of any note on the translation": tell QuranEnc the app republishes both translations offline, pass on any note users or the reviewer raise, and ask in writing whether `bengali_zakaria` (not offered for download) may be republished (Q15). Keep the reply in `content/`.
+- [ ] Founder, before each release: QuranEnc condition 6, check https://quranenc.com/api/v1/translations/list/bn and the index page for a newer version of either translation; a new version means a new download, hashes and versions (T-BUILD-6 and `TranslationCreditTest` then force the rest).
+- [x] Quran: an Arabic Uthmani font with a licence that allows bundling (candidates and licences UNKNOWN; research in phase 14). 2026-11-28: Amiri Quran 1.003, SIL OFL 1.1 read in full; covers all 69 code points of the text (measured); bundled with its licence. KFGQPC not researched.
 - [ ] Tafsir: a Bengali tafsir with written permission (phase 16).
 - [ ] Recitation: at least one reciter's audio with written permission, and a host for the packs (phase 16).
 - [ ] A reviewer for every new content kind; may be the same person as for deeds (G9).
@@ -434,110 +436,129 @@ content gate takes more than one kind of record.
 
 **Exit.** Decisions recorded as ADRs; the gate generalised with tests; v1 behaviour unchanged.
 
-- [ ] ADR-17: release order and the network question (founder track, first two items).
-- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested.
-- [ ] Content kinds: `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10].
-- [ ] Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships.
-- [ ] Storage plan: one SQLite database for user data (tracker, khatam); read-only bundled databases for Quran and hadith; numbered migrations continue [ADR-5].
-- [ ] Size budget per feature, measured against the 15 MB total (INV, `01` constraints).
-- [ ] New invariants written into `spec/01` before their code: tracker tone (INV-C4 extended), Quran integrity (INV-Q-text), Hijri attribution (INV-H1).
+- [x] ADR-17: release order, network, location, storage, size budget (2026-11-28, `spec/03`).
+- [ ] Navigation: a home screen with one entry per feature, platform Views, no library (ADR-11); back behaviour tested. Deferred to phase 10, the first phase with a new screen; an entry list with no entries would be a stub. Phase 10 added the smallest entry: one button on Home to the tracker (2026-11-28); the system back button is the whole back behaviour (BaseActivity). Back behaviour is not tested; stays open.
+- [x] Content kinds (deferred to phase 13, the second kind; ADR-17 item 5): `checkProvenance` reused by a `ContentKind` per type (deed, dua, hadith); one rotation helper shared; existing deed tests unchanged [INV-C1, ADR-10]. 2026-11-28 (ADR-22): `checkProvenanceOf` is the one check, the deed's `checkProvenance` wraps it; `content/pickForDay` is the one rotation; no deed test file was edited and all pass.
+- [x] (phase 13) Gate task per kind in `tools/content-gate`, each required in the store build only when that feature ships. 2026-11-28: `checkDuaContent`, `checkHadithContent` (and the debug twins); `-PduasRequired=true` / `-PhadithRequired=true`; seen failing with `-PhadithRequired=true` and no file. `tools/release.sh` does not pass them yet: the founder decides which kinds ship.
+- [x] Storage plan: `user-data.db` for tracker and khatam; read-only asset databases for Quran and hadith; numbered migrations continue [ADR-5, ADR-17 item 6]. Plan only; nothing built.
+- [x] Size budget per feature written in ADR-17 (allowances, ASSUMED); each content phase must measure its real size.
+- [x] New invariants written into `spec/01` before their code 2026-11-28: INV-C5 (tracker), INV-C6 (content kinds), INV-QT1 (Quran), INV-H1 (Hijri), INV-Z1 (Zakat); rows added to `spec/04`.
 
 ## Phase 10 · Widgets, Salah tracker, "find my district"
 
 **Outcome.** The next prayer at a glance on the home screen; a private, guilt-free record of
 prayers; an optional "find my district" button.
 
-**Widgets** (platform `AppWidgetProvider`, no new dependency)
-- [ ] Next-prayer widget and a five-times widget, Bengali digits [INV-L2].
-- [ ] Read the planner and clock only; the widget computes nothing [spec 03 forward path].
-- [ ] Updated from the alarm path's replan and at each prayer, never by a polling job; no new permission [INV-P3].
-- [ ] Shows "—" and a warning state when reminders are Degraded [INV-S6, INV-T7].
-- [ ] Tests: the widget's view model as a pure function; instrumented check on an emulator.
+**Widgets** (platform `AppWidgetProvider`, no new dependency). Built 2026-11-28 16:59 +0600 (KNOWN: `./gradlew build` green, lint clean, 8 JVM tests of the model). Nothing has been drawn on an emulator or a phone, so the behaviour items stay open.
+- [ ] Next-prayer widget and a five-times widget, Bengali digits [INV-L2]. Built (`app/.../widget/PrayerWidgets.kt`, two layouts, two provider files); digits come from the same `Texts` the home screen uses. Open: look at both on an emulator in both languages.
+- [x] Read the planner and clock only; the widget computes nothing [spec 03 forward path]. 2026-11-28: the model is `core/.../widget/WidgetModel.kt`, built only from `upcomingSalah` and `PrayerClock.dayTimes`; the shell only formats it.
+- [ ] Updated from the alarm path's replan and at each prayer, never by a polling job; no new permission [INV-P3]. Built: `replan` ends in `refreshWidgets`; one alarm (request code 1001) at the next prayer or local midnight; both provider files set `updatePeriodMillis="0"`; the permission gate is unchanged. Open: watch a widget change at a prayer on an emulator.
+- [ ] Shows "—" and a warning state when reminders are Degraded [INV-S6, INV-T7]. Built as: "—" where no time can be named (INV-T7), and a warning line in words under the times whenever `Health` is Degraded (INV-S6); the times themselves stay (see the 2026-11-28 LOG entry for why). Open: render check.
+- [x] Tests: the widget's view model as a pure function (7 tests, `WidgetModelTest`, 2026-11-28).
+- [ ] Tests: instrumented check on an emulator. Not run.
 
-**Salah tracker**
-- [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41].
-- [ ] "Prayed" action on the prayer notification, built by the one notification builder.
-- [ ] Manual tick on the home screen for today and the past 7 days.
-- [ ] Week view like the deed's: dots only. No counts, streaks, percentages or "missed" wording anywhere [INV-C4].
-- [ ] Never prompts about a prayer not marked; never a notification about the tracker.
-- [ ] Tests: tone rules as a string check over every tracker string; date attribution across midnight and travel.
+**Salah tracker.** Built 2026-11-28 17:04 +0600 (KNOWN: `./gradlew build` green). Not run on an emulator or phone.
+- [ ] Table `salah_log(local_date, salah, prayed_at)`, one migration, backed up with deed days [ADR-5, G41]. Built as migration 2 of `deed-days.db`, so backup rules are unchanged (ADR-18, which amends ADR-17 item 6). Statements run by hand in the `sqlite3` CLI (insert, ignore duplicate, range select, delete: all as intended); `MigrationsTest` checks numbering and the backup rules. Open: the 1 to 2 upgrade on a device, and a backup/restore.
+- [ ] "Prayed" action on the prayer notification, built by the one notification builder. Built (`Notifications.post`, `PrayedReceiver`); only on silent notices, not on the Adhan's own notification (G53). Open: tap it on an emulator.
+- [ ] Manual tick on the home screen for today and the past 7 days. Built as `TrackerActivity`, reached by a button on Home (the Phase 10 navigation entry), not inline on Home. Open: look at it on an emulator, in both languages, at 200 % font.
+- [ ] Week view like the deed's: dots only. No counts, streaks, percentages or "missed" wording anywhere [INV-C4]. Built: five dots a day for eight days. Verified by `TrackerTest` (member names) and `TrackerStringsTest` (strings). Open: reviewer's read of the screen (T-UI-2).
+- [ ] Never prompts about a prayer not marked; never a notification about the tracker. By construction nothing reads the log except `TrackerActivity`; the only notification change is one action on an existing notice. Open: not machine-checked beyond that.
+- [x] Tests: tone rules as a string check over every tracker string (`TrackerStringsTest`, 4 tests, 2026-11-28); date attribution across midnight and a change of zone (`TrackerTest`, 8 tests including a property over 200 random windows, 2026-11-28).
 
-**Find my district** (only with the founder's yes)
-- [ ] ADR reversing ADR-12 for `ACCESS_COARSE_LOCATION` only; allowlist edit [INV-P3].
-- [ ] Read once while the district screen is open; never in the background; nothing stored but the chosen district [INV-P2, T-INST-11].
-- [ ] Nearest district from the 64 headquarters points; outside the bounding box or more than 50 km away asks before changing [F1#6, F1#7].
-- [ ] Privacy page and Data safety draft updated.
+**Find my district** (the founder's yes is recorded in ADR-17). Built 2026-11-28 17:08 +0600 (KNOWN: `./gradlew build --rerun-tasks` green, permission gate "passed, 8 permissions, no INTERNET"). Not run on an emulator or phone.
+- [x] ADR reversing ADR-12 for `ACCESS_COARSE_LOCATION` only; allowlist edit [INV-P3]. ADR-19; manifest, `app/allowlist/permissions.txt` and the permissions table in `spec/03` edited together; the gate counts 8 and a test run shows the build passing with them.
+- [ ] Read once while the district screen is open; never in the background; nothing stored but the chosen district [INV-P2, T-INST-11]. Built: `OneShotLocation` (one call, 20 s limit, `stop()` in `onPause`), only the district and a distance are kept. Open: T-INST-11 and the permission dialog on an emulator and a phone, including a phone with location off.
+- [x] Nearest district from the 64 headquarters points; outside the bounding box or more than 50 km away asks before changing [F1#6, F1#7]. `core/districts/Nearest.kt`, 10 tests (`NearestTest`: the 50 km edge, the box edge, the nearest wins, each of the 64 real points finds itself, the sea asks, a seeded property). Every case needs a tap; the two far cases show a warning panel first.
+- [ ] Privacy page and Data safety draft updated. Done in `spec/06` (facts table, privacy text, Data safety row, decision 2) and marked as drafts; stays open until the founder reads them and Play's live form is seen (Play's location declaration: UNKNOWN).
+- [ ] Runtime-permission flow with a clear denied state. Built (denied sentence plus the always-present district list); open: seen on a device.
 
 ## Phase 11 · Hijri date, ±1 day
 
-**Outcome.** The Hijri date on the home screen, following Bangladesh's announcement, with a
-one-tap ±1 day correction.
+**Outcome.** The Hijri date on the home screen, labelled with its rule, with a one-day correction. Built 2026-11-28 17:15 +0600 as a **calculated** date only; the authority is open (Q10, G54, ADR-20). Not run on an emulator or phone.
 
-- [ ] Vendor the engine repository's `hijri` module (Apache-2.0, KNOWN from its POM; depends only on kotlinx-datetime, already allowed) with a MODIFICATIONS note if changed [ADR-2 pattern].
-- [ ] `clock` gains `hijriDate(localDate, adjustment)`; adjustment is -1, 0 or +1, set by the user [spec 03 forward path].
-- [ ] The Hijri day changes at Maghrib, not midnight (ASSUMED convention; reviewer confirms) [INV-H1].
-- [ ] Optional: Ramadan mode suggests itself when the Hijri month is Ramadan, but still waits for the user's tap (G33 ruling stands).
-- [ ] Formatting only in `l10n`; Bengali month names from the native speaker.
-- [ ] Tests: against a published table of Hijri month starts for Bangladesh (source to fetch), and the ±1 property.
+- [x] ~~Vendor the engine repository's `hijri` module~~ Read line by line (cloned, 5 Kotlin files and `hijri.tsv`); **not vendored**: its table is Turkey's Diyanet and its other mode is the JDK calendar. A 60-line pure implementation of the tabular rule instead, source cited (ADR-20). `NOTICE` unchanged, nothing to modify.
+- [x] `core/hijri`: `calculatedHijri`, `gregorianOf`, `hijriReading(date, afterMaghrib, adjustment)`; the adjustment is a closed enum of -1, 0, +1 (2026-11-28, `HijriTest`). (Not on `clock`: a package of its own, as the plan allowed.)
+- [x] The Hijri day changes at Maghrib (ASSUMED convention; reviewer confirms, Q10); midnight where Maghrib cannot be computed. Tested with an instant either side of a Maghrib.
+- [x] Ramadan mode suggests itself in the calculated month of Ramadan and waits for the tap (`suggestsRamadanMode`, tested over 400 days).
+- [x] Formatting only in `l10n` (`hijriDateText`) and `Texts`; 13 Bengali strings drafted by Claude, all in `app/l10n-review.txt` (month names too).
+- [x] Tests: month length 29 or 30, the 30-year leap pattern and the 10,631-day cycle, both round trips (700 years weekly; every valid date 1300 to 1500 AH), the ±1 property over 1,500 days, Maghrib shift, independence of the default zone, the Umm al-Qura gap (worst 2 days over 1980 to 2070), one announced Bangladesh month start (press report; calculated is 1 day early). **No published table of Bangladesh month starts was found**, so there is no table test.
+- [ ] Reviewer: confirm the Maghrib day change, the rule wording and the Bengali month names [Q10].
+- [ ] Founder: which authority, and whether announced dates should ever be shipped [Q10, G54].
+- [ ] Look at Home and Settings on an emulator in both languages at 200 % font; tap the Ramadan suggestion [T-UI-2].
 
 ## Phase 12 · Zakat calculator
 
-**Outcome.** A pure, offline calculator in local units that shows its working.
+**Outcome.** A pure, offline calculator in local units that shows its working. Built 2026-11-28 17:24 +0600 on a FAKE rules file only; no real rule exists until the reviewer signs `content/zakat-rules.json` (Q11, ADR-21). Not run on an emulator or phone.
 
-- [ ] Pure `zakat` package in core: inputs in taka, bhori, ana, ratti and grams; outputs nisab, whether it is reached, and the amount.
-- [ ] Conversions fetched from a source and recorded (ASSUMED until then: 1 bhori = 11.664 g, 1 bhori = 16 ana, 1 ana = 6 ratti) [data rule].
-- [ ] Gold and silver prices typed by the user, with the date; the app never fetches them (no network) and says so.
-- [ ] Rules exactly as the reviewer signs them; the reviewer's note committed beside the rules, like deeds [INV-C1 pattern].
-- [ ] Shows every step of the working; no rounding against the payer's obligation.
-- [ ] Property tests: unit round trips, monotonicity, nisab boundary.
+- [x] Pure `zakat` package in core: inputs in taka, bhori, ana, ratti and grams; outputs nisab, whether it is reached, and the amount, as a sealed outcome (`Due`, `BelowNisab`, `HawlNotComplete`, `MissingPrice`) (`CalculatorTest`, 12 tests, 2026-11-28).
+- [ ] Conversions fetched from a source and recorded. One secondary, unattributed source found and recorded as a lead in G55 (11.664 g, 16 ana, 6 ratti); **not** put in any file or code. Stays open for the reviewer's primary source.
+- [x] Gold and silver prices typed by the user, with a date picked by the user; the screen says the app never fetches them and has no internet (`zakat_price_note`). Built; not seen on a device.
+- [ ] Rules exactly as the reviewer signs them; the reviewer's note committed beside the rules [INV-C1 pattern]. The file format, the gate (`checkZakatRules`, absent passes with a notice, a test fixture refused) and a FAKE debug fixture are built; the real file does not exist. Open until the reviewer delivers it.
+- [x] Shows every step of the working (weights in grams, each line and whether it counts, debts, net wealth, nisab with its price date, reached or not, rate, amount) and says the rounding directions on screen; amounts round up to the paisa, the nisab's value down, weights up (ADR-21).
+- [x] Property tests: unit round trips (bhori, ana, ratti and grams worth the same, 100 random), monotonicity in cash, debts and price (200, 200, 100 random), the nisab boundary (at it reached, one paisa below not), amount never below the exact share (200 random), no rule number in the source (checked by mutation: a planted 16 failed the test).
+- [x] Tests for the gate (`ZakatGateTest`, 7) and for number parsing and rounding text (`DecimalTest`, 2).
+- [ ] Reviewer: signs the rules; confirms the "at least the nisab" boundary and the Bengali labels [Q11].
+- [ ] Look at the Zakat screen on an emulator in both languages (debug build, fixture banner), at 200 % font, with Bengali digits typed [T-UI-2].
 
 ## Phase 13 · Daily duas and daily hadith
 
 **Outcome.** A short reviewed dua and a reviewed hadith each day, with source and grade,
-through the same gate as deeds.
+through the same gate as deeds. Built 2026-11-28 17:41 +0600 on FAKE records only (ADR-22); no real dua or hadith exists in the repository. Not run on an emulator or phone.
 
-- [ ] Record shapes for dua (Arabic, transliteration, Bengali, English, source, occasion) and hadith (Arabic, Bengali, English, collection, number, edition, grading).
-- [ ] Gates per kind, reusing provenance; store build requires the approved files [INV-C1, INV-C3].
-- [ ] Arabic shown right-to-left inside Bengali screens with isolates [INV-L3].
-- [ ] Rotation per kind, same rules as deeds (stable for the day, no repeats within a cycle) [INV-C2].
-- [ ] Optional nudge per kind? Decide; default off, at most one notification a day across all content kinds.
-- [ ] Fake records in debug only, like deeds.
+- [x] Record shapes for dua (Arabic, transliteration, Bengali, English, source, occasion) and hadith (Arabic, Bengali, English, collection, number, edition, grading). 2026-11-28 (ADR-22): `core/content/Kinds.kt`, one key table for both parsers; a dua also carries number, edition and grading (INV-C6); `KindGateTest.INV_C6_record_shapes_follow_the_plan`.
+- [ ] Gates per kind, reusing provenance; store build requires the approved files [INV-C1, INV-C3]. Gates built and tested 2026-11-28 (22 tests over both kinds, fixtures refused by the shipping gate); the allowed books are the reviewer's `sources` list in each file (Q12). Open: `tools/release.sh` does not set `-PduasRequired`/`-PhadithRequired` until the founder decides the kinds ship.
+- [ ] Arabic shown right-to-left inside Bengali screens with isolates [INV-L3]. Built 2026-11-28: `l10n.rightToLeft` (RLI ... PDI), tested with `java.text.Bidi` (`RightToLeftTest`: contents at an RTL level even for ASCII fixtures, neighbours stay at level 0); the gate refuses direction controls inside texts. Open: T-UI-3, a look on an emulator and phones.
+- [x] Rotation per kind, same rules as deeds (stable for the day, no repeats within a cycle) [INV-C2]. 2026-11-28: `content/RotationTest` (window of N shows each once, repeats after N, alternate differs from neighbours, deeds, duas and hadith pick the same index for 300 random dates). The shown record is not stored (G56).
+- [x] Optional nudge per kind? Decide; default off, at most one notification a day across all content kinds. Decided 2026-11-28 (Claude, reviewer and founder to confirm, ADR-22 item 5, Q12): no per-kind nudge; the deed nudge stays the only content notification. Nothing was added to the alarm path.
+- [x] Fake records in debug only, like deeds. 2026-11-28: `app/src/debug/assets/duas.json`, `hadith.json`, 30 records each, every text "TEST ..." or "পরীক্ষা ...", `test_fixture: true`; the shipping gate and a release-build loader refuse a fixture; release stages only `content/`.
+- [ ] Look at the Today screen on an emulator in both languages at 200 % font, with the fixture banner [T-UI-2, T-UI-3].
+- [ ] Reviewer: the `sources` list for each kind, the grading wording, the floor of 30, and the no-nudge decision [Q12].
+- [x] Hisnul Muslim reader, unreviewed, local and debug only (ADR-27; founder's request 2026-11-28). 2026-11-28 21:24 +0600: 313 raw API files in git-ignored `content/local/hisnul-muslim/`, only hashes and counts committed (`content/hisnul-muslim-SOURCES.md`); `core/hisnul` parses them exactly (`HisnulMuslimTest` 16 on fake fixtures, `HisnulRealFilesTest` 3, skipped without the files); `checkHisnulMuslim` gate (`HisnulGateTest` 6); debug-only staging; T-BUILD-7 reads the release APK (fails when forced to include them); `HisnulActivity` and `HisnulChapterActivity` from Home, seen on the API 36 emulator (list and chapter 1, `ui.sh` PASS, no crash). `./gradlew build --rerun-tasks` green with and without `content/local`.
+- [ ] Hisnul Muslim: who translated it and permission (Q16, founder); a reviewer's read (INV-C1, INV-C6) before it can reach any release [G67]. Not seen: English UI, 200 % font, chapters with notes only.
 
 ## Phase 14 · Quran: text offline, reader, verse search
 
 **Outcome.** The whole Quran in Arabic with a Bengali translation, readable and searchable
-with the radio off.
+with the radio off. Built 2026-11-28 with the real Tanzil Arabic text (ADR-23); the two QuranEnc Bengali translations (Zakaria, Rowwad) added the same day, the user picks (ADR-26). Not run on an emulator or phone.
 
-- [ ] Fetch the chosen Arabic text and translation; record source, version, licence and hash (founder track).
-- [ ] Bundled read-only SQLite database built at build time from the source files; the build fails if the text's hash differs from the recorded one (INV-Q-text: the Quran text is never modified).
-- [ ] Size measured against the budget (ASSUMED: text and one translation under 5 MB with an index; measure).
-- [ ] Reader: surah list, ayah view, Arabic in the licensed Uthmani font, translation below, last position remembered.
-- [ ] Verse search with SQLite FTS: Bengali and English words, Arabic with and without diacritics, surah:ayah lookup.
-- [ ] Credits and licence shown on the Licences screen and with the text as the licence requires.
-- [ ] Tests: every surah and ayah count matches the source; search finds known verses; the text round-trips byte for byte.
+- [x] Fetch the chosen Arabic text and translation; record source, version, licence and hash (founder track). Arabic done 2026-11-28 (`content/quran-SOURCES.md`: URLs, version 1.1, licence quoted, SHA-256 of five files). Translations done 2026-11-28 20:24 +0600 (ADR-26): QuranEnc `bengali_rwwad` v1.1.4 (whole XML) and `bengali_zakaria` v1.1.1 (114 sura API responses), URLs, fetch times, QuranEnc's seven terms quoted, SHA-256 of 115 files; 6236 ayahs each, per-surah counts equal the metadata. The permission is QuranEnc's published text, not a letter (Q15 for Zakaria).
+- [ ] Bundled read-only SQLite database built at build time from the source files; the build fails if the text's hash differs from the recorded one (INV-Q-text: the Quran text is never modified). **Changed by ADR-23:** the verified text files ship and the database is built on the phone (a build-time SQLite needs a JDBC library, INV-P4). Hash half done 2026-11-28: T-BUILD-6 (`checkQuranText`, `QuranGateTest` tampering) fails the build; `stageQuran` depends on it; the five files in the release APK have the recorded hashes. Open: the on-phone build and its read-back check have not run on a device.
+- [x] Size measured against the budget (ASSUMED: text and one translation under 5 MB with an index; measure). 2026-11-28: release APK 233,370 to 867,257 bytes (+633,887); compressed Quran assets 612,262 (ADR-17 line updated). Index size on a phone: UNKNOWN (built on the device). Re-measured with both translations 2026-11-28 20:24 +0600: 5,440,616 bytes (+4,540,512; Zakaria 3,933,814 compressed, Rowwad 571,890), over the 4 MB text allowance by about 1.1 MB (G66).
+- [ ] Reader: surah list, ayah view, Arabic in the licensed Uthmani font, translation below, last position remembered. Built 2026-11-28 (`QuranActivity`, `SurahActivity`, Amiri Quran, `AppPrefs.quranPosition` with a JVM round-trip test). Translation built 2026-11-28 (ADR-26): the chosen QuranEnc translation under each ayah and its footnotes under a label, exactly as the source has them; `AppPrefs.quranTranslation` null until the user picks (JVM round trip). Open: seen on an emulator and phones (T-UI-2, T-UI-3, INV-L4), the choice buttons, long footnotes at 200 % font.
+- [ ] The user's choice of translation: Zakaria or Rowwad, asked on the Quran and surah screens until picked, changeable in Settings (ADR-26). Built 2026-11-28; JVM: `AppPrefsTest`. Open: tap through it on an emulator.
+- [ ] Verse search with SQLite FTS: Bengali and English words, Arabic with and without diacritics, surah:ayah lookup. Built 2026-11-28: FTS4 (API 26 has FTS3/FTS4, no FTS5, KNOWN from AOSP), `quran.indexWords` for index and query only; `QuranTest` checks diacritics in and out give the same index words for all 6236 ayahs, 300 random ayahs are found from two of their own words in either text, references in three digit systems; the SQL ran by hand on desktop SQLite 3.54.1 with the real text. Bengali since 2026-11-28 over the chosen translation (ADR-26: one FTS4 query per word over `arabic_index` and the chosen edition's `translation_index`; `QuranEncTest` finds 300 random ayahs per translation from two of their own words with `MemoryIndex`; the schema and the search SQL ran by hand on desktop SQLite 3.54.1 with Rowwad's real text: 6236 rows read back equal, a two-word search finds its ayah). English: no English translation is bundled. Open: FTS on Android SQLite 3.18 on a device.
+- [ ] Credits and licence shown on the Licences screen and with the text as the licence requires. Built 2026-11-28: credit line on the reader and surah screens; Licences screen has the Tanzil and Amiri notices, the text's own copyright block read from the shipped file, and the OFL in full; `NOTICE` updated. Open: seen on a device; the offline "link" question (Q13). QuranEnc credit (ADR-26): title, QuranEnc.com and version under the translation; the seven terms, each edition's credit and Rowwad's `<meta>` block on the Licences screen; `NOTICE`; `TranslationCreditTest` checks them against `content/`. Not seen on a device.
+- [x] Tests: every surah and ayah count matches the source; search finds known verses; the text round-trips byte for byte. 2026-11-28: `QuranTest` (12; 114 and 6236 from the metadata, per-surah counts in both texts, byte-for-byte round trip, 2:255 found by reference and by its own words) and `QuranGateTest` (6). The database round trip is checked by the app on each rebuild; not run on a device.
+- [ ] On an emulator: first open (time it), a surah, search with and without diacritics, 2:255, the remembered position, the translation choice (the FAKE translation and its banner were removed by ADR-26), the Licences screen, Bengali digits, 200 % font [T-UI-2, T-UI-3, INV-L4].
+- [ ] Founder: Tanzil's "a link is made to tanzil.net" in an app with no internet, and joining Tanzil's update mailing list [Q13].
+- [x] Tests for the translations: 6236 ayahs and per-surah counts per translation, a one-byte tamper per translation fails the build, exact text. 2026-11-28 20:24 +0600: `QuranEncTest` (9), `QuranGateTest` (10), `TranslationCreditTest` (3), `AppPrefsTest`, `QuranSchemaTest`; `./gradlew build --rerun-tasks` green.
+- [ ] On an emulator: the first open after this update rebuilds the database with both translations (time it), footnotes of 2:1 in each, a Bengali two-word search, the choice and Settings, the Licences screen [G65, G66].
 
 ## Phase 15 · Khatam planner
 
-**Outcome.** A plan to finish the Quran by a date the user picks, with gentle progress.
+**Outcome.** A plan to finish the Quran by a date the user picks, with gentle progress. Built 2026-11-28 18:20 +0600 (ADR-24). Not run on an emulator or phone.
 
-- [ ] Table for the plan and progress (by juz, page or ayah: decide), one migration.
-- [ ] Daily portion computed from today to the target date; recomputed, never "behind" language [INV-C4].
-- [ ] Optional single daily reminder through the existing nudge path, off by default.
-- [ ] Opens the reader at today's portion.
-- [ ] Tests: portions sum to the whole Quran; date changes and travel; finishing early.
+- [x] Table for the plan and progress (by juz, page or ayah: decide), one migration. 2026-11-28: **ayah** (ADR-24: exact from the bundled metadata; juz shown, not used to divide); `khatam` is migration 3 of `deed-days.db`, one row (`CHECK (id = 1)`), backup rules unchanged. `MigrationsTest` (third step, no day or count column); the SQL ran by hand in `sqlite3` 3.54.0 (upgrade from 2, replace keeps one row, a second id refused by the CHECK).
+- [ ] The 2 to 3 upgrade of `deed-days.db` on a device, and a backup/restore with a plan in it.
+- [x] Daily portion computed from today to the target date; recomputed, never "behind" language [INV-C4]. 2026-11-28: `core/khatam/khatamToday`, sealed `KhatamDay` (`ToRead`, `Read`, `Complete`, `NewDateNeeded`); `KhatamTest` (member names) and `KhatamStringsTest` (28 strings, both languages). The screen's look is not checked (item below).
+- [ ] Optional single daily reminder through the existing nudge path, off by default. Built 2026-11-28: no new alarm or notification; `AppPrefs.khatamInNudge` (off) changes the words of the one nudge (`nudgeFor`, `TriggerTest`); shown in Settings only while the nudge has a time. Open: see the nudge's three texts on an emulator.
+- [ ] Opens the reader at today's portion. Built: `KhatamActivity` "Open today's portion" calls `openSurah` at the first unread ayah of the portion. Open: tap it on an emulator.
+- [x] Tests: portions sum to the whole Quran; date changes and travel; finishing early. 2026-11-28, `KhatamTest` (14): 159 plan lengths (0 to 7000 days) cover 6236 ayahs once with no gap or overlap by the target; target today hands out the rest; a past target is `NewDateNeeded`; finishing early stays `Complete` after the target; a zone change that moves the date back joins the marked day; 300 random sequences of reading, not reading, reading on, undo, date changes and travel keep `0 <= dayStart <= position <= 6236`.
+- [ ] Look at the khatam screen on an emulator in both languages at 200 % font; the reviewer's and native speaker's read of the 28 strings [T-UI-2, INV-C4].
 
 ## Phase 16 · Tafsir and recitation audio as downloadable packs
 
 **Outcome.** Optional downloads, verified and stored on the device, without weakening the
-privacy promise for anyone who never downloads.
+privacy promise for anyone who never downloads. Machinery built 2026-11-28 against a TEST PACK only, **without `INTERNET`** (ADR-25): no host exists and no tafsir or recitation has permission. Nothing can be downloaded in any build.
 
-- [ ] ADR reversing ADR-6 for one host only, with the founder's yes; or the separate-app option.
-- [ ] `INTERNET` added; allowlist edit; T-BUILD-1 changed to "no host other than the pack host is ever contacted", tested [INV-P1 replaced by a written new invariant].
-- [ ] Pack manifest bundled in the app (names, sizes, SHA-256); a downloaded pack is used only if its hash matches; no other request is ever made.
-- [ ] No analytics, no identifiers in requests, no request without a user tap.
-- [ ] Downloads resume, can be cancelled, and can be deleted; storage shown in Settings.
-- [ ] Audio player for recitation with verse sync (if the source provides timings).
-- [ ] Privacy page and Data safety form updated before release (`spec/06`).
+- [ ] ADR reversing ADR-6 for one host only, with the founder's yes; or the separate-app option. ADR-25 written 2026-11-28: the founder's yes for the main app is in ADR-17; ADR-25 defers `INTERNET` until a host is named and a pack has permission, and lists the one commit that adds it. Open: the host.
+- [ ] `INTERNET` added; allowlist edit; T-BUILD-1 changed to "no host other than the pack host is ever contacted", tested [INV-P1 replaced by a written new invariant]. **Deliberately not done** (ADR-25); the replacement INV-P1 is written in ADR-25 as proposed, not in `spec/01`. The permission gate still reports "no INTERNET" (2026-11-28).
+- [x] Pack manifest bundled in the app (names, sizes, SHA-256); a downloaded pack is used only if its hash matches; no other request is ever made. 2026-11-28: `assets/packs/manifest.txt` (empty), `core/packs/parseManifest` (`PacksTest`), `PackFiles.accept`/`verified` (`DownloaderTest`: a tampered file is deleted and never named; a checked file changed later deletes the pack); `NetworkSurfaceTest` (only `Downloader.kt` opens a connection; no URL literal; host in one file).
+- [x] No analytics, no identifiers in requests, no request without a user tap. 2026-11-28 on the JVM: `DownloaderTest` checks every request's headers against a fixed list and `User-Agent: packs`; `step` lets only `Tap` start requests (`PacksTest`, 3000 random sequences); `PackDownloads.start` is called only from `PacksActivity` (`NetworkSurfaceTest`). On a device: not run.
+- [ ] Downloads resume, can be cancelled, and can be deleted; storage shown in Settings. JVM part 2026-11-28 (`DownloaderTest`: resume with `Range: bytes=70000-` ends byte for byte; a server ignoring the range still gives the exact file; cancel keeps the bytes; delete leaves 0 bytes; a 416 deletes the partial file; `PacksTest`: 300 random interruption patterns rebuild the file). The Settings line and the screen are built, not seen on a device.
+- [ ] Audio player for recitation with verse sync (if the source provides timings). Built: `RecitationActivity` (`MediaPlayer`, re-hash before play, current ayah from `ayahAt` when the pack has timings, stops when the screen is left). The timing format is data (`parseTimings`, `PacksTest`); the FAKE tone pack and its timings are checked in `DownloaderTest`. Open: play anything on a device; no real pack exists.
+- [ ] Privacy page and Data safety form updated before release (`spec/06`). Drafted 2026-11-28 as `spec/06` F, marked "applies when `INTERNET` lands"; founder and host details open.
+- [ ] `HttpsURLConnection` on Android: the headers it adds, TLS to the real host, the downloads screen with a host (needs ADR-25's commit).
 
 ## Phase 17 · Proof and release of the update
 

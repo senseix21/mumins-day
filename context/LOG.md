@@ -541,3 +541,128 @@ Sizes, unit conversions, the Quran text licence and the Hijri authority are mark
 the plan until fetched.
 
 **Not done / follow-up.** Founder decisions at the top of Part 2's founder track.
+
+## 2026-11-28 16:52 +0600 · Phase 9: decisions and invariants
+
+**Did.** Pulled `main` (`e6c8044`; it already contained the Dhaka comparison commit). Recorded the founder's three decisions (all phases, internet for packs only, "find my district" back) as ADR-17 with storage plan and size budget; added INV-C5, INV-C6, INV-QT1, INV-H1, INV-Z1 to `spec/01` and rows to `spec/04`; ticked phase 9 and the three founder-track decisions.
+
+**Verified.** `./gradlew build` on `main` before the edit: exit 0, gates passed (64 districts, 7 permissions). The edit is documentation only; no code changed.
+
+**Not done / follow-up.** Navigation and the content-kind generalisation are deferred to phases 10 and 13, where the first user exists; reasons are in the plan lines. INV-P1 and ADR-12 are unchanged until phases 16 and 10 change the manifest.
+
+## 2026-11-28 16:59 +0600 · Phase 10, slice 1: home-screen widgets
+
+**Did.** Two platform widgets (next prayer, five times) with no library. Pure view model in `core/.../widget/WidgetModel.kt` (built on `upcomingSalah` and `PrayerClock.dayTimes`); shell in `app/.../widget/PrayerWidgets.kt`. `replan` now ends in `refreshWidgets`; one extra alarm (request code 1001, outside the planner's id space) redraws at the next prayer or local midnight, so prayers set to Off still keep the widget current. Degraded reminders show a warning line in words; "—" is shown where no time can be named. Added `Context.inLanguage` (shared by `BaseActivity` and the widgets). Five new keys in both languages, listed in `app/l10n-review.txt`.
+
+**Decision to confirm.** The plan line says "—" and a warning when Degraded. Most phones are Degraded by default (battery optimisation), so blanking the times would make the widget useless for them. The times stay (they are right); the warning line is added; "—" is for a time that cannot be computed.
+
+**Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 167 tests (7 new), `:app` 64, gates passed. **Not verified:** any drawing or behaviour of the widgets (no emulator or phone).
+
+## 2026-11-28 17:04 +0600 · Phase 10, slice 2: Salah tracker
+
+**Did.** `core/tracker` (model, date attribution, the eight-day window), `store/SalahLog`, `salah_log` as migration 2 of `deed-days.db` (ADR-18, amending ADR-17 item 6; backup rules unchanged), `TrackerActivity` (five dots a day, tap to mark or take back), a Home button to it, a "Prayed" action on silent prayer notices via the one `Notifications` builder and a non-exported `PrayedReceiver`. Six `tracker_` strings in both languages, listed in `app/l10n-review.txt`. Opened G53.
+
+**Verified.** `./gradlew build --console=plain`: BUILD SUCCESSFUL; `:core` 175 tests (8 new: window, attribution across midnight and zone change, a seeded property, member-name check), `:app` 69 (5 new: tone scan of every tracker string in both languages with a self-check that the scan catches bad examples, plurals ban, migration 2). The SQL of migration 2 was run by hand in the `sqlite3` CLI. **Not verified:** the upgrade from schema 1 to 2 on a device, the notification action, the screen, backup and restore (no emulator or phone).
+
+## 2026-11-28 17:08 +0600 · Phase 10, slice 3: find my district
+
+**Did.** ADR-19 (reverses ADR-12 for `ACCESS_COARSE_LOCATION` only; the founder's yes is the one recorded in ADR-17). Manifest, `app/allowlist/permissions.txt` and the permissions table in `spec/03` edited together; two `uses-feature` lines mark location hardware optional. `core/districts/Nearest.kt` (haversine, 50 km, bounding box), `ui/OneShotLocation.kt`, and a button, privacy sentence, result and denied states on `DistrictActivity`; the district list is always below. Ten new keys in both languages, in `app/l10n-review.txt`. Privacy page, Data safety and decision list in `spec/06` updated. F1 #6 in `spec/02` now says what was built. Also corrected the entry times of slices 1 and 2 in this file and in `PLAN.md`: I had typed 17:03, 17:44 and 17:40 by hand against the rule; the clock said 16:59 and 17:04 (the commit times).
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 269 tests (`:core` 185, `:app` 69, content gate 12, engine 3); permission gate "passed, 8 permissions, no INTERNET"; string gate "190 keys in Bengali and English"; lint clean with warnings as errors; release APK 202,510 bytes. **Not verified:** any behaviour on an emulator or phone (permission dialog, provider choice, the 20 second limit, T-INST-11, widgets, tracker screen, notification action, schema upgrade).
+
+## 2026-11-28 17:16 +0600 · Phase 11: Hijri date, calculated, with a one-day move
+
+**Did.** Cloned upstream (`metinkale38/open-prayer-times` at `0db43f9`) and read its `hijri` module line by line: its default data is a Diyanet (Turkey) table and its other mode is the JDK calendar, so it was not vendored (ADR-20; `NOTICE` unchanged). Wrote `core/hijri` (tabular civil calendar from the rules at https://en.wikipedia.org/wiki/Tabular_Islamic_calendar; `HijriRule` has one case, no `Announced`), `hijriDateText` in `l10n`, `AppPrefs.hijriAdjustment`, a Home line with the rule in words, a Settings choice of earlier, calculated, later, and Home's Ramadan-mode suggestion. 13 Bengali drafts listed in `app/l10n-review.txt`. Opened Q10 and G54; amended G33.
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 283 tests (`:core` 198, `:app` 70, gate 12, engine 3); string gate "203 keys in Bengali and English"; permission gate unchanged (8). Measured by `HijriTest`: worst gap to the JDK's Umm al-Qura calendar 1980 to 2070 is 2 days; the calculated first of Ramadan 1447 is 2026-02-18 against the announced 2026-02-19 (Dhaka Tribune 2026-02-18, https://www.dhakatribune.com/bangladesh/403655/holy-ramadan-begins-on-thursday). **Not verified:** any screen on an emulator or phone; no published table of Bangladesh month starts was found, so none is tested against; the Maghrib day change is ASSUMED.
+
+## 2026-11-28 17:24 +0600 · Phase 12: Zakat calculator on a fake rules file
+
+**Did.** `core/zakat` (rules type and check, calculator, sealed outcome with the full working), `l10n/Decimal.kt` (typed-number parsing with Bengali digits, rounding text in a stated direction), the gate `checkZakatRules` and `checkDebugZakatRules` in `tools/content-gate`, a FAKE `app/src/debug/assets/zakat-rules.json`, `ZakatActivity` and a Home button, `loadZakatRules` (platform `org.json`, same check as the gate). 36 `zakat_` strings in both languages, all listed in `app/l10n-review.txt` (labels only; the strings state no ruling). ADR-21; INV-Z1 text amended; opened Q11 and G55. No rule number is in any code; the conversions found online are in G55 only.
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 311 tests (`:core` 219, `:app` 70, gate 19, engine 3); `checkZakatRules` "no content/zakat-rules.json yet, nothing to check"; `checkDebugZakatRules` passed on the fixture; string gate "239 keys in Bengali and English"; permission gate unchanged. A planted literal `16` in `Calculator.kt` made `RulesTest` fail, then was removed. **Not verified:** the screen on an emulator or phone (layout, Bengali digit entry, date picker); any real rule, which does not exist.
+
+## 2026-11-28 17:43 +0600 · Phase 13: daily dua and daily hadith on fake records
+
+**Did.** Generalised the gate now that a second kind exists (ADR-22): `checkProvenanceOf` in `core/deed/Provenance.kt` is the one provenance check, generic over the kind's book type, and the deed's `checkProvenance` wraps it with v1's two books. New `core/content`: `ContentKind` (Dua, Hadith), the key table, `RawKindFile`, `checkKind` (texts, the reviewer's `sources` list, `test_fixture`, direction controls refused), `Reviewed` with a sealed `Body`, and `pickForDay`/`alternateForDay`, now also behind `deedFor`/`alternateFor`. `l10n.rightToLeft` (RLI...PDI). Gate tasks `checkDuaContent`, `checkHadithContent`, `checkDebugDuaContent`, `checkDebugHadithContent` (`KindMain`). FAKE fixtures `app/src/debug/assets/duas.json` and `hadith.json` (30 each, every text "TEST ..." or "পরীক্ষা ..."). `store/KindAssets.kt` (`org.json`; a fixture is accepted only when `BuildConfig.DEBUG`), `TodayActivity` and a Home button; release staging takes `content/duas.json` and `content/hadith.json` when they exist. Nine `today_` strings in both languages, all in `app/l10n-review.txt`. No notification added. Opened Q12, G56. I wrote no dua, hadith, book name or grading.
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 339 tests (`:core` 240, `:app` 70, gate 26, engine 3); no existing deed test file was edited (`git diff --stat` shows none under `core/src/test/.../deed`). Gate output: "dua gate: no content/duas.json yet", "hadith gate: no content/hadith.json yet", both debug fixtures "passed ... TEST FIXTURE (debug only)"; `./gradlew :tools:content-gate:checkHadithContent -PhadithRequired=true` failed as intended. String gate "248 keys"; permission gate "8 permissions, no INTERNET"; dependency gate "4 libraries". Release APK 233,370 bytes (unsigned). **Not verified:** the Today screen on an emulator or phone (layout, RTL rendering, T-UI-3), any real record.
+
+## 2026-11-28 18:01 +0600 · Phase 14: the Quran text, reader and verse search
+
+**Did.** Fetched, into new empty directories under `$TMPDIR` and never executed: https://tanzil.net/docs/text_license and https://tanzil.net/download/ (terms read and quoted in `content/quran-SOURCES.md`), the Tanzil Uthmani and Simple Clean texts v1.1 (`txt-2`, the page's default options), `quran-data.xml`, https://tanzil.net/updates/, Amiri 1.003 from its GitHub release (OFL read in full), and the AOSP `android-8.0.0_r1` SQLite makefile plus Android's SQLite version table. The terms permit verbatim redistribution in an application with the source and a link, so the Arabic text is bundled (`content/quran/`, `.gitattributes` keeps bytes). New `core/quran` (`parseText`/`render`, `parseMetadata`, `checkQuran`, `checkTranslation`, `indexWords`, `lookup`, `MemoryIndex`), T-BUILD-6 `checkQuranText` (`QuranMain`), `stageQuran` (depends on it) and the debug-only `generateFakeTranslation`, `BuildConfig.QURAN_HASHES`, `quranMigrations` (FTS4), `store/QuranStore.kt` (hash check on every open, rebuild with read-back), `QuranActivity`, `SurahActivity`, `AppPrefs.quranPosition`, Licences screen and `NOTICE` credits. 18 `quran_` strings in both languages, in `app/l10n-review.txt`. ADR-23; ADR-17 size line measured; opened Q13, G57, G58, G59. I typed no Quran text: every test word is taken from the files.
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 361 tests (`:core` 252, `:app` 74, gate 32, engine 3). Gate: "quran gate: passed. 5 files match their recorded SHA-256; 114 surahs, 6236 ayahs, as the metadata gives; 0 translation(s)." `QuranGateTest` changes one byte of each file, adds a newline, converts to CRLF: each fails. Release APK 867,257 bytes; `unzip` of it and `shasum -a 256` give the five recorded hashes; it holds no translation file; `./gradlew :app:assembleRelease --dry-run` runs `checkQuranText` and `stageQuran` and not `generateFakeTranslation`. Font coverage: a Python `cmap` reader found 0 of the text's 69 code points missing. The schema and search SQL ran by hand with Python's sqlite3 (desktop SQLite 3.54.1) on the real text: 6236 rows, byte-equal read-back, a two-word query from 2:255 finds 2:255 in each text. **Not verified:** anything on Android (database build, FTS4 on SQLite 3.18, first-open time, rendering, the screens), the offline reading of Tanzil's link term (Q13).
+
+## 2026-11-28 18:20 +0600 · Phase 15: khatam plan, counted in ayahs
+
+**Did.** Branch `phase-15-16-khatam-packs` from `phase-13-14-content-quran`. Read `quran-data.xml`: it has 30 `<juz>` starts and 604 `<page>` starts besides the surah counts. Chose ayahs as the unit (ADR-24). New `core/quran/parseJuzStarts`, `core/khatam` (`AyahIndex`, `AyahRange`, `QuranLayout`/`buildLayout`, `Khatam`, `startKhatam`, `restoreKhatam`, `khatamToday`, `markRead`, `undoToday`, `portionWaits`). `QuranReader.layout` built from the verified metadata in `openQuran`. Migration 3 of `deedMigrations` (`khatam`, one row), `store/KhatamStore.kt`, `Stores.khatam`. `KhatamActivity` and a Home button. `AppPrefs.khatamInNudge` (off), `nudgeFor` replacing `nudgeNeeded`, `Notifications.postNudge(context, nudge)` with three texts on the same id; the Settings switch shows only while the nudge has a time. 28 `khatam_` strings in both languages, all in `app/l10n-review.txt`. Opened Q14, G60, G61.
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 382 tests (`:core` 266, `:app` 81, gate 32, engine 3); permission gate "passed, 8 permissions, no INTERNET."; dependency gate "4 libraries"; string gate "294 keys in Bengali and English"; quran gate unchanged. `KhatamTest` and `KhatamStringsTest` pass (see `PLAN` phase 15). The migration SQL ran by hand in `sqlite3` 3.54.0: upgrade from version 2, `INSERT OR REPLACE` keeps one row, id 2 fails "CHECK constraint failed: id = 1". Release APK 879,473 bytes (`ls -l`). **Not verified:** anything on an emulator or phone (the screen, the date picker, the reader opening at the ayah, the nudge texts, the 2 to 3 upgrade, backup).
+
+## 2026-11-28 18:36 +0600 · Phase 16: pack machinery against a TEST PACK, `INTERNET` deferred
+
+**Did.** ADR-25: the downloader is built and tested, but `INTERNET` is not added; the commit that adds it and the proposed INV-P1 text are in the ADR. New `core/packs` (`Manifest.kt`, `Host.kt`, `Download.kt`, `Timings.kt`) and `app/.../packs` (`PackHost.kt` with `PACK_HOST = ""`, `Downloader.kt`, `PackFiles.kt`, `PackRun.kt`, `PackDownloads.kt`), `assets/packs/manifest.txt` (comments only), `res/xml/network_security_config.xml` and its manifest attribute, `PacksActivity`, `RecitationActivity`, a Settings section with the space packs use. TEST PACK fixtures in `app/src/test/resources/packs` (a "not a tafsir" line repeated, a generated triangle-wave WAV, made-up timings). `spec/06` F drafted for when `INTERNET` lands. 30 `packs_`/`recitation_` strings in both languages, all in `app/l10n-review.txt`. Read https://developer.android.com/reference/java/net/HttpURLConnection (gzip by default; `Accept-Encoding: identity` disables it). Opened G62, G63, G64. I wrote no tafsir, translation or recitation.
+
+**Verified.** `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 411 tests (`:core` 280, `:app` 96, gate 32, engine 3); permission gate "passed, 8 permissions, no INTERNET."; dependency gate "4 libraries"; string gate "324 keys in Bengali and English". `PacksTest` (14), `DownloaderTest` (10, local HTTPS server on 127.0.0.1 with a `keytool` certificate), `NetworkSurfaceTest` (5) pass. Release APK 900,104 bytes (`ls -l`); `unzip -l` shows `assets/packs/manifest.txt` and no pack. **Not verified:** anything on an emulator or phone (the screens, `MediaPlayer`, Android's `HttpsURLConnection` headers and TLS); no real host or pack exists to download.
+
+
+## 2026-11-28 18:54 +0600 · End-of-part-2 emulator pass (API 36), three fixes
+
+**Did.** On `phase-15-16-khatam-packs`, installed the debug APK on the API 36 emulator (`emulator-5554`), ran `tests/inst/run.sh`, `deed.sh`, `qibla.sh field`, then opened all 17 activities with `adb root` + `am start -n` and ran `tests/inst/ui.sh` on each, checking `logcat -b crash` after each.
+
+**Verified (KNOWN, those commands).** T-INST-1,2,3,4,5,7,8,9,10 PASS, T-INST-6 NOT RUN (API 36). deed.sh all PASS. qibla.sh field 7 of 7 PASS. Before the fixes: `ZakatActivity` crashed on open (NPE: `column()` in a field initializer, no Context yet); `QuranActivity` search box 125 px tall, under 48 dp (126 px); `ReminderHealthActivity` failed T-UNIT-9 because `ui.sh` read the dump's `&#10;` line break as Latin digits (script bug). After the fixes, Zakat, Reminder health, Quran and Home: T-UNIT-9, T-UI-target, T-UI-label PASS, 0 crashes. `./gradlew build` green.
+
+**Not done / follow-up.** `TodayActivity` fails T-UNIT-9 only on the fake fixture text ("TEST HADITH 3" has ASCII digits); real content is untested. `SurahActivity` needs a surah extra and was not opened alone. Not exercised: widgets, notification "Prayed" action, location dialog, khatam reminder, packs (no host), Recitation playback, API 26/31 runs of the new screens. Draft PR #2 opened for CI.
+
+## 2026-11-28 20:24 +0600 · Two QuranEnc Bengali translations, the user picks (ADR-26)
+
+**Did.** Branch `quran-bengali-translations` from `phase-15-16-khatam-packs` (dd179b5), on the founder's decision to bundle
+QuranEnc's `bengali_zakaria` and `bengali_rwwad` and not use github.com/imranpollob/bangla-quran. Fetched with `curl`
+into new empty temp directories, never executed: https://quranenc.com/en/home/api (terms: seven conditions, quoted
+exactly; the brief had five), https://quranenc.com/api/v1/translations/list/bn and `/list`, the `en` and `bn` index pages
+(titles, versions; Zakaria has no download buttons and is not in the list API), Rowwad's
+https://quranenc.com/downloads/xml/bengali_rwwad_v1.1.4-xml.1.xml, Zakaria's 114
+https://quranenc.com/api/v1/translation/sura/bengali_zakaria/{n} (1 to 101 at 19:04, the run stalled, 102 to 114 at
+20:13). Stored byte for byte under `content/quran/translations/`, 115 `sha256` lines and two `permission` lines in
+`content/quran-SOURCES.md`, terms in `content/quranenc-terms.txt`. Code: `core/quran/Translation.kt` (`Edition`,
+`checkTranslation` for both formats), `core/quran/Json.kt`, `Lookup.Words.terms`; gate reads subfolders and editions;
+`stageQuran` copies subfolders; FAKE translation removed; `quranMigrations` v2; `QuranStore` stores both and searches the
+chosen one; `AppPrefs.quranTranslation`; choice on Quran and surah screens and in Settings; credit and footnotes in the
+reader; Licences screen and `NOTICE`. 7 new string keys (5 Claude drafts in `app/l10n-review.txt`, 2 QuranEnc's own
+titles), 2 removed, 2 reworded. ADR-26; ADR-17 size line; INV-QT1 amended; `spec/02`, `spec/04`, `spec/05`; Q13 note,
+Q15, G65, G66. I wrote no translation text and changed none.
+
+**Verified.** Python scratch checks: Rowwad 114 suras, 6236 ayahs, counts equal `quran-data.xml`; Zakaria 6236, counts
+equal, all 114 files re-encode byte for byte. `./gradlew build --console=plain --rerun-tasks`: BUILD SUCCESSFUL; 428 tests
+(`:core` 288, `:app` 101, gate 36, engine 3). Gate: "quran gate: passed. 120 files match their recorded SHA-256; 114 surahs,
+6236 ayahs, as the metadata gives; 2 translation(s): bengali_zakaria 6236 ayahs, bengali_rwwad 6236 ayahs."; permission
+gate "8 permissions, no INTERNET"; dependency gate "4 libraries"; string gate "329 keys". Release APK 5,440,616 bytes
+(`ls -l`); its 120 `assets/quran/` files have the recorded hashes (`unzip`, `shasum -a 256`, `cmp`); no
+`translation-test` in either APK. The schema (both migrations) and the search SQL ran on desktop SQLite 3.54.1 with
+Rowwad's real text: 6236 rows read back equal, a two-word search finds its ayah. **Not verified:** anything on an emulator
+or phone (rebuild time, FTS4 on SQLite 3.18, screens, footnote layout at 200 %); QuranEnc's view on Zakaria (Q15).
+
+
+## 2026-11-28 20:34 +0600 · Quran footnotes: bold markup, shown on tap (G65)
+
+**Did.** Founder's yes in chat: `core/quran/Markup.kt` `boldMarkup` turns QuranEnc's paired `<b>…</b>` into bold ranges, removing only the tag characters; unpaired or nested markup is shown exactly as given. `SurahActivity` draws it with `StyleSpan` and hides each ayah's footnotes behind a "টীকা দেখুন / টীকা লুকান" button (two keys replace `quran_footnotes`; both Bengali are Claude drafts in `l10n-review.txt`). Also: the founder offered github.com/khalid-hussain/hisnulMuslimDB for duas; not used (no licence assigned, see QUESTIONS).
+
+**Verified.** `./gradlew build` green with `MarkupTest` (2000-case property: putting tags back at the ranges gives the source) and `QuranEncTest.G65_every_bundled_bold_tag_is_understood`. On `emulator-5554` (API 36): Al-Fatiha 1 opens with footnotes hidden, the tap shows them with the heading bold and no tag characters; `ui.sh` T-UNIT-9, target, label PASS; no crash.
+
+**Not done / follow-up.** Q15 (QuranEnc on Zakaria) still open.
+
+
+## 2026-11-28 21:24 +0600 · Hisnul Muslim reader, unreviewed, local and debug only (ADR-27)
+
+**Did.** Founder's request in chat ("add hisnul muslim"; "license doesn't matter, I'll talk to the developer later"). Branch `hisnul-muslim` from `quran-footnotes-display` (0221e33). Copied the 312 dua responses and `b1-chapters.json` byte for byte into `content/local/hisnul-muslim/` (`diff -r`, `cmp`: identical), git-ignored; committed only `content/hisnul-muslim-SOURCES.md` (URLs, fetch date, counts, translator UNKNOWN, founder's words, 313 SHA-256 lines) and `tools/fetch-hisnul-muslim.sh` (not run; its offline check step was run and passed). `core/hisnul`, gate `checkHisnulMuslim`, debug-only staging, T-BUILD-7, two screens and a Home button, 12 new string keys in both languages (Bengali Claude drafts, in `l10n-review.txt`). ADR-27, Q16, G67.
+
+**Verified.** `git check-ignore -v` names `.gitignore:27:content/local/` for the files; `git status` shows none of them. `./gradlew build --console=plain --rerun-tasks` green: 458 tests (312 `:core`, 101 `:app`, 42 gate, 3 engine), lint clean; "hisnul muslim gate: passed. 313 files match their recorded SHA-256; 133 chapters, 312 duas, 426 segments"; "local content gate: passed, app-release-unsigned.apk holds no assets/hisnul-muslim/ file"; string gate 342 keys. Same build with `content/local` moved away: green, gate "absent", `HisnulRealFilesTest` 3 skipped, debug APK 0 hisnul entries; moved back. `unzip -l`: release 0 entries, debug 313, and the 313 extracted from the debug APK match the recorded hashes (`shasum -a 256 -c`). With the debug-only condition forced off, `:app:checkReleaseHasNoLocalContent` failed listing the entries (reverted). `HisnulRealFilesTest`: 1809 texts found as written in their files, counts 414/409/390/315, 6 Arabic segments without Bengali. Emulator `emulator-5554` (API 36), Bengali: Hisnul list and chapter 1 (waking up) render, Amiri Arabic right to left, banner on both; `tests/inst/ui.sh` T-UNIT-9, target, label PASS on each; `logcat -b crash` no FATAL. Screenshots in the session scratchpad.
+
+**Not verified.** English UI, 200 % font, the search box on a device, a notes-only chapter, chapter 28's Latin digits (G67), U+06D4 fallback; any phone. Permission and translator (Q16); no review.
+
+## 2026-11-28 21:34 +0600 · Arabic line spacing
+
+**Did.** `arabicText` line-spacing multiplier 1.4 to 1.0: Amiri Quran's own metrics already leave room for marks, and wrapped Arabic lines had nearly a blank line between them.
+
+**Verified.** On `emulator-5554` (API 36): Hisnul chapter 1 and Al-Baqarah 255 (Ayat al-Kursi, dense marks and waqf signs) wrap with no mark touching the line above or below; no crash. `./gradlew :app:assembleDebug` green.

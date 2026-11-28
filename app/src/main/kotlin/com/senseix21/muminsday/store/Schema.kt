@@ -34,8 +34,10 @@ val alarmLogMigrations: List<Migration> = listOf(
 )
 
 /**
- * The deed days' history (G5, G34). This file is backed up, so it holds nothing about one phone's alarms. Numbered on
- * its own: version 1 here has nothing to do with version 1 of the alarm log.
+ * The backed-up user data's history (G5, G34): the deed days, then the Salah log (ADR-18), then the khatam plan
+ * (ADR-24), so the backup rules did not change for either. This file is backed up, so it
+ * holds nothing about one phone's alarms. Numbered on its own: version 1 here has nothing to do with version 1 of the
+ * alarm log.
  */
 val deedMigrations: List<Migration> = listOf(
     Migration(
@@ -51,6 +53,112 @@ val deedMigrations: List<Migration> = listOf(
                 done_at INTEGER
             )
             """.trimIndent(),
+        ),
+    ),
+    Migration(
+        version = 2,
+        statements = listOf(
+            // The Salah tracker (INV-C5, ADR-18): one row per prayer the user marked, on the local date it was prayed for.
+            // Only marked prayers have rows, so the table cannot hold anything about prayers not marked. prayed_at is
+            // epoch milliseconds, kept for the user's own record and read by no screen.
+            """
+            CREATE TABLE salah_log (
+                local_date TEXT NOT NULL,
+                salah TEXT NOT NULL,
+                prayed_at INTEGER NOT NULL,
+                PRIMARY KEY (local_date, salah)
+            )
+            """.trimIndent(),
+        ),
+    ),
+    Migration(
+        version = 3,
+        statements = listOf(
+            // The khatam plan (phase 15, ADR-24): at most one row, where the user has read to, counted in ayahs from 1:1.
+            // It holds no row per day, so nothing here can count a day without reading (INV-C4). end_ayahs is the text's
+            // own ayah count when the plan was made; marked_on and day_start keep today's portion fixed for the day.
+            // Dates are ISO yyyy-MM-dd local dates of the place.
+            """
+            CREATE TABLE khatam (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                started_on TEXT NOT NULL,
+                target_on TEXT NOT NULL,
+                end_ayahs INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                marked_on TEXT NOT NULL,
+                day_start INTEGER NOT NULL
+            )
+            """.trimIndent(),
+        ),
+    ),
+)
+
+/**
+ * The Quran search database's history (ADR-23). It is built on the phone from the verified assets and holds nothing of
+ * the user's, so it is never backed up (not listed in the backup rules) and can be deleted and rebuilt at any time.
+ * FTS4, not FTS5: API 26's SQLite is built with FTS3 and FTS4 only (KNOWN, AOSP `external/sqlite/dist/Android.mk` at
+ * android-8.0.0_r1: `-DSQLITE_ENABLE_FTS3`, `-DSQLITE_ENABLE_FTS4`, no FTS5). The `simple` tokenizer: every character
+ * above 127 is part of a word, and the app has already reduced each text to space-separated words (`quran.indexWords`),
+ * so the tokenizer only splits on spaces. `unicode61` is not used: whether API 26 has it was not established.
+ */
+val quranMigrations: List<Migration> = listOf(
+    Migration(
+        version = 1,
+        statements = listOf(
+            // content_key: the SHA-256 of every asset the rows were built from. A different key means rebuild.
+            // notice: the Tanzil copyright block, which its terms ask to reproduce in every derived file.
+            "CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+            "CREATE TABLE surah (number INTEGER PRIMARY KEY, name TEXT NOT NULL, ayah_count INTEGER NOT NULL)",
+            // text is the Uthmani ayah exactly as in the asset (INV-QT1); translation is null when none is bundled.
+            """
+            CREATE TABLE ayah (
+                id INTEGER PRIMARY KEY,
+                surah INTEGER NOT NULL,
+                ayah INTEGER NOT NULL,
+                text TEXT NOT NULL,
+                translation TEXT,
+                UNIQUE (surah, ayah)
+            )
+            """.trimIndent(),
+            // docid = ayah.id. Index words only, never shown.
+            "CREATE VIRTUAL TABLE ayah_index USING fts4(arabic, arabic_simple, translation, tokenize=simple)",
+        ),
+    ),
+    // ADR-26: two bundled translations, the user's choice shown and searched. The database holds nothing of the user's,
+    // so this step drops the version 1 tables and clears `meta`; the next open rebuilds every row from the assets.
+    // (`ALTER TABLE ... DROP COLUMN` needs SQLite 3.35; API 26 has 3.18.)
+    Migration(
+        version = 2,
+        statements = listOf(
+            "DROP TABLE ayah_index",
+            "DROP TABLE ayah",
+            "DELETE FROM meta",
+            "DELETE FROM surah",
+            """
+            CREATE TABLE ayah (
+                id INTEGER PRIMARY KEY,
+                surah INTEGER NOT NULL,
+                ayah INTEGER NOT NULL,
+                text TEXT NOT NULL,
+                UNIQUE (surah, ayah)
+            )
+            """.trimIndent(),
+            // docid = ayah.id. Index words of the Uthmani and Simple Clean texts only, never shown.
+            "CREATE VIRTUAL TABLE arabic_index USING fts4(arabic, arabic_simple, tokenize=simple)",
+            // One row per edition and ayah: text and footnotes exactly as the source has them (INV-QT1), "" for empty
+            // footnotes. edition is core's Edition.key.
+            """
+            CREATE TABLE translation (
+                id INTEGER PRIMARY KEY,
+                edition TEXT NOT NULL,
+                ayah_id INTEGER NOT NULL REFERENCES ayah (id),
+                text TEXT NOT NULL,
+                footnotes TEXT NOT NULL,
+                UNIQUE (edition, ayah_id)
+            )
+            """.trimIndent(),
+            // docid = translation.id. Index words of the translation's text (not its footnotes), never shown.
+            "CREATE VIRTUAL TABLE translation_index USING fts4(text, tokenize=simple)",
         ),
     ),
 )

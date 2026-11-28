@@ -21,7 +21,7 @@ Each feature starts with the case for cutting it. It stays only if that case fai
 | 3 | Exact-alarm permission denied or revoked | Home screen shows a persistent, plain-language warning with a one-tap fix. No silent inexact fallback | Silent fallback (S4) |
 | 4 | Notification permission denied | Same: visible warning. Adhan audio does not depend on the notification being shown (ASSUMED possible via the playback service; verify on Android 13+) | Not surfaced |
 | 5 | Location unavailable | Works from the stored district. Location is never needed to ring | Needs network for first setup (audit §6) |
-| 6 | GPS spoofing / wild fix | A fix outside Bangladesh, or more than 50 km **(target)** from the stored point, asks before changing the district | Auto-updates |
+| 6 | GPS spoofing / wild fix | A fix outside Bangladesh, or more than 50 km **(target)** from the stored point, asks before changing the district. Built 2026-11-28 for "find my district" as: outside the bounding box, or more than 50 km from the nearest headquarters point, shows a warning and needs a second tap (ADR-19) | Auto-updates |
 | 7 | Travel between districts | Offer to switch, once, when the nearest district changes. Never switch silently | Auto-updates when "auto location" is on |
 | 8 | Phone's time zone is not Asia/Dhaka | Alarms fire at the true instant for the chosen place (INV-S2) | Wrong instant (S3) |
 | 9 | Manual clock change, time-zone change | Reschedule within 60 s | Handled (KNOWN) |
@@ -184,12 +184,12 @@ Design seams for these are in `03-architecture.md`. None is built in v1.
 
 | Feature | Problem | Blocking unknown | Seam |
 |---|---|---|---|
-| Bangla Quran with tafsir, audio, offline | Core need; existing Bangla apps are cluttered (Sheet #7) | Written permission for a Bengali translation. Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit (both KNOWN from earlier fetches) | Content packs (downloaded, verified, stored on device). First feature that needs `INTERNET` |
-| Verse search | Users missed it when a competitor removed it (Sheet #3) | Depends on the Quran text | On-device full-text index |
-| Daily duas, Hisnul Muslim | Short daily practice (Sheet #7) | Source text and translation license; reviewer | Same content model and review gate as deeds |
-| Daily hadith with source and grade | Weak or mis-cited narrations (Sheet #13) | Data source terms (sunnah.com terms unverified) | Same content model |
+| Bangla Quran with tafsir, audio, offline | Core need; existing Bangla apps are cluttered (Sheet #7) | **Translation no longer blocked (2026-11-28, ADR-26):** QuranEnc's Bengali translations by Dr. Abu Bakr Muhammad Zakaria (v1.1.1) and Rowwad Translation Center (v1.1.4) are bundled under QuranEnc's published terms, the user picks one; Zakaria's coverage by those terms is to be confirmed with QuranEnc (Q15). Tafsir and audio still need a source with permission | Content packs (downloaded, verified, stored on device). First feature that needs `INTERNET` |
+| Verse search | Users missed it when a competitor removed it (Sheet #3) | Depends on the Quran text | On-device full-text index. Built 2026-11-28 (ADR-23): FTS4 over Arabic with and without diacritics and surah:ayah lookup; Bengali search over the user's chosen QuranEnc translation since 2026-11-28 (ADR-26); not run on a device |
+| Daily duas, Hisnul Muslim | Short daily practice (Sheet #7) | Source text and translation license; reviewer | Same review gate as deeds (ADR-22). Built 2026-11-28 on fake records: `TodayActivity`, one dua a day by the deed rotation, Arabic right to left, source and grading shown; no notification |
+| Daily hadith with source and grade | Weak or mis-cited narrations (Sheet #13) | Data source terms (sunnah.com terms unverified) | Same review gate (ADR-22). Built 2026-11-28 on fake records, same screen as duas; collection, number, edition and grading shown as the reviewer wrote them |
 | Salah tracker | Help staying consistent (Sheet #11) | None technical. Tone rules of INV-C4 apply | Local table; "Prayed" action on the Adhan notification |
 | Khatam planner | Few finish (Sheet #6) | Depends on Quran | Local table |
-| Zakat with bhori/ana | Local units (Sheet #7) | Reviewer sign-off on the calculation rules | Pure calculator, no data |
-| Hijri calendar, ±1 day | Moon sighting differs by country (Sheet #12) | Which authority's announcement to follow | `hijri` engine module is Apache-2.0 (KNOWN) |
+| Zakat with bhori/ana | Local units (Sheet #7) | Reviewer sign-off on the calculation rules (Q11) | **Built 2026-11-28** (ADR-21): the calculator is pure and holds no rule; the rules are `content/zakat-rules.json`, which does not exist until the reviewer signs it |
+| Hijri calendar, ±1 day | Moon sighting differs by country (Sheet #12) | Which authority's announcement to follow (Q10, G54) | **Built 2026-11-28 as a calculated date only** (ADR-20): tabular rule, user moves it a day, rule named on screen. The upstream `hijri` module was read and not vendored |
 | Widgets | Next prayer at a glance (Sheet #1) | None | Reads the same planner output |

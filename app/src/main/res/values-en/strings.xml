@@ -277,4 +277,211 @@
     <string name="settings_nudge_help">One quiet notification a day at the time you choose. If you do not open it, it does not come again.</string>
     <string name="settings_nudge_on">Nudge on</string>
     <string name="settings_nudge_time">Time: %1$s</string>
+
+    <!-- Home-screen widgets (phase 10). Bengali drafted by Claude, native review pending. -->
+    <string name="widget_next_label">Next prayer</string>
+    <string name="widget_five_label">Five prayer times</string>
+    <string name="widget_next_description">The next prayer at a glance.</string>
+    <string name="widget_five_description">Today\'s five prayer times.</string>
+    <string name="widget_degraded">Reminders may not ring. Open the app.</string>
+
+    <!-- Salah tracker (phase 10, INV-C5). Every tracker string has the prefix tracker_ so a test can scan them all. No digits, no counts, no judgement. Bengali drafted by Claude, native review pending. -->
+    <string name="tracker_title">Salah tracker</string>
+    <string name="tracker_help">Tap a prayer after you have prayed it. This stays on your phone and only you see it.</string>
+    <string name="tracker_today">Today</string>
+    <string name="tracker_prayer_open">%1$s, %2$s. Tap to mark as prayed</string>
+    <string name="tracker_prayer_marked">%1$s, %2$s: prayed. Tap to take the mark back</string>
+    <string name="tracker_prayed_action">Prayed</string>
+
+    <!-- Find my district (phase 10, ADR-19). Bengali drafted by Claude, native review pending. -->
+    <string name="find_button">Find my district</string>
+    <string name="find_privacy">Your position is read once, only while this screen is open. It is not saved and not sent anywhere. Only the district you choose is kept.</string>
+    <string name="find_reading">Finding your position…</string>
+    <string name="find_denied">Location was not allowed, so nothing was read. You can choose your district by hand below.</string>
+    <string name="find_unavailable">Your position could not be found. Location may be switched off, or the phone could not tell. You can choose your district by hand below.</string>
+    <string name="find_near">The nearest district is %1$s, about %2$s km away.</string>
+    <string name="find_use">Use %1$s</string>
+    <string name="find_outside">You seem to be outside Bangladesh. The nearest district is %1$s, about %2$s km away. Prayer times would be worked out for %1$s, not for where you are.</string>
+    <string name="find_far">No district is close to you. The nearest is %1$s, about %2$s km away.</string>
+    <string name="find_use_anyway">Use %1$s anyway</string>
+
+    <!-- Hijri date (phase 11, INV-H1). -->
+    <string-array name="hijri_months">
+        <item>Muharram</item>
+        <item>Safar</item>
+        <item>Rabi al-Awwal</item>
+        <item>Rabi al-Akhir</item>
+        <item>Jumada al-Ula</item>
+        <item>Jumada al-Akhira</item>
+        <item>Rajab</item>
+        <item>Shaban</item>
+        <item>Ramadan</item>
+        <item>Shawwal</item>
+        <item>Dhu al-Qadah</item>
+        <item>Dhu al-Hijjah</item>
+    </string-array>
+    <string name="hijri_line">Hijri: %1$s</string>
+    <string name="hijri_rule_calculated">Calculated by a fixed rule. It is not a moon-sighting announcement and can differ from the announced date by a day.</string>
+    <string name="hijri_rule_earlier">Calculated by a fixed rule, then moved one day earlier by you. It is not a moon-sighting announcement.</string>
+    <string name="hijri_rule_later">Calculated by a fixed rule, then moved one day later by you. It is not a moon-sighting announcement.</string>
+    <string name="hijri_rule_change_hint">You can move it a day earlier or later in Settings.</string>
+    <string name="settings_hijri">Hijri date</string>
+    <string name="settings_hijri_help">The calculated date can differ from the announced date by a day. Move it a day earlier or later if you need to. The Hijri date changes at Maghrib.</string>
+    <string name="hijri_adjust_earlier">One day earlier</string>
+    <string name="hijri_adjust_none">Calculated date</string>
+    <string name="hijri_adjust_later">One day later</string>
+    <string name="ramadan_suggest">By the calculated date this is the month of Ramadan. Turn on Ramadan mode?</string>
+    <string name="ramadan_suggest_on">Turn on Ramadan mode</string>
+
+    <!-- Zakat calculator (phase 12, INV-Z1). -->
+    <string name="zakat_title">Zakat calculator</string>
+    <string name="zakat_help">Works out the nisab and the amount by the rules the reviewer signed, and shows every step. What you type is not saved or sent anywhere.</string>
+    <string name="zakat_no_rules">There are no signed rules yet, so nothing can be calculated.</string>
+    <string name="zakat_rules_rejected">The rules file is incomplete, so nothing can be calculated.</string>
+    <string name="zakat_fixture_banner">TEST RULES: the numbers here are made up, only to try the app. Do not use this result.</string>
+    <string name="zakat_cash">Cash (taka)</string>
+    <string name="zakat_other">Other assets (taka)</string>
+    <string name="zakat_debts">Debts (taka)</string>
+    <string name="zakat_gold">Gold</string>
+    <string name="zakat_silver">Silver</string>
+    <string name="zakat_unit_bhori">Bhori</string>
+    <string name="zakat_unit_ana">Ana</string>
+    <string name="zakat_unit_ratti">Ratti</string>
+    <string name="zakat_unit_grams">Grams</string>
+    <string name="zakat_price_note">You type the price. The app never fetches prices; it has no internet.</string>
+    <string name="zakat_price_gold">Gold price per bhori (taka)</string>
+    <string name="zakat_price_silver">Silver price per bhori (taka)</string>
+    <string name="zakat_price_date">Price date: %1$s</string>
+    <string name="zakat_hawl">I have held this wealth for a full year</string>
+    <string name="zakat_calculate">Calculate</string>
+    <string name="zakat_bad_number">%1$s: not a number</string>
+    <string name="zakat_missing_price">Type the %1$s price; nothing can be calculated without it.</string>
+    <string name="zakat_working_title">The working</string>
+    <string name="zakat_step_weight">%1$s in grams: %2$s</string>
+    <string name="zakat_step_line">%1$s: %2$s taka</string>
+    <string name="zakat_step_not_counted">(not counted by the rules)</string>
+    <string name="zakat_step_debts">Debts taken off: %1$s taka</string>
+    <string name="zakat_step_net">Wealth counted: %1$s taka</string>
+    <string name="zakat_step_nisab">Nisab: %2$s grams of %1$s, worth %3$s taka at the price dated %4$s</string>
+    <string name="zakat_step_rate">Rate: %1$s percent</string>
+    <string name="zakat_reached_yes">The wealth has reached the nisab.</string>
+    <string name="zakat_reached_no">The wealth has not reached the nisab.</string>
+    <string name="zakat_below_nisab">Below the nisab: no amount.</string>
+    <string name="zakat_hawl_pending">The rules ask for a full year; you said it has not been a year.</string>
+    <string name="zakat_amount">Amount: %1$s taka</string>
+    <string name="zakat_rounding_note">The amount is rounded up to the paisa; the nisab\'s value is rounded down.</string>
+
+    <!-- Phase 13: today's dua and hadith (ADR-22). -->
+    <string name="today_title">Today\'s dua and hadith</string>
+    <string name="today_dua">Today\'s dua</string>
+    <string name="today_hadith">Today\'s hadith</string>
+    <string name="today_source">Source: %1$s, number %2$s (%3$s)</string>
+    <string name="today_grading">Grading, as the reviewer wrote it: %1$s</string>
+    <string name="today_occasion">When to read it: %1$s</string>
+    <string name="today_unavailable">This is not in this version of the app yet.</string>
+    <string name="today_rejected">The list has an error, so nothing is shown.</string>
+    <string name="today_fixture_banner">TEST TEXT: these records are made up, only to try the app. They are not a dua or a hadith.</string>
+
+    <!-- Phase 14: the Quran reader and search (ADR-23). -->
+    <string name="quran_title">Quran</string>
+    <string name="quran_preparing">Checking and preparing the Quran text. The first time can take a few seconds.</string>
+    <string name="quran_missing">This version of the app has no Quran text.</string>
+    <string name="quran_unverified">The Quran text could not be verified, so it is not shown. Try installing the app again.</string>
+    <string name="quran_credit">Arabic text: Tanzil Project (tanzil.net), unchanged. Details on the open-source licences page.</string>
+    <string name="quran_continue">Continue: surah %1$s, ayah %2$s</string>
+    <string name="quran_search_hint">An Arabic or Bengali word, or surah:ayah such as 2:255</string>
+    <string name="quran_search">Search</string>
+    <string name="quran_results">Ayahs where it was found</string>
+    <string name="quran_no_results">Nothing found.</string>
+    <string name="quran_no_such_verse">There is no surah or ayah with that number.</string>
+    <string name="quran_results_capped">Only the first ayahs found are shown. More words narrow the search.</string>
+    <string name="quran_search_arabic_only">No translation is chosen, so only the Arabic was searched.</string>
+    <string name="quran_surahs">Surahs</string>
+    <string name="quran_surah_title">Surah %1$s</string>
+    <string name="quran_ayah_number">Ayah %1$s</string>
+    <string name="quran_translation_choose_title">Choose a Bengali translation</string>
+    <string name="quran_translation_choose_help">Both translations come from QuranEnc.com, unchanged. The app does not choose one for you. Until you choose, only the Arabic is shown. You can change it later in Settings.</string>
+    <string name="quran_translation_credit">Translation: %1$s. Source and publisher: QuranEnc.com, version %2$s, unchanged.</string>
+    <string name="quran_footnotes_show">Show footnotes</string>
+    <string name="quran_footnotes_hide">Hide footnotes</string>
+    <string name="quran_edition_zakaria">Bengali Translation - Abu Bakr Zakaria</string>
+    <string name="quran_edition_rwwad">Bengali Translation - Rowwad Translation Center</string>
+    <string name="settings_quran_translation">Quran translation</string>
+
+    <!-- Phase 15: the khatam plan (ADR-24). Every key starts with khatam_ and is scanned by KhatamStringsTest. -->
+    <string name="khatam_title">Khatam plan</string>
+    <string name="khatam_help">Choose the date you would like to finish the Quran by. Each day the app works out today\'s portion afresh for the days until then.</string>
+    <string name="khatam_none">There is no plan.</string>
+    <string name="khatam_start">Choose a finish date</string>
+    <string name="khatam_target">Finish by: %1$s</string>
+    <string name="khatam_today">Today\'s portion</string>
+    <string name="khatam_range">From surah %1$s, ayah %2$s, to surah %3$s, ayah %4$s</string>
+    <string name="khatam_juz">Starts in juz %1$s</string>
+    <string name="khatam_open">Open today\'s portion</string>
+    <string name="khatam_mark_read">I have read it</string>
+    <string name="khatam_today_read">Today\'s portion is read.</string>
+    <string name="khatam_more_help">If you would like to read on, here is the next stretch. Tomorrow\'s portion will then be shorter.</string>
+    <string name="khatam_open_more">Open the next stretch</string>
+    <string name="khatam_mark_more">I have read this too</string>
+    <string name="khatam_undo">Take back today\'s mark</string>
+    <string name="khatam_complete">You have read the whole Quran in this plan.</string>
+    <string name="khatam_start_again">Start a new plan</string>
+    <string name="khatam_new_date">The date you chose has passed. Choose a new date to see a portion for each day.</string>
+    <string name="khatam_open_where">Open where you stopped</string>
+    <string name="khatam_change_date">Change the finish date</string>
+    <string name="khatam_end_plan">Remove this plan</string>
+    <string name="khatam_end_confirm">Remove this plan? Where you have read to is removed from the phone.</string>
+    <string name="khatam_end_yes">Remove</string>
+    <string name="khatam_end_no">Keep it</string>
+    <string name="khatam_nudge_portion">Today\'s Quran portion is ready to open.</string>
+    <string name="khatam_nudge_both">Today\'s good deed and Quran portion are ready to look at.</string>
+    <string name="khatam_settings_nudge">Also mention today\'s Quran portion</string>
+    <string name="khatam_settings_nudge_help">Only on a day the khatam plan has a portion. It is still one notification a day, at the same time.</string>
+
+    <!-- Phase 16: downloadable packs and the recitation player (ADR-25). No pack exists; the host is empty. -->
+    <string name="packs_title">Downloadable packs</string>
+    <string name="packs_not_available">Packs are not available yet. This version of the app downloads nothing and has no permission to use the internet.</string>
+    <string name="packs_privacy">A download starts only when you tap. The app asks one server for the file and sends nothing about you or your phone.</string>
+    <string name="packs_none">No packs are offered yet.</string>
+    <string name="packs_manifest_refused">The list of packs has an error, so nothing is offered.</string>
+    <string name="packs_kind_tafsir">Tafsir</string>
+    <string name="packs_kind_audio">Recitation</string>
+    <string name="packs_size">Size: %1$s MB</string>
+    <string name="packs_download">Download</string>
+    <string name="packs_resume">Continue the download</string>
+    <string name="packs_cancel">Stop</string>
+    <string name="packs_delete">Delete from the phone</string>
+    <string name="packs_listen">Listen</string>
+    <string name="packs_downloading">Downloading: %1$s of %2$s MB</string>
+    <string name="packs_stopped">Stopped at %1$s of %2$s MB. You can continue it.</string>
+    <string name="packs_verifying">Checking the file.</string>
+    <string name="packs_ready">Downloaded and checked.</string>
+    <string name="packs_failed_network">The download stopped because the connection was lost. You can continue it.</string>
+    <string name="packs_failed_refused">The server did not send the pack. You can try again.</string>
+    <string name="packs_failed_large">The server sent more than the pack\'s size, so the file was deleted.</string>
+    <string name="packs_failed_hash">The file did not match its check, so it was deleted. You can download it again.</string>
+    <string name="packs_settings_heading">Downloaded packs</string>
+    <string name="packs_settings_used">Space used: %1$s MB</string>
+    <string name="recitation_title">Recitation</string>
+    <string name="recitation_play">Play</string>
+    <string name="recitation_pause">Pause</string>
+    <string name="recitation_ayah">Now: surah %1$s, ayah %2$s</string>
+    <string name="recitation_no_timings">This pack has no verse timings, so the ayah is not followed.</string>
+    <string name="recitation_unverified">The file did not match its check, so the pack was deleted.</string>
+    <string name="recitation_cannot_play">This recitation cannot be played.</string>
+
+    <!-- Hisnul Muslim, unreviewed, debug builds only (ADR-27). -->
+    <string name="hisnul_title">Hisnul Muslim</string>
+    <string name="hisnul_opening">Opening…</string>
+    <string name="hisnul_unreviewed_banner">Not checked: no reviewer has read these duas yet. Source: the ThelightHub dua API (hisnul.workers.dev). Who made the Bengali translation is not known. The text is shown exactly as the source has it. This is in developer test builds only.</string>
+    <string name="hisnul_not_in_build">Hisnul Muslim is not in this version of the app.</string>
+    <string name="hisnul_refused">A dua file has an error, so nothing is shown.</string>
+    <string name="hisnul_search_hint">Search chapter names</string>
+    <string name="hisnul_search">Search</string>
+    <string name="hisnul_chapters">Chapters</string>
+    <string name="hisnul_no_chapters">No chapter has that in its name.</string>
+    <string name="hisnul_chapter_title">Chapter %1$s</string>
+    <string name="hisnul_dua_number">Dua %1$s</string>
+    <string name="hisnul_reference">Reference: %1$s</string>
+
 </resources>

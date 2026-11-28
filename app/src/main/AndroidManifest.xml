@@ -3,7 +3,8 @@
 
     <!--
         The whole list. app/allowlist/permissions.txt must match it exactly or the build fails (INV-P3).
-        There is no INTERNET permission and there never will be in v1 (INV-P1).
+        There is no INTERNET permission (INV-P1). The pack downloader exists (ADR-25) but INTERNET arrives only in one
+        commit with a named host and a pack that has permission; until then the permission gate fails on it.
     -->
 
     <!-- Ring the Adhan at the exact time. Granted at install on Android 13 and later. -->
@@ -21,6 +22,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <!-- Keep the phone awake while the Adhan plays. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--
+        "Find my district" (ADR-19, reversing ADR-12; the founder's yes is recorded in ADR-17). Coarse only, never fine.
+        Read once, only while the district screen is open, and never stored (INV-P2). Asked for at the tap on that
+        button, never at start.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Location hardware is optional: the district can always be chosen by hand, so no phone is filtered out of Play. -->
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +39,7 @@
         android:fullBackupContent="@xml/full_backup_content"
         android:icon="@drawable/ic_placeholder"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
@@ -48,6 +60,16 @@
         <activity android:name=".ui.BrandStepsActivity" android:exported="false" />
         <activity android:name=".ui.DeedActivity" android:exported="false" />
         <activity android:name=".ui.QiblaActivity" android:exported="false" />
+        <activity android:name=".ui.TrackerActivity" android:exported="false" />
+        <activity android:name=".ui.ZakatActivity" android:exported="false" />
+        <activity android:name=".ui.TodayActivity" android:exported="false" />
+        <activity android:name=".ui.QuranActivity" android:exported="false" />
+        <activity android:name=".ui.SurahActivity" android:exported="false" />
+        <activity android:name=".ui.KhatamActivity" android:exported="false" />
+        <activity android:name=".ui.HisnulActivity" android:exported="false" />
+        <activity android:name=".ui.HisnulChapterActivity" android:exported="false" />
+        <activity android:name=".ui.PacksActivity" android:exported="false" />
+        <activity android:name=".ui.RecitationActivity" android:exported="false" />
 
         <!--
             Not exported: only the system (protected broadcasts) and the app itself reach these. LOCKED_BOOT_COMPLETED is
@@ -67,6 +89,43 @@
 
         <receiver
             android:name=".alarm.AlarmReceiver"
+            android:exported="false" />
+
+        <!-- The "Prayed" action on a prayer notification (INV-C5). Only the app's own PendingIntent reaches it. -->
+        <receiver
+            android:name=".alarm.PrayedReceiver"
+            android:exported="false" />
+
+        <!--
+            The two widgets. AppWidgetProviders are exported: the launcher sends them APPWIDGET_UPDATE. Neither adds a
+            permission. The refresh receiver is the app's own alarm and is not exported.
+        -->
+        <receiver
+            android:name=".widget.NextPrayerWidget"
+            android:exported="true"
+            android:label="@string/widget_next_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.FiveTimesWidget"
+            android:exported="true"
+            android:label="@string/widget_five_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_five_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.WidgetRefreshReceiver"
             android:exported="false" />
 
         <service
