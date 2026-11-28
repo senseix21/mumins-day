@@ -1,10 +1,10 @@
 # State
 
-**Last updated:** 2026-11-27 22:10 +0600  
+**Last updated:** 2026-11-28 00:06 +0600
 
 **Where it runs.** The Mac (`ABUs-MacBook-Pro-2`) now builds and runs the app: JDK 21 from
 Homebrew, `local.properties` with `sdk.dir` (git-ignored), platform 37 and build tools 37
-installed. `./gradlew build --rerun-tasks` is green there (KNOWN, 2026-11-27): 142 tests in `:core`, 52 in `:app`, 12 in the content gate; the adb suite passes 9 of 10 T-INST ids (6 not run) and `tests/inst/ui.sh` passes. The `streambert`
+installed. `./gradlew build --rerun-tasks` is green there (KNOWN, 2026-11-27): 144 tests in `:core`, 52 in `:app`, 12 in the content gate; the adb suite passes 9 of 10 T-INST ids (6 not run) and `tests/inst/ui.sh` passes. The `streambert`
 emulator boots (20 s) and runs the debug APK. This answers the emulator half of G13; a physical
 phone is still needed for the reliability claim. Claude Code's sandbox blocks writes to the SDK
 folder and adb/emulator sockets, so those commands run with the sandbox off.
@@ -46,14 +46,15 @@ folder and adb/emulator sockets, so those commands run with the sandbox off.
 
 ## Next
 
-All six slices are built as far as they can be without the founder's inputs and without phones. Release APK 1,055,071 bytes, R8 on (ADR-15), desugaring gone (ADR-14), LGPL texts shipped in assets (ADR-13), 4 libraries, 7 permissions. Seen on an emulator only: alarms, store, screens, deed card (fake records), Qibla. Measured: APK 1,034,164 bytes, 142 tests in `:core`, 52 in `:app`, 12 in the content gate.
+All six slices are built as far as they can be without the founder's inputs and without phones. Release APK 1,055,071 bytes, R8 on (ADR-15), desugaring gone (ADR-14), LGPL texts shipped in assets (ADR-13), 4 libraries, 7 permissions. Seen on an emulator only: alarms, store, screens, deed card (fake records), Qibla. Measured: APK 1,034,164 bytes, 144 tests in `:core`, 52 in `:app`, 12 in the content gate.
 
 What blocks the rest, in order of leverage:
 1. **Decisions** (no work for anyone else): G38, G41, G42, G44, G45, G35, G33, default language (INV-L1), test-only dependencies, G26 and G30.
 2. **Content and data:** reviewer and `content/deeds.json` (G9); district list (Q4); Adhan recording (Q5); native Bengali speaker for 152 draft keys (G9); support email, developer name, privacy URL (G15).
-3. **Phones** (Q8, G13): M-1 to M-4, T-INST-6 (API 31 or 32), the accuracy half of T-INST-12, audible Adhan, brand steps, backup and restore.
-4. **A commit and a push** so CI runs the app (G46).
-5. Reference timetable for the prayer times (Q2). Lawyer on LGPL (Q6).
+3. **Phones** (Q8, G13): M-1 to M-4, the accuracy half of T-INST-12, audible Adhan (the audio-track count was 0 on every emulator, cause not investigated), brand steps, backup and restore. T-INST-6 now passes on an API 31 emulator; API 32 and a phone not run. Emulators `mumins_api26`, `mumins_api31`, `mumins_api35` exist (9 GB of images).
+4. ~~A commit and a push so CI runs the app (G46).~~ Done: merged as PR #1 (`a7d54ab` on `main`); CI green.
+5. Reference timetable for the prayer times (Q2): one city and one month now compared (G48): method matches; the reference point decides the minute. Lawyer on LGPL (Q6).
+6. **New decision (G48):** Foundation reference points per district, or true coordinates. Also G49 (Sehri margin 3 minutes in the table, 0 by default here), and the web leads for Q4 and Q5 in `QUESTIONS.md`.
 
 ## Waiting on the founder
 

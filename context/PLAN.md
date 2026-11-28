@@ -128,7 +128,7 @@ Tests
 - [x] Purity gate: no Android, clock or locale reads in `:core` main sources. 2026-11-26
 
 Still open
-- [ ] T-FIX-4: commit the reference table (8 cities × 365 days) and diff within 1 minute [INV-T4]. (blocked: Q2)
+- [ ] T-FIX-4: commit the reference table (8 cities × 365 days) and diff within 1 minute [INV-T4]. (blocked: Q2) Partial evidence 2026-11-27: `DhakaTableComparisonTest` against a secondary copy of the Foundation's Dhaka Ramadan 2026 table (30 days, one city): Iftar 30 of 30 exact and Fajr within 1 minute at reference longitude 90.2 E, but 1 to 2 minutes early at the city centre (G48). Not the full T-FIX-4.
 - [ ] If the diff shows a steady bias, set default offsets; if it shows disagreement, design the per-district timetable override [F2#7].
 - [ ] Reviewer rulings applied or confirmed [Q3, G19, G20]. (blocked: G9)
 - [ ] Measure: a year of times for one district in under 100 ms **(target)**; here on the JVM now, on the minimum phone in phase 7.

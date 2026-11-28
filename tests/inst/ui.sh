@@ -10,7 +10,8 @@ cd "$(dirname "$0")/../.."
 dump=$(mktemp); trap 'rm -f "$dump"' EXIT
 sh_ uiautomator dump /sdcard/u.xml >/dev/null; adb_ exec-out cat /sdcard/u.xml > "$dump"
 density=$(sh_ wm density | tr -d '\r' | grep -o '[0-9]*$' | tail -1); min=$(( 48 * density / 160 ))
-height=$(sh_ wm size | tr -d '\r' | grep -o '[0-9]*$' | tail -1)
+# The window bottom, not the screen: with 3-button navigation the app ends above the bar, and a view cut off there is scrolled.
+height=$(grep -oE 'bounds="\[0,0\]\[[0-9]+,[0-9]+\]' "$dump" | head -1 | grep -oE '[0-9]+\]$' | tr -d ']')
 
 latin=$(grep -oE '(text|content-desc)="[^"]*[0-9][^"]*"' "$dump" || true)
 if [ -z "$latin" ]; then result T-UNIT-9 PASS "no Latin digit in any text or content-desc on this screen"; else result T-UNIT-9 FAIL "$latin"; fi
