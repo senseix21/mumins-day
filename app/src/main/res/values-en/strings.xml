@@ -107,12 +107,55 @@
         <item>Open Apps > Special access and switch on \"Display pop-up windows of applications running in the background\" for alarm apps.</item>
         <item>Avoid the phone\'s power-saving modes.</item>
     </string-array>
-    <string-array name="brand_infinix_steps">
+    <string-array name="brand_tecno_steps">
         <item>Lock Mu\'mins DAY in the list of recent apps.</item>
         <item>Open Settings > Battery Lab > Battery Saving Settings and disable power saving management for apps.</item>
         <item>Open Phone Master > Toolbox > Auto-start management and switch auto-start on for this app.</item>
+        <item>In Phone Master, open Power Marathon and turn off Power Boost.</item>
+        <item>In Phone Master > Advanced Settings, turn off \"Screen off push block\", \"Screen off sleep\" and \"Screen off scheduled push\".</item>
     </string-array>
-    <string name="brand_infinix_note">These are the steps published for Tecno phones. Infinix\'s own steps could not be confirmed.</string>
+    <string-array name="brand_samsung_steps">
+        <item>Open Settings > Apps > Mu\'mins DAY > Battery > Battery optimization > All apps > Mu\'mins DAY and choose \"Don\'t optimize\".</item>
+        <item>Open Battery > Background usage limits, turn off \"Put unused apps to sleep\", and keep Mu\'mins DAY out of the sleeping lists.</item>
+        <item>Open Battery > More battery settings and turn off \"Adaptive battery\".</item>
+        <item>In Recent apps, long-press the app icon to lock Mu\'mins DAY, if your phone offers it.</item>
+        <item>Check these again after a system update: Samsung may switch them back.</item>
+    </string-array>
+    <string-array name="brand_oppo_steps">
+        <item>Lock Mu\'mins DAY in the list of recent apps.</item>
+        <item>Open App info > Allow Auto Start-up and switch it on.</item>
+        <item>In App info > Battery usage, choose \"Run in background\".</item>
+        <item>In the Security app, allow Mu\'mins DAY in \"startup manager\" and \"floating app list\".</item>
+        <item>Turn off battery optimisation for this app.</item>
+        <item>In App info > Power Saver, pick the option that lets the app run in the background.</item>
+    </string-array>
+    <string-array name="brand_vivo_steps">
+        <item>Lock Mu\'mins DAY in the list of recent apps (the \"lock\" or \"Lockdown\" option in its menu).</item>
+        <item>Open Settings > More settings > Applications > Autostart and switch on Mu\'mins DAY.</item>
+        <item>Open Settings > Battery > Background power consumption management (or \"High background power consumption\") and enable it for Mu\'mins DAY.</item>
+        <item>Open App Info > Battery > Battery Optimization and set Mu\'mins DAY to \"Not optimized\".</item>
+        <item>In the app\'s Battery page, if you can choose unrestricted battery usage, choose it.</item>
+    </string-array>
+    <string-array name="brand_oneplus_steps">
+        <item>Lock Mu\'mins DAY in Recent apps: long-press the app window and tap the lock button.</item>
+        <item>Open Settings > Battery > Battery optimization, switch to \"All apps\", open Mu\'mins DAY and choose \"Don\'t optimize\".</item>
+        <item>In that menu, open the three dots > Advanced optimization and turn off \"Deep optimization\" and \"Sleep standby optimization\".</item>
+        <item>If \"App Auto-Launch\" exists on your phone, turn it off for this app.</item>
+        <item>Look at these settings again from time to time: OnePlus can switch them back.</item>
+    </string-array>
+    <string-array name="brand_huawei_steps">
+        <item>Open Settings, search for \"Battery optimization\", choose All apps, and set this app to \"Don\'t allow\".</item>
+        <item>Open Phone settings > Battery > App launch, turn off \"Manage all automatically\" and switch every toggle on.</item>
+        <item>Open Settings > All > Startup manager and allow Mu\'mins DAY.</item>
+        <item>In System Manager, tap the cog icon and turn off \"Smart tune-up\".</item>
+    </string-array>
+    <string-array name="brand_motorola_steps">
+        <item>Open Settings > Apps > Mu\'mins DAY > App battery usage, tap the option with the toggle and choose \"Unrestricted\".</item>
+        <item>Open Settings > Battery and turn off \"Adaptive battery\".</item>
+        <item>In Mu\'mins DAY\'s app page > Advanced > Battery > Background restriction (or \"Background limits\"), tap \"Remove\" if it is restricted.</item>
+        <item>Search the settings for \"managing background apps\" and allow this app.</item>
+    </string-array>
+    <string name="brand_transsion_note">These are the steps published for Tecno phones. The steps for your phone\'s own brand could not be confirmed.</string>
     <string name="brand_open_settings">Open this app\'s settings</string>
     <string name="brand_confirm">I have done these steps</string>
     <string name="brand_confirm_note">The app cannot check this, so it takes your word.</string>

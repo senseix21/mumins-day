@@ -39,8 +39,22 @@ android {
         buildConfig = true
     }
 
+    // Play upload key (phase 8). Never in the repository: the four values come from the environment of the machine that
+    // makes the store build (see tools/release.sh). Without all four, the release build is simply left unsigned.
+    val uploadKey = listOf("MUMINS_UPLOAD_STORE_FILE", "MUMINS_UPLOAD_STORE_PASSWORD", "MUMINS_UPLOAD_KEY_ALIAS", "MUMINS_UPLOAD_KEY_PASSWORD")
+        .associateWith { providers.environmentVariable(it).orNull }
+    if (uploadKey.values.all { !it.isNullOrBlank() }) {
+        signingConfigs.create("upload") {
+            storeFile = file(uploadKey.getValue("MUMINS_UPLOAD_STORE_FILE")!!)
+            storePassword = uploadKey.getValue("MUMINS_UPLOAD_STORE_PASSWORD")
+            keyAlias = uploadKey.getValue("MUMINS_UPLOAD_KEY_ALIAS")
+            keyPassword = uploadKey.getValue("MUMINS_UPLOAD_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("upload")
             // ADR-15. Manifest components are kept by the plugin's generated rules; the app uses only platform APIs and
             // org.json, so no rules file is needed. Signing happens outside the repository.
             isMinifyEnabled = true

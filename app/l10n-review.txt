@@ -57,8 +57,14 @@ brand_title
 brand_intro
 brand_xiaomi_steps
 brand_realme_steps
-brand_infinix_steps
-brand_infinix_note
+brand_tecno_steps
+brand_samsung_steps
+brand_oppo_steps
+brand_vivo_steps
+brand_oneplus_steps
+brand_huawei_steps
+brand_motorola_steps
+brand_transsion_note
 brand_open_settings
 brand_confirm
 brand_confirm_note

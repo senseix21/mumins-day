@@ -96,11 +96,18 @@ Draft answer, to be adapted to the live form:
 
 Reasoning and risks:
 - KNOWN (Android docs, read 2026-11-27, `03-architecture.md` ADR-4): `USE_EXACT_ALARM` is granted automatically, cannot be revoked, and is "subject to an upcoming Google Play policy"; Play requires exact alarms to be core functionality (`01-constraints.md`, with URLs).
-- UNKNOWN: whether Play treats an Adhan or prayer-reminder app as an alarm-clock-type app for `USE_EXACT_ALARM`. The base (upstream) declares both and is on Play (KNOWN it declares both; its review history UNKNOWN).
+- **KNOWN, Play policy read 2026-11-28** (https://support.google.com/googleplay/android-developer/answer/16558241, "Permissions and APIs that Access Sensitive Information", section "Exact Alarm Permission"): `USE_EXACT_ALARM` "is a highly restricted permission used only for apps whose core, user-facing functionality genuinely requires precise timing, like dedicated alarm, timer, or calendar applications with event notifications". Acceptable use cases listed: "The app is an alarm or timer app" and "The app is a calendar app that shows event notifications". "If you have a use case for exact alarm functionality that's not covered above, you should evaluate if using SCHEDULE_EXACT_ALARM as an alternative is an option." The developer must "Complete Play Console declaration to indicate app functionality". Apps that do not meet the criteria "will be disallowed from publishing on Google Play".
+- Reading of that text (ASSUMED, the founder decides, G51): an Adhan app's core is alarms at prayer times, so "an alarm app" is a fair description, but it is not named. Declaring `SCHEDULE_EXACT_ALARM` alone (on every Android version, with the in-app grant step already built) removes the review risk at the cost of one permission step for the user on Android 13 and later.
+- UNKNOWN (unchanged): whether Play treats an Adhan or prayer-reminder app as an alarm-clock-type app for `USE_EXACT_ALARM`. The base (upstream) declares both and is on Play (KNOWN it declares both; its review history UNKNOWN).
 - Fallback already built (KNOWN, ADR-4): the Degraded state and the grant flow for `SCHEDULE_EXACT_ALARM`, so dropping `USE_EXACT_ALARM` is a one-line manifest change plus an allowlist edit. A rejection costs a review cycle.
 - Attach evidence: the Reminder-health screen and the late-alarm rule (INV-S7) show the app handles the case where exact alarms are denied honestly (T-UI-1: Not run).
 
 ### C3. Foreground service declaration (`mediaPlayback`)
+
+**KNOWN, read 2026-11-28** (https://support.google.com/googleplay/android-developer/answer/13392821, "Understanding foreground service and full-screen intent requirements"): for each type the declaration asks to "Describe the user impact if: the task is deferred by the system … and/or the task is interrupted by the system", and to "Include a link to a video demonstrating each foreground service feature. The video should demonstrate the steps the user needs to take in your app in order to trigger the feature." For `TYPE_MEDIA_PLAYBACK`: "Continue audio or video playback from the background … Show a user starting video or audio playback. **Playback must be user-initiated**; any automatic soundtracks that play when you open an app do not qualify."
+
+Risk (G52, founder): the Adhan starts from an alarm, not from a tap. It was set up by the user, which may or may not count as "user-initiated". The fallback is the `systemExempted` type, which Android documents for "Apps holding SCHEDULE_EXACT_ALARM or USE_EXACT_ALARM permission" (KNOWN, developer.android.com/develop/background-work/services/fgs/service-types, read 2026-11-28 by a research subagent). The video for either: turn a prayer's Adhan on, then show it playing at the prayer time with the Stop control.
+
 
 Draft answer:
 
@@ -122,9 +129,28 @@ Not KNOWN to be accepted: UNKNOWN until submitted.
 3. Support email, privacy page URL, company or developer name, last-updated date (G15, G14). Founder.
 4. Whether the report email's retention, reader and purpose must be stated more fully, and by what law. Lawyer.
 5. Whether Bangladeshi, Play, or other rules require any further statement (data-controller identity, a data-protection act). **UNKNOWN; for a lawyer.** Nothing here is legal advice.
-6. Whether the Play Data safety form's definitions count the user-sent report email, device backup, or the on-device alarm log as "collection". UNKNOWN until read in Play Console.
+6. Whether the Play Data safety form's definitions count the user-sent report email, device backup, or the on-device alarm log as "collection". Partly answered 2026-11-28 (https://support.google.com/googleplay/android-developer/answer/10787469): for data a user uploads "directly to their own external drive or cloud storage account … governed by the external drive or cloud storage provider's terms … and your app never collects or accesses the data in question, then your app does not need to declare the collection of this data." Android's own backup to the user's Google account looks like that case (ASSUMED by analogy; the page does not name Auto Backup).
+6a. **Closed testing, KNOWN 2026-11-28** (https://support.google.com/googleplay/android-developer/answer/14151465): "Developers with personal accounts created after November 13, 2023, must run a closed test for their app with a minimum of 12 testers who have been opted in continuously for at least 14 days." Production access is applied for on the Dashboard after that.
+6b. **Target API, KNOWN 2026-11-28** (developer.android.com/google/play/requirements/target-sdk, research subagent): "Starting August 31 2026: New apps and app updates must target Android 16 (API level 36) or higher". The app targets 37.
 7. Whether Play accepts `USE_EXACT_ALARM` for this app (ADR-4), and what the foreground-service declaration asks for in a demo. UNKNOWN until submitted; the plan has a fallback.
 8. "Designed for children" status and the content-rating questionnaire. UNKNOWN; founder.
 9. The Bengali privacy page: native speaker, after items 1 to 5 are decided.
 10. LGPL text is now in the app (ADR-13); the Classpath-Exception library is removed (ADR-14). Apache notices and the lawyer's reading: see `05-licences.md`, Q6.
 11. Whether the Adhan recording or the district data licence adds any statement the page must make (Q4, Q5).
+
+## E. Adhan recording candidates (Q5), found 2026-11-28
+
+Searched Wikimedia Commons by its API (`list=search` in the File namespace for adhan, azan, athan, "call to prayer", then `imageinfo` with `extmetadata`). Licences are as the file page states them (KNOWN for the statement, ASSUMED for its truth: Commons licences are given by the uploader). **Nothing was downloaded or bundled.** The founder chooses after listening; a recording made for the app, licensed in writing, is still the safest answer.
+
+| File (commons.wikimedia.org/wiki/…) | Licence stated | Author / uploader | Length | Note |
+|---|---|---|---|---|
+| `File:Beautiful_adhan.ogg` | CC0 | Adam-synagda / same | 2 min 34 s, 1.2 MB | Best fit so far: CC0 needs no credit; author and uploader are the same account. Reciter not named |
+| `File:Adhan.ogg` | CC0 | Aishatu98 / same | 42 s | Short; may be partial. Same uploader also gives `File:Iqamah.ogg` (CC0) |
+| `File:Adhan_in_Istanbul.webm` | CC0 | Viceskeeni2 / same | 50 s | A street recording inside a 65 MB video; audio would need extracting |
+| `File:Azan.ogg` | CC BY-SA 4.0 | Andrewler / same | 3 min 3 s | Share-alike: the credit and licence must travel with the audio; a lawyer should say whether that reaches the app (Q6) |
+| `File:The_Adhan_-_Muslim_Call_to_Prayer_-_Aaqib_Azeez.mp3` | CC BY-SA 4.0 | Atcovi / same | 1 min 27 s | Reciter named in the title; same share-alike question |
+| `File:Call_to_prayer_by_Sabah_Fakhry.mp3` | "Public domain" | Sabah Fakhri / Maher27777 | 2 min 38 s | **Risky:** uploaded by someone other than the performer; a modern recording is unlikely to be public domain |
+| `File:Oldest_recording_of_the_Quran_1885.oga` | Public domain | 1885 recording | 1 min 30 s | Historic; too poor for a phone alarm |
+
+No short notification tone was searched for; the app's tone can be a synthesised beep made for it.
+

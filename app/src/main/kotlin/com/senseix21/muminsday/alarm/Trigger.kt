@@ -135,11 +135,6 @@ fun chooseAction(kind: AlarmKind, plannedAt: Instant, now: Instant, phoneBusy: B
     }
 }
 
-/** Manufacturers named in the spec as stopping apps in the background (F1 story 3). Other brands: UNKNOWN, fetch each. */
-private val BRANDS_THAT_NEED_STEPS: Set<String> = setOf("xiaomi", "realme", "infinix")
-
-fun brandNeedsSteps(manufacturer: String): Boolean = manufacturer.trim().lowercase() in BRANDS_THAT_NEED_STEPS
-
 /** A mono 16-bit sine with a linear fade at both ends so it starts and stops without a click. */
 fun sineWave(sampleRate: Int, length: Duration, frequencyHz: Double, fade: Duration): ShortArray {
     val count = (length.toMillis() * sampleRate / 1000).toInt()

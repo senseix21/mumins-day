@@ -134,13 +134,6 @@ class TriggerTest {
     }
 
     @Test
-    fun `brands that need steps`() {
-        assertTrue(brandNeedsSteps("Xiaomi"))
-        assertTrue(brandNeedsSteps(" realme "))
-        assertEquals(false, brandNeedsSteps("Google"))
-    }
-
-    @Test
     fun `sine wave has the right length, stays inside the range and starts and ends at zero`() {
         val wave = sineWave(22_050, Duration.ofSeconds(2), 440.0, Duration.ofMillis(100))
         assertEquals(44_100, wave.size)

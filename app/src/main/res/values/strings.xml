@@ -121,12 +121,55 @@
         <item>Apps > Special access এ গিয়ে অ্যালার্ম অ্যাপের জন্য \"Display pop-up windows of applications running in the background\" চালু করুন।</item>
         <item>ফোনের পাওয়ার-সেভিং মোড এড়িয়ে চলুন।</item>
     </string-array>
-    <string-array name="brand_infinix_steps">
+    <string-array name="brand_tecno_steps">
         <item>সাম্প্রতিক অ্যাপের তালিকায় Mu\'mins DAY লক করে রাখুন।</item>
         <item>Settings > Battery Lab > Battery Saving Settings এ গিয়ে অ্যাপগুলোর জন্য পাওয়ার-সেভিং ম্যানেজমেন্ট বন্ধ করুন।</item>
         <item>Phone Master > Toolbox > Auto-start management এ গিয়ে এই অ্যাপের অটো-স্টার্ট চালু করুন।</item>
+        <item>Phone Master এ Power Marathon খুলে Power Boost বন্ধ করুন।</item>
+        <item>Phone Master > Advanced Settings এ গিয়ে \"Screen off push block\", \"Screen off sleep\" ও \"Screen off scheduled push\" বন্ধ করুন।</item>
     </string-array>
-    <string name="brand_infinix_note">এগুলো টেকনো ফোনের জন্য প্রকাশিত ধাপ। ইনফিনিক্সের নিজস্ব ধাপ নিশ্চিত করা যায়নি।</string>
+    <string-array name="brand_samsung_steps">
+        <item>Settings > Apps > Mu\'mins DAY > Battery > Battery optimization > All apps > Mu\'mins DAY খুলে \"Don\'t optimize\" বাছাই করুন।</item>
+        <item>Battery > Background usage limits খুলে \"Put unused apps to sleep\" বন্ধ করুন এবং Mu\'mins DAY যেন ঘুমানো অ্যাপের তালিকায় না থাকে দেখে নিন।</item>
+        <item>Battery > More battery settings খুলে \"Adaptive battery\" বন্ধ করুন।</item>
+        <item>ফোনে থাকলে, সাম্প্রতিক অ্যাপের তালিকায় অ্যাপের আইকন চেপে ধরে Mu\'mins DAY লক করুন।</item>
+        <item>সিস্টেম আপডেটের পর এগুলো আবার দেখে নিন, কারণ স্যামসাং সেটিংগুলো ফিরিয়ে দিতে পারে।</item>
+    </string-array>
+    <string-array name="brand_oppo_steps">
+        <item>সাম্প্রতিক অ্যাপের তালিকায় Mu\'mins DAY লক করে রাখুন।</item>
+        <item>App info > Allow Auto Start-up খুলে চালু করুন।</item>
+        <item>App info > Battery usage এ গিয়ে \"Run in background\" বাছাই করুন।</item>
+        <item>Security অ্যাপে \"startup manager\" ও \"floating app list\" এ Mu\'mins DAY এর অনুমতি দিন।</item>
+        <item>এই অ্যাপের জন্য ব্যাটারি অপটিমাইজেশন বন্ধ করুন।</item>
+        <item>App info > Power Saver এ গিয়ে যে বিকল্পে অ্যাপ ব্যাকগ্রাউন্ডে চলতে পারে সেটি বাছাই করুন।</item>
+    </string-array>
+    <string-array name="brand_vivo_steps">
+        <item>সাম্প্রতিক অ্যাপের তালিকায় Mu\'mins DAY লক করে রাখুন (মেনুতে \"lock\" বা \"Lockdown\" বিকল্প থাকে)।</item>
+        <item>Settings > More settings > Applications > Autostart এ গিয়ে Mu\'mins DAY চালু করুন।</item>
+        <item>Settings > Battery > Background power consumption management (বা \"High background power consumption\") খুলে Mu\'mins DAY এর জন্য চালু করুন।</item>
+        <item>App Info > Battery > Battery Optimization খুলে Mu\'mins DAY কে \"Not optimized\" করুন।</item>
+        <item>অ্যাপের Battery পাতায় বিনা সীমায় ব্যাটারি ব্যবহারের বিকল্প থাকলে সেটি বাছাই করুন।</item>
+    </string-array>
+    <string-array name="brand_oneplus_steps">
+        <item>Recent apps এ অ্যাপের জানালা চেপে ধরে লক বোতামে চেপে Mu\'mins DAY লক করুন।</item>
+        <item>Settings > Battery > Battery optimization খুলে \"All apps\" দেখুন, Mu\'mins DAY খুলে \"Don\'t optimize\" বাছাই করুন।</item>
+        <item>সেই মেনুর তিন ফোঁটা > Advanced optimization এ গিয়ে \"Deep optimization\" ও \"Sleep standby optimization\" বন্ধ করুন।</item>
+        <item>ফোনে \"App Auto-Launch\" থাকলে এই অ্যাপের জন্য সেটি বন্ধ করুন।</item>
+        <item>মাঝেমধ্যে এই সেটিংগুলো আবার দেখে নিন, কারণ ওয়ানপ্লাস সেগুলো ফিরিয়ে দিতে পারে।</item>
+    </string-array>
+    <string-array name="brand_huawei_steps">
+        <item>Settings এ \"Battery optimization\" খুঁজে খুলুন, All apps বাছাই করুন এবং এই অ্যাপের জন্য \"Don\'t allow\" দিন।</item>
+        <item>Phone settings > Battery > App launch খুলে \"Manage all automatically\" বন্ধ করুন এবং সব টগল চালু করুন।</item>
+        <item>Settings > All > Startup manager এ গিয়ে Mu\'mins DAY কে অনুমতি দিন।</item>
+        <item>System Manager এ গিয়ে গিয়ার আইকনে চেপে \"Smart tune-up\" বন্ধ করুন।</item>
+    </string-array>
+    <string-array name="brand_motorola_steps">
+        <item>Settings > Apps > Mu\'mins DAY > App battery usage খুলে টগলসহ বিকল্পটিতে চাপ দিন এবং \"Unrestricted\" বাছাই করুন।</item>
+        <item>Settings > Battery খুলে \"Adaptive battery\" বন্ধ করুন।</item>
+        <item>Mu\'mins DAY এর অ্যাপ পাতা > Advanced > Battery > Background restriction (বা \"Background limits\") এ সীমা দেওয়া থাকলে \"Remove\" চাপুন।</item>
+        <item>সেটিংসে \"managing background apps\" খুঁজে এই অ্যাপকে অনুমতি দিন।</item>
+    </string-array>
+    <string name="brand_transsion_note">এগুলো টেকনো ফোনের জন্য প্রকাশিত ধাপ। আপনার ফোনের নিজস্ব ব্র্যান্ডের ধাপ নিশ্চিত করা যায়নি।</string>
     <string name="brand_open_settings">এই অ্যাপের সেটিংস খুলুন</string>
     <string name="brand_confirm">আমি ধাপগুলো করেছি</string>
     <string name="brand_confirm_note">অ্যাপ এটি যাচাই করতে পারে না, তাই আপনার কথাই ধরে নেয়।</string>
