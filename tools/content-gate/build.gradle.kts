@@ -179,3 +179,23 @@ val checkHisnulMuslim = tasks.register<JavaExec>("checkHisnulMuslim") {
     inputs.files(fileTree(hisnulDirectory)).withPropertyName("hisnulMuslim")
 }
 tasks.check { dependsOn(checkHisnulMuslim) }
+
+/**
+ * ADR-28: eight hadith books from fawazahmed0's hadith-api, unreviewed, kept only in the git-ignored
+ * `content/local/hadith/`. Absent (CI, a fresh clone) passes with a notice; present, every file must have the SHA-256
+ * recorded in `content/hadith-books-SOURCES.md`, each book's two editions must pair, and the counts there must hold. The
+ * debug build's staging depends on this task; no release build packages the files (T-BUILD-7).
+ */
+val hadithBooksSources = rootProject.layout.projectDirectory.file("content/hadith-books-SOURCES.md")
+val hadithBooksDirectory = rootProject.layout.projectDirectory.dir("content/local/hadith")
+val checkHadithBooks = tasks.register<JavaExec>("checkHadithBooks") {
+    group = "verification"
+    description = "ADR-28: the local hadith books, when present, match their recorded SHA-256 and counts."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.senseix21.muminsday.tools.gate.HadithBooksMain")
+    args(hadithBooksSources.asFile.absolutePath, hadithBooksDirectory.asFile.absolutePath)
+    inputs.file(hadithBooksSources).withPropertyName("sources")
+    // A file tree, not inputs.dir: the folder is absent on every machine but the one that fetched it.
+    inputs.files(fileTree(hadithBooksDirectory)).withPropertyName("hadithBooks")
+}
+tasks.check { dependsOn(checkHadithBooks) }

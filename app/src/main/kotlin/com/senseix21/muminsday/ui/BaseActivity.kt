@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.ScrollView
 import com.senseix21.muminsday.l10n.Language
 import com.senseix21.muminsday.store.Stores
@@ -51,5 +52,25 @@ abstract class BaseActivity : Activity() {
             }
         }
         setContentView(scroll)
+    }
+
+    /**
+     * Shows [list] as the whole screen, with the margins and system-bar insets of [show]. For a list too long to build at
+     * once (ADR-28: a section of a hadith book holds up to hundreds of long texts): a ListView builds only the rows on
+     * screen, which a ListView inside [show]'s scroll view would not.
+     */
+    protected fun showList(list: ListView) {
+        list.setBackgroundColor(Palette.paper)
+        list.divider = null
+        list.clipToPadding = false
+        list.setPadding(dp(16), dp(16), dp(16), dp(32))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            list.setOnApplyWindowInsetsListener { view: View, insets: WindowInsets ->
+                val bars = insets.getInsets(WindowInsets.Type.systemBars())
+                view.setPadding(bars.left + dp(16), bars.top + dp(16), bars.right + dp(16), bars.bottom + dp(32))
+                insets
+            }
+        }
+        setContentView(list)
     }
 }

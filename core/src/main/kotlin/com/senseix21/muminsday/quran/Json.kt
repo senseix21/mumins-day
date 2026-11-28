@@ -146,11 +146,34 @@ private class JsonReader(private val text: String) {
         }
     }
 
+    /**
+     * `-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?`, scanned by hand: on Android a regex match at an offset copies
+     * the whole input into native memory, so a 14 MB file with 7,589 numbers took minutes (KNOWN, ADR-28, emulator).
+     * As with the regex, a fraction or exponent without its digits is not part of the number.
+     */
     private fun number(): Json {
-        val found = NUMBER.matchAt(text, at) ?: fail("unknown value")
-        at += found.value.length
-        return Json.Num(found.value)
+        val start = at
+        var end = at
+        if (end < text.length && text[end] == '-') end++
+        when {
+            end < text.length && text[end] == '0' -> end++
+            end < text.length && text[end] in '1'..'9' -> end = digitsFrom(end)
+            else -> fail("unknown value")
+        }
+        if (end + 1 < text.length && text[end] == '.' && text[end + 1].isAsciiDigit()) end = digitsFrom(end + 1)
+        if (end < text.length && (text[end] == 'e' || text[end] == 'E')) {
+            val sign = if (end + 1 < text.length && (text[end + 1] == '+' || text[end + 1] == '-')) end + 2 else end + 1
+            if (sign < text.length && text[sign].isAsciiDigit()) end = digitsFrom(sign)
+        }
+        at = end
+        return Json.Num(text.substring(start, end))
+    }
+
+    private fun digitsFrom(from: Int): Int {
+        var end = from
+        while (end < text.length && text[end].isAsciiDigit()) end++
+        return end
     }
 }
 
-private val NUMBER = Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?")
+private fun Char.isAsciiDigit(): Boolean = this in '0'..'9'
