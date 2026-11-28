@@ -33,17 +33,17 @@ the code; this file, `STATE.md` and `LOG.md` are updated; committed only on the 
 
 ## Phases at a glance
 
-| Phase | Outcome | Where it runs | Status |
+| Phase | Outcome | Where it runs | Status (2026-11-28) |
 |---|---|---|---|
-| 0 | Repository, rules, context, decisions | Anywhere | Done |
-| 1 | Prayer times are computed correctly and safely | JVM | Done, except the timetable check |
+| 0 | Repository, rules, context, decisions | Anywhere | Done except one checksum comparison |
+| 1 | Prayer times are computed correctly and safely | JVM | Done; calibrated to the Foundation's Dhaka table (ADR-16). Open: reviewer rulings |
 | 2 | The alarm plan is computed correctly; Bengali digits | JVM | Done |
-| 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | App module and build gates done; storage and alarm path not started |
-| 4 | A Bengali user completes first run offline and trusts what they see | Phone | Not started |
-| 5 | One reviewed deed a day | JVM + phone | Pure part done; build gate, content and screen not started |
-| 6 | A Qibla compass that admits doubt | JVM + phone | Maths done; sensors and screen not started |
-| 7 | Proof on the device matrix; size and speed measured | Phones | Not started |
-| 8 | On Google Play | Play Console | Not started |
+| 3 | An Adhan rings on a real phone, on time, after every disruption | Phone | Built; all 10 instrumented tests passed on emulators (API 26, 31, 35, 36) on 2026-11-27, before the 28 Nov changes. Open: latency, a real phone |
+| 4 | A Bengali user completes first run offline and trusts what they see | Phone | Built with real districts. Open: native-speaker review, TalkBack, location (removed by ADR-12) |
+| 5 | One reviewed deed a day | JVM + phone | Built on fake records. Open: the reviewer's deeds |
+| 6 | A Qibla compass that admits doubt | JVM + phone | Built. Open: Bengali wording, a real compass test |
+| 7 | Proof on the device matrix; size and speed measured | Phones | Not started: needs phones. Release APK 184,738 bytes |
+| 8 | On Google Play | Play Console | Build side ready (signing, store script, policy read). Open: Play account, forms, Adhan audio, closed test |
 
 Phases 1, 2 and the pure parts of 5 and 6 need nothing but a JVM. From phase 3 on, building
 needs the Android SDK (now in the cloud environment) and proof needs phones (G13). The founder track below runs alongside everything.
@@ -60,7 +60,7 @@ These gate later phases. Starting them now is what keeps phases 3 to 8 from stal
 - [x] Android SDK in the cloud environment: environment `mumins-day` allows `dl.google.com`; SDK at `/opt/android-sdk` (platform 37, build tools 37 and 36); an empty probe app builds an APK. 2026-11-26
 - [ ] Confirm the saved setup script installs the SDK in a fresh session (unproven until one starts).
 - [ ] A physical phone, or an emulator that can run here, for anything that must ring or sense (G13). Gates the instrumented tests of phase 3.
-- [ ] Reference timetable for Bangladesh, a full year, eight divisional cities (Q2). Gates T-FIX-4.
+- [ ] Reference timetable for Bangladesh, a full year, eight divisional cities (Q2). Gates T-FIX-4. **Partly answered 2026-11-28:** the Islamic Foundation's permanent Dhaka timetable (12 months, 6 days each) is now the reference, from a mirrored copy; a full-year table for the other districts does not exist, because the Foundation times them as Dhaka plus a fixed offset (ADR-16, G50).
 - [ ] Reviewer named, with an agreed way of signing content (G9, INV-C1). Gates phase 5 and three rulings in phase 1.
 - [ ] Native Bengali speaker for all copy (G9, INV-L1, INV-C4). Gates phase 4.
 - [ ] Reviewer rulings: Sehri margin and two-value display (Q3); Sehri end vs Fajr offset (G19); sunrise rounding (G20).
@@ -128,12 +128,12 @@ Tests
 - [x] Purity gate: no Android, clock or locale reads in `:core` main sources. 2026-11-26
 
 Still open
-- [ ] T-FIX-4: commit the reference table (8 cities × 365 days) and diff within 1 minute [INV-T4]. (blocked: Q2) Partial evidence 2026-11-27: `DhakaTableComparisonTest` against a secondary copy of the Foundation's Dhaka Ramadan 2026 table (30 days, one city): Iftar 30 of 30 exact and Fajr within 1 minute at reference longitude 90.2 E, but 1 to 2 minutes early at the city centre (G48). Not the full T-FIX-4.
-- [ ] If the diff shows a steady bias, set default offsets; if it shows disagreement, design the per-district timetable override [F2#7].
+- [x] T-FIX-4 for Dhaka: `IslamicFoundationTableTest` against the Foundation's permanent timetable (71 rows, 2025 to 2028) [INV-T4, ADR-16]. Within 1 minute for Dhuhr only; every prayer within 1 minute on the unsafe side, by construction of the calibration. Other districts: no full reference exists (G50). 2026-11-28
+- [x] Steady bias found and set as the default: `Calibration.islamicFoundation` (Fajr +2, Dhuhr +3, Maghrib +3, Isha +2, Sehri 6 min before Fajr), fixed in the app, user offsets on top [ADR-16]. Per-district override not built: districts follow their own sun (G50). 2026-11-28
 - [ ] Reviewer rulings applied or confirmed [Q3, G19, G20]. (blocked: G9)
-- [ ] Measure: a year of times for one district in under 100 ms **(target)**; here on the JVM now, on the minimum phone in phase 7.
+- [x] Measured on the JVM: a year of times for Dhaka in about 1 ms (`BudgetTest`); the 100 ms target is for the minimum phone, phase 7. 2026-11-28
 - [ ] Per-district spread: confirm one fixed point per district keeps every time within 1 minute east to west, else subdivide [ADR-8]. (blocked: Q4)
-- [ ] `Bangladesh` bounds check as a value: is a coordinate inside the country [F1#6]. Needed by phase 4.
+- [x] `isInsideBangladeshBoundingBox` in core, named as a box, not a border; edge tests [F1#6]. 2026-11-28
 
 ## Phase 2 · Alarm planner and Bengali digits (F1, pure part)
 
@@ -240,7 +240,7 @@ digits, turn the Adhan on, be told plainly about anything that could stop it.
 **Needs.** District data (Q4), native speaker (G9), UI direction (G12).
 
 Content and data
-- [ ] `content/districts.json`, validated at build into typed values; fixed elevation per district [ADR-8, F2#3]. Parser, validator (116 core tests), build gate `checkDistricts` and debug fixture (3 fake records) done 2026-11-27; the real list is blocked on Q4. `loadDistricts` has not run on a device.
+- [x] `content/districts.json`: 64 districts from Wikidata (CC0) checked against Wikipedia, elevation from Open-Meteo; sources per row in `content/districts-SOURCES.md`; gate passes with the file required; the release APK ships it [Q4]. Bengali names need a native speaker. 2026-11-28
 - [x] T-BUILD-5 (`:app:checkStrings`) fails on a missing key either way, an empty English value, or a Latin digit in Bengali; seen failing eight ways 2026-11-27.
 - [ ] Bengali strings reviewed by a native speaker: 16 of 16 drafted by Claude are listed unreviewed in `app/l10n-review.txt` (blocked: G9).
 - [ ] `l10n`: time text (12-hour with day-part words, 24-hour option), Gregorian date in Bengali; wording from the native speaker. Pure code and property tests done 2026-11-27 (words come in as data); the day-part hour boundaries and all words need the native speaker.
@@ -249,7 +249,7 @@ Content and data
 
 Screens (platform Views, no Compose, no Material, no AndroidX, no navigation library) [ADR-11]
 - [x] Onboarding (platform Views; emulator, airplane mode, Bengali; location left out by choice): language, district (list or coarse location), reminder choices, silent-mode choice, per-brand steps, the force-stop sentence [F1#18].
-- [ ] Home: five times, countdown and health warnings in words are built and seen on the emulator 2026-11-27 [INV-S6]. Still open: Sehri end and Iftar largest in Ramadan [F2#5, 6] needs a Hijri calendar, which core does not have (new gap G33).
+- [x] Home in Ramadan mode: Sehri end and Iftar as the two largest items with one countdown, switched on by the user; no Hijri date is computed, because Bangladesh follows the moon-sighting announcement (G33, Claude's ruling) [F2#5, 6]. Not seen on a device. 2026-11-28
 - [x] Settings (seen on emulator 2026-11-27; offset and Asr convention changed times as expected): per-prayer mode and pre-reminder, per-prayer offset ±30 framed as "matches my mosque" [F2#1], Asr convention under Advanced, language, "Send a report".
 - [x] Reminder health 2026-11-27 (emulator): seven days of planned and actual times [INV-S8].
 - [ ] Open-source licences screen built 2026-11-27; wording and the repo URL shown need the founder's confirmation.
@@ -258,7 +258,7 @@ Screens (platform Views, no Compose, no Material, no AndroidX, no navigation lib
 Behaviour
 - [ ] Location: NOT built (district by hand only); the three location items remain. Location read only while a screen needs it; coarse; only the district or rounded coordinates stored [INV-P2]; T-INST-11.
 - [ ] A fix outside Bangladesh or over 50 km away asks before changing; a new nearest district is offered once, never switched silently [F1#6, 7].
-- [ ] Per-brand guidance: fetch each brand's page, write steps, deep-link where a settings screen exists. Xiaomi first.
+- [x] Per-brand guidance for Xiaomi, Realme, Samsung, Oppo, Vivo, Tecno (also Infinix and itel), OnePlus, Huawei, Motorola from dontkillmyapp.com, in our own words; one map drives screen and health check (`alarm/Brands.kt`). No deep links: none are named on the pages for current versions. Not checked on a phone. 2026-11-28
 - [ ] "Send a report" (draft intent and `ReportTest` done 2026-11-27; recipient empty until G15; the draft text itself not seen): plain-text email draft with versions, model, health results, 7-day log; no identifiers [ADR-7].
 - [ ] Backup rules written, lint-clean, never run (settings in; alarm log, database and device flag out; deed completions share the alarm log's database, so they are out too: G34). Original item: settings and deed completions in, alarm log out; health check after restore [F1#12].
 - [x] `entitlements` interface that returns "everything" (`core/.../entitlements`). 2026-11-27
@@ -298,7 +298,7 @@ Build and app
 - [ ] `content/deeds.json` and the reviewer's signed note, both from the reviewer. (blocked: G9)
 - [x] Card: text, source book and number, Bengali digits; one tap marks done; quiet done state. Seen on the emulator with 30 fake records, 2026-11-27 (`tests/inst/deed.sh`, T-UI-2 screen part PASS, 200 % font seen).
 - [x] Week view: seven dots, no numbers [INV-C4]; 3 of 7 filled after seeding, seen 2026-11-27.
-- [ ] NOT BUILT 2026-11-27 (needs a founder decision, new gap G35): optional daily nudge, off by default, at most one a day, built by the one notification builder.
+- [x] Daily nudge built: off by default, a time the user picks, one notification a day, none if the deed is done, never re-posted, not counted in reminder health (G35, Claude's ruling). Not seen on a device. 2026-11-28
 - [ ] `deed_day` table keyed by local date, one row per card shown; moving the clock back does not undo a day [F4#4].
 - [ ] Retiring a deed is a content change only [F4#5].
 - [ ] T-UI-2: tone review of every string and screen by the reviewer and the native speaker.
@@ -350,7 +350,7 @@ Licences
 - [ ] Dependency report drafted in `context/spec/05-licences.md` 2026-11-27 (licences read from POMs, not licence texts); lawyer review open (Q6).
 - [ ] Engine notices in the app (LGPL, GPL-3.0, NOTICE and Apache texts ship as assets and show on the Licences screen, 2026-11-27, ADR-13) and repository; modified engine source public. Lawyer's reading of LGPL 4(b) open (Q6); Apache notices for Kotlin and kotlinx-datetime not yet shown.
 - [ ] `NOTICE` credits upstream for ported code.
-- [ ] Adhan recording licence in writing (Q5). District data licence recorded (Q4).
+- [ ] Adhan recording licence in writing (Q5). District data licence recorded (Q4). District data licence recorded 2026-11-28 (Wikidata CC0; Open-Meteo licence ASSUMED CC BY 4.0, credit still to add). Adhan candidates with stated licences listed in `06` section E; none chosen.
 
 Content
 - [ ] Reviewer's signed note for the shipped content version.
@@ -358,7 +358,7 @@ Content
 
 Privacy and policy
 - [ ] Privacy page: English draft in `context/spec/06-release-drafts.md` 2026-11-27 with placeholders for developer name, support email, URL, date; Bengali must come from the native speaker.
-- [ ] Play Data safety form; exact-alarm and foreground-service declarations [ADR-4]: ASSUMED drafts in `06-release-drafts.md` 2026-11-27; Play Console forms never read.
+- [ ] Play Data safety form; exact-alarm and foreground-service declarations [ADR-4]: ASSUMED drafts in `06-release-drafts.md` 2026-11-27; Play Console forms never read. Policy pages read 2026-11-28 and quoted in `06` (exact alarms, foreground service, Data safety, closed testing); two release risks opened (G51, G52). Forms themselves not filled.
 - [ ] Side-by-side review against upstream: clearly a different product.
 
 Testing
@@ -367,7 +367,7 @@ Testing
 
 Listing and rollout
 - [ ] Title and descriptions in both languages; screenshots from the release build.
-- [ ] Upload key generated, kept offline, backed up; Play App Signing on.
+- [ ] Upload key generated, kept offline, backed up; Play App Signing on. Build side ready 2026-11-28: release signs only with the four `MUMINS_UPLOAD_*` environment values; `tools/release.sh` makes the store bundle with both content files required.
 - [ ] Staged rollout 10 → 50 → 100 %, 48 hours each **(target)**, watching the report inbox and Play vitals.
 
 ---

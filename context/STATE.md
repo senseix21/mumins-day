@@ -1,67 +1,60 @@
 # State
 
-**Last updated:** 2026-11-28 00:06 +0600
+**Last updated:** 2026-11-28 15:16 +0600
 
-**Where it runs.** The Mac (`ABUs-MacBook-Pro-2`) now builds and runs the app: JDK 21 from
-Homebrew, `local.properties` with `sdk.dir` (git-ignored), platform 37 and build tools 37
-installed. `./gradlew build --rerun-tasks` is green there (KNOWN, 2026-11-27): 144 tests in `:core`, 52 in `:app`, 12 in the content gate; the adb suite passes 9 of 10 T-INST ids (6 not run) and `tests/inst/ui.sh` passes. The `streambert`
-emulator boots (20 s) and runs the debug APK. This answers the emulator half of G13; a physical
-phone is still needed for the reliability claim. Claude Code's sandbox blocks writes to the SDK
-folder and adb/emulator sockets, so those commands run with the sandbox off.
+## In one paragraph
 
-## Where the project stands
+Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
+without a native speaker and without a Play account. `./gradlew build` is green in the cloud:
+239 tests (160 `:core`, 64 `:app`, 12 content gate, 3 engine), lint clean, all five gates
+passing (no `INTERNET`, 7 permissions, 4 libraries, 169 string keys in both languages, 64 real
+districts). The release APK is 184,738 bytes, minified. **Nothing has run on a real phone, and
+nothing changed on 28 Nov has run on any device.**
 
-- **Everything that can be built without a phone is built and green on the JVM:** phases 1
-  and 2, and the pure parts of phases 5 and 6. `./gradlew build` passes: 94 tests in `:core`, 12 in `:tools:content-gate`, 3 upstream tests in `:engine:calctimes`. Phase 1 still lacks the timetable check (Q2).
-- Three decisions are recorded: engine vendored with one change (ADR-2 amended), plain Kotlin
-  `:core` module (ADR-9), application id `com.senseix21.muminsday`.
-- What exists in code:
-  - `engine/calctimes/`: upstream engine at `a136f9b`, two visibility modifiers changed,
-    recorded in `MODIFICATIONS.md`.
-  - `core/.../clock/`: `PrayerClock` seam, `CalcTimesClock` (Karachi, Hanafi default, safe-side
-    rounding, explicit `NotComputable`, correct local-day attribution in any zone).
-  - `core/.../planner/`: `Planner.plan(now, settings)` gives every alarm for the next 48 hours
-    with stable ids in a closed space of 64, one replan after local midnight, and gaps for
-    days that cannot be computed.
-  - `core/.../planner/Delivery.kt`: the late rule, `decideDelivery` (10 minutes).
-  - `core/.../health/`: `assessHealth(now, facts)` gives `Armed` or `Degraded` with named reasons.
-  - `core/.../l10n/`: `toBengaliDigits`.
-  - `core/.../bearing/`: `qiblaDirection`, `magneticBearing`, `compassPoint`.
-  - `core/.../deed/`: the review gate (`checkContent`), rotation (`deedFor`, `alternateFor`)
-    and the day card (`cardFor`, `swap`, `markDone`, `weekDots`). Test records are fake; no
-    deed content exists.
-  - `app/`: the Android module. Manifest with the seven allowlisted permissions (ADR-12: location and vibration removed), backup on for `settings.xml` and `deed-days.db` only (G41), gates
-    T-BUILD-1…3. `store/` (settings, SQLite log and deed tables, migrations), `alarm/`
-    (`apply(plan)`, receivers, delivery, `mediaPlayback` service with Stop, notifications, health,
-    Test Adhan), a debug-only adb receiver, and `tests/inst/run.sh` (the T-INST suite over adb).
-    Still no real screens: the home screen is a placeholder.
-  - `tools/content-gate/`: the T-BUILD-4 build task. Passes with a notice until
-    `content/deeds.json` exists.
-- The placeholder app has run on an emulator, nothing more. Nothing has run on a phone.
-  Nothing is checked against a real timetable.
-- Committed: `764dc7a` (phase 1), `da2fd48` (planner, digits, plan), `62ea747` (late rule,
-  health), `586630d` (Qibla maths), `0684bc1` (deed core). Pushed to
-  `github.com/senseix21/mumins-day` (`main`). The repository is public. CI builds and tests every push on JDK 17. Upstream clones for reading are in
-  `dev/upstream/`, outside this repository.
+## What changed on 28 Nov 2026
+
+- **Real districts (Q4).** `content/districts.json`: all 64, Wikidata (CC0) checked against
+  Wikipedia, elevations from Open-Meteo, every source in `content/districts-SOURCES.md`.
+- **Times follow the Islamic Foundation (ADR-16).** Its permanent Dhaka timetable (a mirrored
+  copy of its PDF) showed the app put Iftar about 3 minutes early and let people eat about
+  5 minutes past the Foundation's Sehri end. The app now adds the Foundation's own safety
+  margins by default (Fajr +2, Dhuhr +3, Maghrib +3, Isha +2, Sehri end 6 minutes before Fajr),
+  never more than 1 minute on the unsafe side over a leap cycle. Each district still follows
+  its own sun, so outside Dhaka the app can differ from mosques that use the Foundation's
+  flat district offsets by up to about 10 minutes (G50).
+- **Ramadan mode and the daily deed nudge** built (G33, G35, Claude's rulings).
+- **Phone-maker steps** for nine makers plus Infinix and itel.
+- **Release:** R8 minification (ADR-15 had recorded it, the build never had it), environment
+  signing, `tools/release.sh`.
+- **Research recorded:** Play's exact-alarm and foreground-service policies (G51, G52), closed
+  testing, Data safety (`spec/06`); Adhan recordings with stated licences (`spec/06` E).
+
+## Copies and branches
+
+- This cloud copy, `main`, is ahead of GitHub until pushed. The Mac's clone
+  (`~/dev/mumins-day`) has not been updated by this session.
+- The cloud environment `mumins-day` now also allows Wikidata, Wikipedia, Open-Meteo,
+  kivabe.com, the Islamic Foundation, dontkillmyapp.com, Android and Play documentation, and
+  Wikimedia Commons.
 
 ## Next
 
-All six slices are built as far as they can be without the founder's inputs and without phones. Release APK 1,055,071 bytes, R8 on (ADR-15), desugaring gone (ADR-14), LGPL texts shipped in assets (ADR-13), 4 libraries, 7 permissions. Seen on an emulator only: alarms, store, screens, deed card (fake records), Qibla. Measured: APK 1,034,164 bytes, 144 tests in `:core`, 52 in `:app`, 12 in the content gate.
-
-What blocks the rest, in order of leverage:
-1. **Decisions** (no work for anyone else): G38, G41, G42, G44, G45, G35, G33, default language (INV-L1), test-only dependencies, G26 and G30.
-2. **Content and data:** reviewer and `content/deeds.json` (G9); district list (Q4); Adhan recording (Q5); native Bengali speaker for 152 draft keys (G9); support email, developer name, privacy URL (G15).
-3. **Phones** (Q8, G13): M-1 to M-4, the accuracy half of T-INST-12, audible Adhan (the audio-track count was 0 on every emulator, cause not investigated), brand steps, backup and restore. T-INST-6 now passes on an API 31 emulator; API 32 and a phone not run. Emulators `mumins_api26`, `mumins_api31`, `mumins_api35` exist (9 GB of images).
-4. ~~A commit and a push so CI runs the app (G46).~~ Done: merged as PR #1 (`a7d54ab` on `main`); CI green.
-5. Reference timetable for the prayer times (Q2): one city and one month now compared (G48): method matches; the reference point decides the minute. Lawyer on LGPL (Q6).
-6. **New decision (G48):** Foundation reference points per district, or true coordinates. Also G49 (Sehri margin 3 minutes in the table, 0 by default here), and the web leads for Q4 and Q5 in `QUESTIONS.md`.
+1. **Run the emulator suite on the Mac** (`tests/inst/run.sh`, `ui.sh`, `deed.sh`,
+   `qibla.sh`, `onboard.sh`) against this commit: calibration, Ramadan mode, the nudge and the
+   brand screen have only run on the JVM.
+2. **Founder and reviewer decisions**, highest leverage first: ADR-16's margins (G48, G49, G50);
+   G51 (`USE_EXACT_ALARM`); G52 (`mediaPlayback`); G33 and G35 rulings; an Adhan recording (Q5).
+3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
+4. **Phones** for phase 7.
 
 ## Waiting on the founder
 
 | What | Why it matters | Id |
 |---|---|---|
-| Reference timetable | The only real test of correctness, T-FIX-4 | Q2 |
-| Reviewer and native speaker, by name | Sehri/Fajr rulings below; all deed content | G9, Q3 |
-| Confirm: Sehri end ignores the user's Fajr offset; Sehri end and Fajr can show one minute apart; sunrise rounds down | Rulings taken in slice 1 on the safe side | G19, G20 |
-| A phone (or several) | The app can be built here, but not run or tested | G13 |
-| Adhan recording, district list | Slices 3 and 4 | Q5, Q4 |
+| Confirm or change the Foundation margins | They decide when people stop eating and break their fast | ADR-16, G48–G50, Q3 |
+| Reviewer and native speaker, by name | All deed content; all Bengali | G9 |
+| Exact-alarm permission choice | Play may reject `USE_EXACT_ALARM` | G51 |
+| Playback service type | Play says media playback "must be user-initiated" | G52 |
+| An Adhan recording | Release | Q5 |
+| Phones | Phase 7, the reliability claim | Q8, G13 |
+| Play account, support email, privacy URL | Release | G14, G15 |

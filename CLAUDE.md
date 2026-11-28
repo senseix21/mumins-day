@@ -4,7 +4,7 @@ An offline, private Android app for Muslims in Bangladesh. Four features in v1: 
 Adhan (F1), Bangladesh-correct prayer times (F2), an honest Qibla compass (F3), and one good
 deed a day (F4). Bengali first, English second. No network, no ads, no analytics, no account.
 
-**Status: all six slices are built as far as possible without phones and without the founder's content** (prayer times, planner and alarm path, screens in platform Views, deed card on fake records, Qibla). Proven on an emulator only; nothing has run on a phone. Real deeds, districts, Adhan audio and reviewed Bengali are missing. `context/STATE.md` has the current picture; `context/PLAN.md` has the phases and checklists.
+**Status: every phase is coded as far as it can go without phones and without people.** Prayer times calibrated to the Islamic Foundation (ADR-16), 64 real districts, planner and alarm path, screens in platform Views, Ramadan mode, deed card and nudge on fake records, Qibla, phone-maker steps, store build. Proven on the JVM and, before 28 Nov 2026, on emulators; nothing has run on a phone. Missing: the reviewer's deeds, an Adhan recording, reviewed Bengali, a Play account. Start with `context/HANDOFF.md` if you are new. `context/STATE.md` has the current picture; `context/PLAN.md` has the phases and checklists.
 
 ## Start and end of every task
 
@@ -75,6 +75,12 @@ and ask; do not work around it.
   from English; a string Claude drafts is marked for native review.
 - **Rounding is safe-side.** "Stop eating" rounds down; "may break fast" and "prayer may
   begin" round up (INV-T5).
+- **The timetable calibration is fixed.** `Calibration.islamicFoundation` (ADR-16) decides when
+  people stop eating and break their fast. Never change it, its default use, or
+  `IslamicFoundationTableTest`'s limits to make something pass; a change needs the reviewer's
+  word, a new ADR note and the test still green.
+- **Data comes from a fetched source, never from memory.** Coordinates, timetables, names,
+  policy wording: fetch them, record the URL and date, or report them as missing.
 
 ## Shape of the code
 
@@ -84,20 +90,22 @@ modules (ADR-9). Root package `com.senseix21.muminsday`.
 ```
 engine/calctimes/   vendored LGPL engine, one recorded change; do not edit (see below)
 core/      plain Kotlin, no Android on the classpath; a test also bans clock and locale reads
-  clock/     date + place + settings -> DayTimes | NotComputable
-  planner/   now + settings -> list of AlarmSpec (next 24 h, plus one replan)
+  clock/     date + place + settings -> DayTimes | NotComputable; Calibration (ADR-16)
+  planner/   now + settings -> list of AlarmSpec (next 48 h, one replan, optional deed nudge)
   deed/      date + content -> Deed
   bearing/   place -> Qibla bearing
   l10n/      Bengali digits, time and date text
+  districts/ parse and check the district list
   health/    facts about the phone -> Armed | Degraded(reasons)
-tools/content-gate/   build-only: fails the build if content/deeds.json is not fully reviewed (ADR-10)
-app/       Android only. So far: manifest, build gates, a placeholder screen
-  ui/        Compose: Home, Qibla, Deed, Settings, Onboarding
-  alarm/     apply the plan, receivers, playback service
+tools/content-gate/   build-only: fails the build on unreviewed deeds or a bad district list (ADR-10)
+tools/release.sh      the store build: signed, both content files required
+app/       Android only
+  ui/        platform Views (ADR-11): Home, Onboarding, Settings, Districts, Deed, Qibla, health, licences
+  alarm/     apply the plan, receivers, playback service, notifications, Brands.kt (phone-maker steps)
   sensors/   compass
   store/     SharedPreferences settings + one SQLite database
   health/    permission and OEM checks -> Degraded reasons
-content/   deeds.json, districts.json, reviewer notes
+content/   districts.json + districts-SOURCES.md (real); deeds.json and the reviewer's note (not yet)
 ```
 
 Dependencies point inward: `app` may use `core`; `core` never knows `app` exists, and engine
@@ -106,7 +114,7 @@ never computes a time, never builds a notification, and never formats a date its
 `clock`, `alarm` and `l10n`. The application id and root package are
 `com.senseix21.muminsday`; it cannot change after the first Play release.
 
-The scheduler holds every enabled prayer in the next 24 hours, is recomputed on every
+The scheduler holds every enabled prayer in the next 48 hours, is recomputed on every
 trigger, and is never persisted. `apply(plan)` is "cancel the whole closed id space, then set
 the plan", which is what makes it idempotent (ADR-3, INV-S4).
 
@@ -201,6 +209,9 @@ everywhere else. A settings screen does not need a type-level proof. The planner
 ./gradlew :tools:content-gate:checkDeedContent   # the review gate over content/deeds.json (part of build)
 ./gradlew :app:assembleDebug     # the APK, in app/build/outputs/apk/debug/
 ./gradlew :app:checkReleasePermissions :app:checkReleaseDependencies   # the allowlist gates (part of build)
+./gradlew :tools:content-gate:checkDistricts -PdistrictsRequired=true   # the real district list
+tests/inst/run.sh                # T-INST suite over adb; needs an emulator or phone (Mac: sandbox off)
+tools/release.sh                 # the signed store bundle; needs the MUMINS_UPLOAD_* environment values
 ```
 
 Gradle 9.9.2 wrapper (checksum pinned), Kotlin 2.4.10, JVM target 17. Repositories are Maven Central and the
@@ -208,4 +219,5 @@ Gradle plugin portal only. The Android SDK is at `/opt/android-sdk` (`ANDROID_HO
 platform 37, build tools 37 and 36, installed by the environment's setup script. A local
 checkout needs `sdk.dir` in `local.properties` instead. `./gradlew build` also runs Android lint with warnings as errors and all four build gates
 (T-BUILD-1…4). The allowlists the gates enforce are `app/allowlist/permissions.txt` and
-`app/allowlist/dependencies.txt`; never edit either without an ADR. No instrumented tests yet.
+`app/allowlist/dependencies.txt`; never edit either without an ADR. The cloud container has no
+KVM, so no emulator: instrumented tests (`tests/inst/*.sh`) run on the founder's Mac or a phone.

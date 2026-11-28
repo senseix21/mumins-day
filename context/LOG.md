@@ -472,3 +472,39 @@ Mac. Nothing was changed on the Mac.
 **Verified.** Mine: `./gradlew build --rerun-tasks` green, 144 core, 52 app, 12 gate tests; the comparison numbers in G48 printed by `./gradlew :core:test --tests '*DhakaTableComparisonTest*' -i`. Agent-reported, not re-run by me: T-INST-1, 2, 3, 4, 5, 7, 8, 9, 10 pass on API 26, 31 and 35; T-INST-6 passes on API 31 with a screenshot of the health banner and the system "Alarms and reminders" screen; no `NoClassDefFound`/`FATAL` on API 26 (ADR-14 holds at minSdk); no foreground-service exception and no playback from the boot receiver on API 35 (10 s to restore alarms); API 26 emulator cold start median 174 ms, PSS 19.5 MB (not a phone).
 
 **Not done.** API 32 and a phone for T-INST-6; Adhan not audible (AudioTrack count 0 on every level, cause not investigated); Settings, Licences, Brand steps and reminder health not opened on API 26; a real prayer-time alarm from a reboot-restored queue not tested. The battery banner shows on stock Google emulators too (not investigated). Whether the Foundation's own tables match is open (Q2).
+
+## 2026-11-28 15:16 +0600 · Code all phases: districts, Foundation calibration, Ramadan mode, nudge, brands, release
+
+**Did.**
+- Merged branch `dhaka-comparison-and-inst-scripts` (the founder's, unmerged on GitHub).
+- Asked for and got (founder approval card) twelve hosts added to the `mumins-day` environment;
+  the first agents had stopped because every data host was blocked, rather than fill values from
+  memory.
+- Claude, by script: `content/districts.json` (64 districts) and its SOURCES file; the
+  Foundation's permanent Dhaka timetable parsed from its PDF; a snapshot of all 64 districts'
+  times from kivabe.com for 28 Nov; `Calibration` in `clock` (ADR-16) with
+  `IslamicFoundationTableTest`; the settings default and a test that storage cannot change it;
+  R8 in the release build; environment signing and `tools/release.sh`; Play policy and Adhan
+  research written into `spec/06`.
+- Sonnet subagents: Ramadan mode, the deed nudge (alarm slot 10), the bounding box (worktree,
+  merged); phone-maker steps for seven more brands (`alarm/Brands.kt`). A research subagent
+  answered direct boot and the target-API requirement from developer.android.com.
+- ADR-15 corrected: minification was never in the build file; ADR-16 written; G33, G35, G48,
+  G49 closed as rulings for confirmation; G50, G51, G52 opened; Q2, Q4, Q5 annotated.
+
+**Verified.**
+- `./gradlew build`: success; 239 tests, none failed; gates: "permission gate: passed, 7
+  permissions, no INTERNET", "dependency gate: passed, 4 libraries", "string gate: passed, 169
+  keys", "districts gate: passed. content/districts.json: 64 districts".
+- `IslamicFoundationTableTest`, table minus app with the calibration, 2025–2028: Sehri end -1..4,
+  Fajr -4..1, sunrise -1..2, Dhuhr -1..1, Asr -2..0, Maghrib -2..1, Isha -2..1.
+- Release APK 1,066,146 to 175,734 bytes with R8 (184,738 with the brand strings); every
+  manifest component is in the dex; `assets/districts.json` holds 64 districts.
+- `tools/release.sh` refuses a partial key (seen). The signed path was not run: no key exists.
+- PDF SHA-256 `13ced531a4955a546f5edb536559578ee2771867280fbfca7a42d541390da7df`.
+
+**Not done / follow-up.**
+- Nothing ran on an emulator or phone: no KVM in the cloud, and the Mac was not used this time.
+- The district snapshot data and parsing scripts live only in this container's scratchpad;
+  the numbers are recorded in ADR-16 and G50.
+- Open-Meteo's licence was not read (open-meteo.com is not an allowed host).
