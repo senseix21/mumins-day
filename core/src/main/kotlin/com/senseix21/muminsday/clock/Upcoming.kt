@@ -17,13 +17,48 @@ public sealed interface Upcoming {
  * skipped, never filled in. Pure: [now] is an argument (INV-T3).
  */
 public fun upcomingSalah(clock: PrayerClock, now: Instant, place: Place, settings: ClockSettings): Upcoming {
+    val next = firstAfter(clock, now, place, settings) { times -> Salah.entries.map { it to times[it.prayer] } }
+    return if (next == null) Upcoming.Unknown else Upcoming.Found(next.first, next.second)
+}
+
+/** The two times a fast is kept between. Iftar is Maghrib (INV-T2); Sehri end is not Fajr (F2 #6). */
+public enum class FastingTime { SehriEnd, Iftar }
+
+/** The next of [FastingTime] after a moment, or the fact that none can be named (INV-T7). */
+public sealed interface UpcomingFast {
+    public data class Found(val time: FastingTime, val at: Instant) : UpcomingFast
+
+    /** Neither today nor tomorrow could be computed. */
+    public data object Unknown : UpcomingFast
+}
+
+/**
+ * Ramadan mode's "what comes next" (F2 #5): the first Sehri end or Iftar strictly after [now], today or tomorrow in
+ * the place's zone. After today's Iftar the answer is tomorrow's Sehri end, so the countdown never stops at midnight.
+ * It names no Hijri date and decides nothing about whether it is Ramadan: the user turns the mode on (G33).
+ */
+public fun upcomingFast(clock: PrayerClock, now: Instant, place: Place, settings: ClockSettings): UpcomingFast {
+    val next = firstAfter(clock, now, place, settings) { times ->
+        listOf(FastingTime.SehriEnd to times.sehriEnd, FastingTime.Iftar to times.iftar)
+    }
+    return if (next == null) UpcomingFast.Unknown else UpcomingFast.Found(next.first, next.second)
+}
+
+/** [candidates] lists a day's named instants in order; the first strictly after [now] over today and tomorrow wins. */
+private fun <T> firstAfter(
+    clock: PrayerClock,
+    now: Instant,
+    place: Place,
+    settings: ClockSettings,
+    candidates: (DayTimes) -> List<Pair<T, Instant>>,
+): Pair<T, Instant>? {
     val today = now.atZone(place.zone).toLocalDate()
     for (date in listOf(today, today.plusDays(1))) {
         val computed = clock.dayTimes(date, place, settings) as? ClockResult.Computed ?: continue
-        val next = Salah.entries.map { it to computed.times[it.prayer] }.firstOrNull { (_, at) -> at > now }
-        if (next != null) return Upcoming.Found(next.first, next.second)
+        val next = candidates(computed.times).firstOrNull { (_, at) -> at > now }
+        if (next != null) return next
     }
-    return Upcoming.Unknown
+    return null
 }
 
 /** Whole hours and the minutes left over. */

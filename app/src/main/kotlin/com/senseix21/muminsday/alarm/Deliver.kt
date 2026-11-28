@@ -17,6 +17,8 @@ import java.time.Instant
 fun deliver(context: Context, trigger: Trigger, now: Instant) {
     when (trigger) {
         Trigger.Replan, Trigger.Unreadable -> Unit
+        // Not logged, for the same reason as the test: it is not a prayer alarm (G35).
+        Trigger.Nudge -> nudge(context, now)
         is Trigger.Reminder -> {
             val alarm = trigger.alarm
             val outcome = act(context, alarm.kind, alarm.plannedAt, now, noticeCode = alarm.noticeCode())
@@ -28,6 +30,15 @@ fun deliver(context: Context, trigger: Trigger, now: Instant) {
 }
 
 private const val TEST_NOTICE_CODE = 60
+
+/**
+ * F4: one notification, and none when today's card is already done. Posted once per delivery and never again: nothing
+ * schedules a second one, and the next day's nudge is a separate alarm the planner puts there.
+ */
+private fun nudge(context: Context, now: Instant) {
+    val zone = Stores.settings(context).read().place.zone
+    if (nudgeNeeded(Stores.deedDays(context).get(now.atZone(zone).toLocalDate()))) Notifications.postNudge(context)
+}
 
 private fun LoggedAlarm.noticeCode(): Int = salah.ordinal * AlarmKind.entries.size + kind.ordinal
 

@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import com.senseix21.muminsday.MainActivity
 import com.senseix21.muminsday.R
+import com.senseix21.muminsday.ui.DeedActivity
 
 /**
  * The only place a notification is built or a channel defined. Both channels are low importance: the Adhan is audio
@@ -21,6 +22,9 @@ object Notifications {
 
     /** Notices are numbered from here, one per alarm id, so two prayers' notices do not replace each other. */
     private const val NOTICE_BASE_ID = 100
+
+    /** Above every notice id (100 plus a notice code of at most 60). */
+    private const val NUDGE_NOTIFICATION_ID = 200
 
     private fun ensureChannels(context: Context) {
         val manager = checkNotNull(context.getSystemService(NotificationManager::class.java))
@@ -66,7 +70,33 @@ object Notifications {
         )
     }
 
+    /**
+     * The daily deed nudge (F4): one quiet notification whose tap opens the deed card. A fixed id, so even a second
+     * call could only replace it, never stack. It carries no count and no word about days missed (INV-C4).
+     */
+    fun postNudge(context: Context) {
+        ensureChannels(context)
+        val manager = checkNotNull(context.getSystemService(NotificationManager::class.java))
+        manager.notify(
+            NUDGE_NOTIFICATION_ID,
+            Notification.Builder(context, NOTICE_CHANNEL)
+                .setSmallIcon(R.drawable.ic_placeholder)
+                .setContentTitle(context.getString(R.string.notification_nudge))
+                .setCategory(Notification.CATEGORY_REMINDER)
+                .setAutoCancel(true)
+                .setContentIntent(openDeed(context))
+                .build(),
+        )
+    }
+
     enum class Notice { Reminder, Missed }
+
+    private fun openDeed(context: Context): PendingIntent = PendingIntent.getActivity(
+        context,
+        1,
+        Intent(context, DeedActivity::class.java),
+        PendingIntent.FLAG_IMMUTABLE,
+    )
 
     private fun openApp(context: Context): PendingIntent = PendingIntent.getActivity(
         context,

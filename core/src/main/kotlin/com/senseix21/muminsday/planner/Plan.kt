@@ -36,6 +36,9 @@ public sealed interface AlarmSpec {
         }
     }
 
+    /** The one optional nudge to look at today's deed card (F4). [at] is the user's chosen local time on one date. */
+    public data class DeedNudge(override val id: AlarmId, override val at: Instant) : AlarmSpec
+
     /** Asks the shell to plan again; it carries nothing else. */
     public data class Replan(override val id: AlarmId, override val at: Instant) : AlarmSpec
 }

@@ -16,8 +16,12 @@ import com.senseix21.muminsday.alarm.replan
 import com.senseix21.muminsday.alarm.scheduleTestAdhan
 import com.senseix21.muminsday.clock.CalcTimesClock
 import com.senseix21.muminsday.clock.ClockResult
+import com.senseix21.muminsday.clock.FastingTime
+import com.senseix21.muminsday.clock.Prayer
 import com.senseix21.muminsday.clock.Upcoming
+import com.senseix21.muminsday.clock.UpcomingFast
 import com.senseix21.muminsday.clock.countdown
+import com.senseix21.muminsday.clock.upcomingFast
 import com.senseix21.muminsday.clock.upcomingSalah
 import com.senseix21.muminsday.health.Health
 import com.senseix21.muminsday.l10n.Language
@@ -110,26 +114,42 @@ class MainActivity : BaseActivity() {
         // Health first: if a reminder cannot be promised, that is the most important thing on the screen (INV-S6).
         page.addView(healthView(now, remindersEnabled(settings), texts))
 
-        when (val next = upcomingSalah(clock, now, settings.place, settings.clock)) {
-            is Upcoming.Found -> {
-                page.addView(heading(getString(R.string.home_next, texts.salah(next.salah))))
-                page.addView(
-                    body(getString(R.string.home_in, texts.countdown(countdown(now, next.at))))
-                        .apply { textSize = 22f },
-                )
+        // Ramadan mode (F2 #5, G33) is the user's switch, not a calendar: while it is on the countdown is to Sehri end or
+        // Iftar, whichever is next, and those two are the largest items. Off, the home screen is the plain prayer list.
+        if (prefs.ramadanMode) {
+            when (val next = upcomingFast(clock, now, settings.place, settings.clock)) {
+                is UpcomingFast.Found -> countdownTo(page, texts.fastingTime(next.time), now, next.at, texts)
+                UpcomingFast.Unknown -> page.addView(heading(getString(R.string.home_next_fast_unknown)))
             }
-            Upcoming.Unknown -> page.addView(heading(getString(R.string.home_next_unknown)))
+        } else {
+            when (val next = upcomingSalah(clock, now, settings.place, settings.clock)) {
+                is Upcoming.Found -> countdownTo(page, texts.salah(next.salah), now, next.at, texts)
+                Upcoming.Unknown -> page.addView(heading(getString(R.string.home_next_unknown)))
+            }
         }
 
-        // Ramadan: core has no Hijri calendar yet, so Sehri end and Iftar are not singled out (F2 #5 waits for it).
         val today = clock.dayTimes(now.atZone(zone).toLocalDate(), settings.place, settings.clock)
-        for (salah in Salah.entries) {
-            val time = when (today) {
-                is ClockResult.Computed -> texts.time(today.times[salah.prayer], zone)
-                is ClockResult.NotComputable -> NO_TIME
-            }
-            page.addView(prayerRow(texts.salah(salah), time))
+        fun timeText(prayer: Prayer): String = when (today) {
+            is ClockResult.Computed -> texts.time(today.times[prayer], zone)
+            is ClockResult.NotComputable -> NO_TIME
         }
+        if (prefs.ramadanMode) {
+            for (fasting in FastingTime.entries) {
+                page.addView(
+                    prayerRow(
+                        texts.fastingTime(fasting),
+                        timeText(
+                            when (fasting) {
+                                FastingTime.SehriEnd -> Prayer.SehriEnd
+                                FastingTime.Iftar -> Prayer.Maghrib // INV-T2: Iftar is Maghrib
+                            },
+                        ),
+                        sizeSp = LARGEST_SP,
+                    ),
+                )
+            }
+        }
+        for (salah in Salah.entries) page.addView(prayerRow(texts.salah(salah), timeText(salah.prayer)))
         if (today is ClockResult.NotComputable) page.addView(body(getString(R.string.times_unavailable)))
 
         page.addView(actionButton(getString(R.string.deed_title), primary = false) {
@@ -155,21 +175,27 @@ class MainActivity : BaseActivity() {
         show(page)
     }
 
+    /** "Next: Iftar" and "3 hours 25 minutes left". */
+    private fun countdownTo(page: LinearLayout, name: String, now: Instant, at: Instant, texts: Texts) {
+        page.addView(heading(getString(R.string.home_next, name)))
+        page.addView(body(getString(R.string.home_in, texts.countdown(countdown(now, at)))).apply { textSize = 22f })
+    }
+
     private fun districtName(id: String, texts: Texts): String? {
         val district = (loadDistricts(this) as? DistrictsLoad.Loaded)?.check?.districts?.firstOrNull { it.id.value == id }
             ?: return null
         return texts.data(if (language == Language.Bengali) district.nameBn else district.nameEn)
     }
 
-    private fun prayerRow(name: String, time: String): View = LinearLayout(this).apply {
+    private fun prayerRow(name: String, time: String, sizeSp: Float = 22f): View = LinearLayout(this).apply {
         orientation = LinearLayout.HORIZONTAL
         minimumHeight = dp(48)
         setPadding(0, dp(8), 0, dp(8))
         // One focus stop for TalkBack: "Fajr, 5:10 am".
         isFocusable = true
         contentDescription = "$name, $time"
-        addView(TextView(context).apply { text = name; textSize = 22f; setTextColor(Palette.ink) }, LinearLayout.LayoutParams(0, -2, 1f))
-        addView(TextView(context).apply { text = time; textSize = 22f; setTextColor(Palette.ink) }, LinearLayout.LayoutParams(-2, -2))
+        addView(TextView(context).apply { text = name; textSize = sizeSp; setTextColor(Palette.ink) }, LinearLayout.LayoutParams(0, -2, 1f))
+        addView(TextView(context).apply { text = time; textSize = sizeSp; setTextColor(Palette.ink) }, LinearLayout.LayoutParams(-2, -2))
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
     }
 
@@ -203,5 +229,8 @@ class MainActivity : BaseActivity() {
 
     private companion object {
         const val REFRESH_MILLIS = 30_000L
+
+        /** Larger than the countdown (22 sp) and the prayer rows, so Sehri end and Iftar are the two largest items. */
+        const val LARGEST_SP = 30f
     }
 }

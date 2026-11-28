@@ -44,7 +44,11 @@ enum class Outcome {
 /** The identity of a logged alarm: the same alarm at the same instant is the same row (INV-S4). */
 data class LoggedAlarm(val salah: Salah, val kind: AlarmKind, val plannedAt: Instant) {
     companion object {
-        /** Null for the replan alarm, which is not a reminder and is never logged. */
+        /**
+         * Null for the replan alarm, which is not a reminder, and for the deed nudge, which is not a prayer alarm: the
+         * log has a prayer on every row and `assessHealth` judges prayer alarms only (G35). Not logging it is what keeps
+         * a nudge from ever reading as a missed reminder.
+         */
         fun of(spec: AlarmSpec): LoggedAlarm? = when (spec) {
             is AlarmSpec.PrayerAlarm -> LoggedAlarm(
                 spec.salah,
@@ -56,7 +60,7 @@ data class LoggedAlarm(val salah: Salah, val kind: AlarmKind, val plannedAt: Ins
                 spec.at,
             )
             is AlarmSpec.PreReminderAlarm -> LoggedAlarm(spec.salah, AlarmKind.PreReminder, spec.at)
-            is AlarmSpec.Replan -> null
+            is AlarmSpec.DeedNudge, is AlarmSpec.Replan -> null
         }
     }
 }

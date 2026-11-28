@@ -20,6 +20,19 @@ class AppPrefsTest {
     }
 
     @Test
+    fun `Ramadan mode is off by default, the user's own switch, and survives a round trip`() {
+        assertFalse(parseAppPrefs(emptyMap<String, String>()).ramadanMode)
+        assertFalse(AppPrefs().ramadanMode)
+        val on = chosen.copy(ramadanMode = true)
+        assertTrue(parseAppPrefs(encodeAppPrefs(on)).ramadanMode)
+        assertEquals(on, parseAppPrefs(encodeAppPrefs(on)))
+        assertEquals(chosen, parseAppPrefs(encodeAppPrefs(on.copy(ramadanMode = false))))
+        // Anything but the word "true" is off, so a damaged value cannot switch the screen over.
+        for (bad in listOf("", "True", "1", "yes", "on")) assertFalse(parseAppPrefs(encodeAppPrefs(on) + ("app.ramadanMode" to bad)).ramadanMode, bad)
+        assertTrue("app.ramadanMode" in appPrefKeys())
+    }
+
+    @Test
     fun `what is written reads back the same`() {
         assertEquals(chosen, parseAppPrefs(encodeAppPrefs(chosen)))
     }

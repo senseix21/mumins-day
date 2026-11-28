@@ -1,5 +1,7 @@
 package com.senseix21.muminsday.districts
 
+import com.senseix21.muminsday.clock.Latitude
+import com.senseix21.muminsday.clock.Longitude
 import java.time.ZoneId
 import kotlin.random.Random
 import kotlin.test.Test
@@ -74,6 +76,34 @@ class DistrictsTest {
             ),
             kinds(listOf(record(1).copy(latitude = 90.0, longitude = 23.0))),
         )
+    }
+
+    @Test
+    fun the_bounding_box_includes_its_edges_and_nothing_beyond() {
+        fun inside(latitude: Double, longitude: Double) =
+            isInsideBangladeshBoundingBox(checkNotNull(Latitude.of(latitude)), checkNotNull(Longitude.of(longitude)))
+        assertTrue(inside(23.8103, 90.4125), "Dhaka's centre")
+        assertTrue(inside(20.5, 88.0), "south-west corner")
+        assertTrue(inside(26.7, 92.7), "north-east corner")
+        assertTrue(inside(20.5, 92.7) && inside(26.7, 88.0), "the other two corners")
+        for ((latitude, longitude) in listOf(
+            Math.nextDown(20.5) to 90.0, Math.nextUp(26.7) to 90.0, 23.0 to Math.nextDown(88.0), 23.0 to Math.nextUp(92.7),
+            23.0 to 23.8, // latitude and longitude swapped
+            28.6 to 77.2, // Delhi, a valid coordinate in the wrong country
+        )) {
+            assertTrue(!inside(latitude, longitude), "$latitude, $longitude is outside")
+        }
+    }
+
+    @Test
+    fun the_bounding_box_agrees_with_the_district_check() {
+        val random = Random(12)
+        repeat(500) { n ->
+            val latitude = random.nextDouble(19.0, 28.0)
+            val longitude = random.nextDouble(86.0, 94.0)
+            val accepted = parseDistricts(listOf(record(1).copy(latitude = latitude, longitude = longitude))) is DistrictCheck.Accepted
+            assertEquals(accepted, isInsideBangladeshBoundingBox(checkNotNull(Latitude.of(latitude)), checkNotNull(Longitude.of(longitude))), "$n: $latitude, $longitude")
+        }
     }
 
     @Test

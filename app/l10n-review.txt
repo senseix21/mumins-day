@@ -156,3 +156,14 @@ qibla_no_sensor
 qibla_no_sensor_hint
 qibla_needle_desc
 qibla_needle_desc_unsure
+notification_nudge
+fast_sehri_end
+fast_iftar
+home_next_fast_unknown
+settings_ramadan
+settings_ramadan_help
+settings_ramadan_on
+settings_nudge
+settings_nudge_help
+settings_nudge_on
+settings_nudge_time

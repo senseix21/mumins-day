@@ -19,6 +19,7 @@ import kotlin.test.assertTrue
  * The bounds asserted here are deliberately loose (20x the targets) so a slow or busy machine does not make the build
  * flaky; the real numbers are printed. Each measurement is the best of several runs after a warm-up, because the first
  * calls pay for JIT compilation and class loading, which a phone pays once per process too but is not the steady state.
+ * The 100 ms target is for the minimum phone and is measured there in phase 7; this JVM number is a smoke test only.
  */
 class BudgetTest {
     private val dhakaPlace = Place(Latitude.of(23.81)!!, Longitude.of(90.41)!!, Meters.of(10.0)!!, dhaka)

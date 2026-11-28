@@ -24,6 +24,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.random.Random
@@ -68,7 +69,7 @@ private fun Instant.localDate(zone: ZoneId): LocalDate = atZone(zone).toLocalDat
 private fun AlarmSpec.prayerDate(zone: ZoneId): LocalDate? = when (this) {
     is AlarmSpec.PrayerAlarm -> prayerAt.localDate(zone)
     is AlarmSpec.PreReminderAlarm -> prayerAt.localDate(zone)
-    is AlarmSpec.Replan -> null
+    is AlarmSpec.DeedNudge, is AlarmSpec.Replan -> null
 }
 
 private data class Entry(val at: Instant, val salah: Salah, val label: String)
@@ -108,7 +109,7 @@ private fun assertComplete(now: Instant, settings: PlannerSettings, plan: Plan, 
         when (it) {
             is AlarmSpec.PrayerAlarm -> Entry(it.at, it.salah, it.mode.label())
             is AlarmSpec.PreReminderAlarm -> Entry(it.at, it.salah, "pre")
-            is AlarmSpec.Replan -> null
+            is AlarmSpec.DeedNudge, is AlarmSpec.Replan -> null
         }
     }
     assertEquals(expected.sortedWith(entryOrder), actual.sortedWith(entryOrder), "INV-S1 completeness: $where")
@@ -325,6 +326,7 @@ class PlannerTest {
                     when (alarm) {
                         is AlarmSpec.PrayerAlarm -> assertEquals(AlarmId.prayer(alarm.at.localDate(zone), alarm.salah), alarm.id, "$alarm")
                         is AlarmSpec.PreReminderAlarm -> assertEquals(AlarmId.preReminder(alarm.prayerAt.localDate(zone), alarm.salah), alarm.id, "$alarm")
+                        is AlarmSpec.DeedNudge -> assertEquals(AlarmId.deedNudge(alarm.at.localDate(zone)), alarm.id, "$alarm")
                         is AlarmSpec.Replan -> assertEquals(AlarmId.replan(alarm.at.localDate(zone)), alarm.id, "$alarm")
                     }
                 }
@@ -346,6 +348,8 @@ class PlannerTest {
         assertEquals(1, AlarmId.preReminder(date, Salah.Fajr).value)
         assertEquals(8, AlarmId.prayer(date, Salah.Isha).value)
         assertEquals(9, AlarmId.preReminder(date, Salah.Isha).value)
+        assertEquals(10, AlarmId.deedNudge(date).value)
+        assertEquals(16 + 10, AlarmId.deedNudge(date.plusDays(1)).value)
         assertEquals(15, AlarmId.replan(date).value)
         assertEquals(16 + 4, AlarmId.prayer(date.plusDays(1), Salah.Asr).value)
         assertEquals(AlarmId.replan(date), AlarmId.replan(date.plusDays(4)), "four day slots, then they repeat")
@@ -353,10 +357,10 @@ class PlannerTest {
 
         val produced = (0L until 8L).flatMap { day ->
             Salah.entries.flatMap { listOf(AlarmId.prayer(date.plusDays(day), it), AlarmId.preReminder(date.plusDays(day), it)) } +
-                AlarmId.replan(date.plusDays(day))
+                AlarmId.deedNudge(date.plusDays(day)) + AlarmId.replan(date.plusDays(day))
         }.map { it.value }.toSet()
-        assertTrue(produced.none { it % 16 in 10..14 }, "slots 10..14 are never used")
-        assertEquals(4 * 11, produced.size)
+        assertTrue(produced.none { it % 16 in 11..14 }, "slots 11..14 are never used")
+        assertEquals(4 * 12, produced.size)
     }
 
     @Test
@@ -478,6 +482,109 @@ class PlannerTest {
         }
     }
 
+    private fun Scenario.withNudge(random: Random): PlannerSettings =
+        settings.copy(deedNudge = LocalTime.of(random.nextInt(0, 24), random.nextInt(0, 60)))
+
+    private fun Plan.nudges() = alarms.filterIsInstance<AlarmSpec.DeedNudge>()
+
+    /** G35: present iff enabled, strictly after now, in the window, at the chosen local time, at most one per local date. */
+    @Test
+    fun G35_the_nudge_is_present_iff_enabled_at_the_chosen_local_time_once_per_date() {
+        val random = Random(40)
+        for (scenario in scenarios(count = 1000, seed = 40)) {
+            val zone = scenario.settings.place.zone
+            assertTrue(planner.plan(scenario.now, scenario.settings).nudges().isEmpty(), "off by default: $scenario")
+
+            val settings = scenario.withNudge(random)
+            val time = checkNotNull(settings.deedNudge)
+            val plan = planner.plan(scenario.now, settings)
+            val where = "nudge=$time $scenario"
+            val nudges = plan.nudges()
+            // 48 h always holds at least two chosen times, and at most three (the window's edges are inclusive).
+            assertTrue(nudges.size in 2..3, "${nudges.size} nudges: $where")
+            val dates = nudges.map { it.at.localDate(zone) }
+            assertEquals(dates.size, dates.toSet().size, "at most one per local date: $where")
+            for (nudge in nudges) {
+                assertEquals(time, nudge.at.atZone(zone).toLocalTime(), "at the chosen local time: $where")
+                assertTrue(nudge.at > scenario.now && nudge.at <= scenario.now.plus(PLAN_WINDOW), "inside the window: $where")
+                assertEquals(AlarmId.deedNudge(nudge.at.localDate(zone)), nudge.id, "id from its own date: $where")
+            }
+            assertIdsDistinctAndInSpace(plan, where)
+            assertOneReplan(scenario.now, zone, plan, where)
+            // Independent of the prayers: the rest of the plan is exactly what it was without the nudge.
+            assertEquals(
+                planner.plan(scenario.now, scenario.settings).alarms,
+                plan.alarms.filterNot { it is AlarmSpec.DeedNudge },
+                "prayer alarms unchanged: $where",
+            )
+        }
+    }
+
+    @Test
+    fun G35_the_nudge_is_planned_when_every_prayer_is_off() {
+        val random = Random(41)
+        for (scenario in scenarios(count = 200, seed = 41)) {
+            val settings = scenario.withNudge(random).copy(reminders = Reminders.allOff)
+            val alarms = planner.plan(scenario.now, settings).alarms
+            assertTrue(alarms.any { it is AlarmSpec.DeedNudge }, "$scenario")
+            assertTrue(alarms.all { it is AlarmSpec.DeedNudge || it is AlarmSpec.Replan }, "$scenario")
+        }
+    }
+
+    @Test
+    fun G35_the_nudge_does_not_need_computable_prayer_times() {
+        val broken = PrayerClock { _, _, _ -> ClockResult.NotComputable(Prayer.Fajr, Reason.SunNeverReachesAngle) }
+        val scenario = scenarios(count = 1, seed = 42).single()
+        val plan = Planner(broken).plan(scenario.now, scenario.settings.copy(deedNudge = LocalTime.of(9, 0)))
+        assertTrue(plan.nudges().size >= 2)
+        assertTrue(plan.gaps.isNotEmpty())
+    }
+
+    @Test
+    fun INV_S5_the_nudge_boundary_is_exact() {
+        val settings = scenarios(count = 1, seed = 43).single().settings.copy(deedNudge = LocalTime.of(7, 30))
+        val nudgeAt = LocalDateTime.of(2026, 11, 26, 7, 30).atZone(dhaka).toInstant()
+        assertTrue(planner.plan(nudgeAt.minusNanos(1), settings).nudges().any { it.at == nudgeAt }, "1 ns before is in")
+        assertTrue(planner.plan(nudgeAt, settings).nudges().none { it.at == nudgeAt }, "now == at is the one firing, so out")
+        val exactlyAtEnd = nudgeAt.minus(PLAN_WINDOW)
+        assertTrue(planner.plan(exactlyAtEnd, settings).nudges().any { it.at == nudgeAt }, "at == now + 48 h is in")
+        assertTrue(planner.plan(exactlyAtEnd.minusNanos(1), settings).nudges().none { it.at == nudgeAt }, "1 ns beyond is out")
+    }
+
+    /** DST in Los Angeles: the chosen local time holds on every ordinary date, and the gap hour moves forward. */
+    @Test
+    fun G35_the_nudge_across_daylight_saving_changes() {
+        val zone = losAngeles.zone
+        fun nudges(at: LocalDateTime, time: LocalTime): List<AlarmSpec.DeedNudge> =
+            planner.plan(at.atZone(zone).toInstant(), PlannerSettings(losAngeles, ClockSettings(), Reminders.allOff, time)).nudges()
+
+        // 2026-03-08 02:00 -> 03:00. 02:30 does not exist that day; ZonedDateTime.of moves it to 03:30.
+        assertEquals(
+            listOf(LocalDateTime.of(2026, 3, 7, 2, 30), LocalDateTime.of(2026, 3, 8, 3, 30), LocalDateTime.of(2026, 3, 9, 2, 30)),
+            nudges(LocalDateTime.of(2026, 3, 7, 2, 0), LocalTime.of(2, 30)).map { it.at.atZone(zone).toLocalDateTime() },
+        )
+        // 2026-11-01 02:00 -> 01:00. 01:30 happens twice; the earlier instant is used, so still one nudge on that date.
+        val fallBack = nudges(LocalDateTime.of(2026, 10, 31, 1, 0), LocalTime.of(1, 30))
+        assertEquals(
+            listOf(LocalDate.of(2026, 10, 31), LocalDate.of(2026, 11, 1)),
+            fallBack.map { it.at.localDate(zone) },
+        )
+        assertEquals(
+            ZonedDateTime.of(LocalDate.of(2026, 11, 1), LocalTime.of(1, 30), zone).withEarlierOffsetAtOverlap().toInstant(),
+            fallBack[1].at,
+        )
+
+        // Ids stay distinct across the year's DST changes, with the nudge at any time of day.
+        val random = Random(44)
+        var now = LocalDate.of(2026, 3, 5).atStartOfDay(zone).toInstant()
+        val stop = LocalDate.of(2026, 11, 5).atStartOfDay(zone).toInstant()
+        while (now < stop) {
+            val settings = PlannerSettings(losAngeles, ClockSettings(), randomReminders(random), LocalTime.of(random.nextInt(0, 24), random.nextInt(0, 60)))
+            assertIdsDistinctAndInSpace(planner.plan(now, settings), "now=$now ${settings.deedNudge}")
+            now = now.plusSeconds(11 * 3600 + 17 * 60)
+        }
+    }
+
     @Test
     fun example_dhaka_plan_for_a_thursday_noon() {
         val place = Place(Latitude.of(23.8103)!!, Longitude.of(90.4125)!!, Meters.of(8.0)!!, dhaka)
@@ -489,6 +596,7 @@ class PlannerTest {
             val kind = when (alarm) {
                 is AlarmSpec.PrayerAlarm -> "${alarm.salah} ${alarm.mode}"
                 is AlarmSpec.PreReminderAlarm -> "${alarm.salah} pre-reminder"
+                is AlarmSpec.DeedNudge -> "Deed nudge"
                 is AlarmSpec.Replan -> "Replan"
             }
             println("  id=${alarm.id.value.toString().padStart(2)}  ${alarm.at.atZone(dhaka).toLocalDateTime()}  $kind")

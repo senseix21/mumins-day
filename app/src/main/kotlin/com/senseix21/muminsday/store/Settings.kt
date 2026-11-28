@@ -17,7 +17,11 @@ import com.senseix21.muminsday.planner.ReminderMode
 import com.senseix21.muminsday.planner.Reminders
 import com.senseix21.muminsday.planner.Salah
 import java.time.DateTimeException
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+import java.time.format.ResolverStyle
 
 /** INV-T6: a per-prayer offset is at most this many minutes either way. */
 const val MAX_OFFSET_MINUTES: Int = 30
@@ -80,8 +84,22 @@ fun parseSettings(stored: Map<String, *>): PlannerSettings {
         place = parsePlace(::text) ?: defaults.place,
         clock = ClockSettings(asr, offsets, sehriMargin),
         reminders = reminders,
+        deedNudge = parseNudgeTime(text("deedNudge")),
     )
 }
+
+/** "HH:mm" and nothing else; absent or anything different is off, so a damaged value never rings at a wrong hour. */
+private fun parseNudgeTime(stored: String?): LocalTime? {
+    if (stored == null) return null
+    return try {
+        LocalTime.parse(stored, NUDGE_FORMAT)
+    } catch (_: DateTimeParseException) {
+        null
+    }
+}
+
+// STRICT, because the default lenient-ish style reads "24:00" as midnight, which would ring a damaged value at 00:00.
+private val NUDGE_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm").withResolverStyle(ResolverStyle.STRICT)
 
 private fun parsePlace(text: (String) -> String?): Place? {
     val latitude = text("place.lat")?.toDoubleOrNull()?.let(Latitude::of) ?: return null
@@ -110,6 +128,8 @@ fun encodeSettings(settings: PlannerSettings): Map<String, String> = buildMap {
     put(V + "place.lon", settings.place.longitude.degrees.toString())
     put(V + "place.elevation", settings.place.elevation.value.toString())
     put(V + "place.zone", settings.place.zone.id)
+    // Off is the absence of the key, so settingsEdits removes it when the user turns the nudge off.
+    settings.deedNudge?.let { put(V + "deedNudge", it.format(NUDGE_FORMAT)) }
 }
 
 /** The only reader and writer of the settings file. Planner settings and app preferences share it under different prefixes. */

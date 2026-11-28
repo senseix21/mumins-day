@@ -221,4 +221,17 @@
     <string name="qibla_no_sensor_hint">Check the number above against another compass, or use a place whose Qibla direction you already know.</string>
     <string name="qibla_needle_desc">Qibla needle: the Qibla is %1$s degrees clockwise from the top of the phone</string>
     <string name="qibla_needle_desc_unsure">Qibla needle, not reliable: %1$s degrees clockwise from the top of the phone</string>
+
+    <!-- Ramadan mode (G33) and the daily deed nudge (G35). -->
+    <string name="notification_nudge">Today\'s good deed is ready to look at.</string>
+    <string name="fast_sehri_end">Sehri ends</string>
+    <string name="fast_iftar">Iftar</string>
+    <string name="home_next_fast_unknown">Sehri end and Iftar are not known.</string>
+    <string name="settings_ramadan">Ramadan mode</string>
+    <string name="settings_ramadan_help">While on, the home screen shows Sehri end and Iftar largest. The app does not work out when Ramadan begins; you turn this on and off yourself.</string>
+    <string name="settings_ramadan_on">Ramadan mode on</string>
+    <string name="settings_nudge">Daily good deed nudge</string>
+    <string name="settings_nudge_help">One quiet notification a day at the time you choose. If you do not open it, it does not come again.</string>
+    <string name="settings_nudge_on">Nudge on</string>
+    <string name="settings_nudge_time">Time: %1$s</string>
 </resources>

@@ -18,6 +18,11 @@ data class AppPrefs(
     val onboarded: Boolean = false,
     /** Which district the place came from, so the settings screen can name it. Null until one is picked. */
     val districtId: DistrictId? = null,
+    /**
+     * Ramadan mode (F2 #5, G33). The user turns it on and off; the app computes no Hijri date, because the first day
+     * follows the national moon-sighting announcement and a computed date can be a day out. Off by default.
+     */
+    val ramadanMode: Boolean = false,
 )
 
 private const val A = "app."
@@ -31,6 +36,7 @@ fun parseAppPrefs(stored: Map<String, *>): AppPrefs {
         silentMode = SilentMode.entries.firstOrNull { it.name == text("silentMode") } ?: defaults.silentMode,
         onboarded = text("onboarded") == "true",
         districtId = text("districtId")?.let(DistrictId::of),
+        ramadanMode = text("ramadanMode") == "true",
     )
 }
 
@@ -38,6 +44,7 @@ fun encodeAppPrefs(prefs: AppPrefs): Map<String, String> = buildMap {
     put(A + "language", prefs.language.name)
     put(A + "silentMode", prefs.silentMode.name)
     put(A + "onboarded", prefs.onboarded.toString())
+    put(A + "ramadanMode", prefs.ramadanMode.toString())
     prefs.districtId?.let { put(A + "districtId", it.value) }
 }
 
