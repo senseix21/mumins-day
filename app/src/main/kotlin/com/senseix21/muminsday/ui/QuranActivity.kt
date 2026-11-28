@@ -191,7 +191,9 @@ internal fun openSurah(context: Context, at: VerseRef) {
 internal fun arabicText(context: Context, text: String): TextView = context.body(rightToLeft(text)).apply {
     typeface = quranTypeface(context)
     textSize = 28f
-    setLineSpacing(0f, 1.4f)
+    // Amiri Quran's own line metrics already leave room for stacked marks; a 1.4 multiplier on top left a gap of
+    // nearly a blank line between wrapped lines (seen on the API 36 emulator, Hisnul chapter 1).
+    setLineSpacing(0f, 1.0f)
     textDirection = View.TEXT_DIRECTION_RTL
     textAlignment = View.TEXT_ALIGNMENT_VIEW_START
     layoutDirection = View.LAYOUT_DIRECTION_RTL

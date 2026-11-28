@@ -660,3 +660,9 @@ or phone (rebuild time, FTS4 on SQLite 3.18, screens, footnote layout at 200 %);
 **Verified.** `git check-ignore -v` names `.gitignore:27:content/local/` for the files; `git status` shows none of them. `./gradlew build --console=plain --rerun-tasks` green: 458 tests (312 `:core`, 101 `:app`, 42 gate, 3 engine), lint clean; "hisnul muslim gate: passed. 313 files match their recorded SHA-256; 133 chapters, 312 duas, 426 segments"; "local content gate: passed, app-release-unsigned.apk holds no assets/hisnul-muslim/ file"; string gate 342 keys. Same build with `content/local` moved away: green, gate "absent", `HisnulRealFilesTest` 3 skipped, debug APK 0 hisnul entries; moved back. `unzip -l`: release 0 entries, debug 313, and the 313 extracted from the debug APK match the recorded hashes (`shasum -a 256 -c`). With the debug-only condition forced off, `:app:checkReleaseHasNoLocalContent` failed listing the entries (reverted). `HisnulRealFilesTest`: 1809 texts found as written in their files, counts 414/409/390/315, 6 Arabic segments without Bengali. Emulator `emulator-5554` (API 36), Bengali: Hisnul list and chapter 1 (waking up) render, Amiri Arabic right to left, banner on both; `tests/inst/ui.sh` T-UNIT-9, target, label PASS on each; `logcat -b crash` no FATAL. Screenshots in the session scratchpad.
 
 **Not verified.** English UI, 200 % font, the search box on a device, a notes-only chapter, chapter 28's Latin digits (G67), U+06D4 fallback; any phone. Permission and translator (Q16); no review.
+
+## 2026-11-28 21:34 +0600 · Arabic line spacing
+
+**Did.** `arabicText` line-spacing multiplier 1.4 to 1.0: Amiri Quran's own metrics already leave room for marks, and wrapped Arabic lines had nearly a blank line between them.
+
+**Verified.** On `emulator-5554` (API 36): Hisnul chapter 1 and Al-Baqarah 255 (Ayat al-Kursi, dense marks and waqf signs) wrap with no mark touching the line above or below; no crash. `./gradlew :app:assembleDebug` green.
