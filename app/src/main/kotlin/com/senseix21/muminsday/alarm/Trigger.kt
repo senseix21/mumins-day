@@ -44,8 +44,23 @@ fun remindersEnabled(settings: PlannerSettings): Boolean =
  */
 fun alarmsNeeded(settings: PlannerSettings): Boolean = remindersEnabled(settings) || settings.deedNudge != null
 
-/** F4: the nudge is for a card not yet done. A day with no card recorded is not done. Never a reason to repeat. */
-fun nudgeNeeded(today: DayCard?): Boolean = today?.doneAt == null
+/** What the one daily nudge says, if anything (F4, ADR-24). */
+enum class Nudge { Nothing, Deed, Portion, DeedAndPortion }
+
+/**
+ * F4: the nudge is for a card not yet done; a day with no card recorded is not done. Phase 15 (ADR-24): when the user
+ * asked for it, the same notification also mentions a khatam portion waiting today. Still one notification a day: this
+ * only chooses its words, never a second one. Never a reason to repeat.
+ */
+fun nudgeFor(today: DayCard?, portionWaits: Boolean): Nudge {
+    val deedWaits = today?.doneAt == null
+    return when {
+        deedWaits && portionWaits -> Nudge.DeedAndPortion
+        deedWaits -> Nudge.Deed
+        portionWaits -> Nudge.Portion
+        else -> Nudge.Nothing
+    }
+}
 
 /** What a delivered alarm turned out to be, read from its intent. */
 sealed interface Trigger {

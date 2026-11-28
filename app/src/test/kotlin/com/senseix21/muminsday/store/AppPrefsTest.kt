@@ -37,6 +37,17 @@ class AppPrefsTest {
         assertTrue("app.ramadanMode" in appPrefKeys())
     }
 
+    // ADR-24: the khatam mention in the nudge is off unless the user turns it on.
+    @Test
+    fun `the khatam mention in the nudge is off by default and survives a round trip`() {
+        assertFalse(parseAppPrefs(emptyMap<String, String>()).khatamInNudge)
+        assertFalse(AppPrefs().khatamInNudge)
+        val on = chosen.copy(khatamInNudge = true)
+        assertEquals(on, parseAppPrefs(encodeAppPrefs(on)))
+        for (bad in listOf("", "True", "1")) assertFalse(parseAppPrefs(encodeAppPrefs(on) + ("app.khatamInNudge" to bad)).khatamInNudge, bad)
+        assertTrue("app.khatamInNudge" in appPrefKeys())
+    }
+
     @Test
     fun `the Hijri adjustment defaults to none, survives a round trip and ignores anything but -1, 0 and 1`() {
         assertEquals(com.senseix21.muminsday.hijri.HijriAdjustment.None, AppPrefs().hijriAdjustment)

@@ -36,6 +36,44 @@ public fun parseMetadata(xml: String): MetadataParse {
 
 private val SURA = Regex("<sura\\s[^>]*/>")
 
+/** The number of juz the metadata divides the Quran into. */
+public const val JUZ_COUNT: Int = 30
+
+public sealed interface JuzParse {
+    /** [starts] holds the first ayah of juz 1 to 30, in order. */
+    public data class Parsed(val starts: List<VerseRef>) : JuzParse
+
+    public data class Refused(val reason: String) : JuzParse
+}
+
+/**
+ * Reads the `<juz index="..." sura="..." aya="..."/>` elements of Tanzil's `quran-data.xml` (ADR-24). Strict, like
+ * [parseMetadata]: exactly 30, numbered 1 to 30 in order, juz 1 at 1:1, each later one strictly after the one before.
+ * Whether each start ayah exists in its surah is checked by the [Quran] layout that uses them.
+ */
+public fun parseJuzStarts(xml: String): JuzParse {
+    val starts = mutableListOf<VerseRef>()
+    for (element in JUZ.findAll(xml)) {
+        fun attribute(name: String): Int? = Regex("\\s$name=\"(\\d+)\"").find(element.value)?.groupValues?.get(1)?.toIntOrNull()
+        val index = attribute("index")
+        val surah = attribute("sura")?.let(SurahNumber::of)
+        val ayah = attribute("aya")?.takeIf { it >= 1 }
+        if (index == null || surah == null || ayah == null) return JuzParse.Refused("a <juz> element lacks a valid index, sura or aya: ${element.value.take(80)}")
+        if (index != starts.size + 1) return JuzParse.Refused("<juz> number $index is at position ${starts.size + 1}")
+        val ref = VerseRef(surah, ayah)
+        val previous = starts.lastOrNull()
+        if (previous != null && !(ref.surah > previous.surah || (ref.surah == previous.surah && ref.ayah > previous.ayah))) {
+            return JuzParse.Refused("juz $index starts at $ref, not after juz ${index - 1} at $previous")
+        }
+        starts += ref
+    }
+    if (starts.size != JUZ_COUNT) return JuzParse.Refused("${starts.size} <juz> elements, expected $JUZ_COUNT")
+    if (starts.first().surah.value != 1 || starts.first().ayah != 1) return JuzParse.Refused("juz 1 starts at ${starts.first()}, not 1:1")
+    return JuzParse.Parsed(starts)
+}
+
+private val JUZ = Regex("<juz\\s[^>]*/>")
+
 /**
  * The verified Quran: the displayed text, the text that is only indexed for search, and the metadata, all agreeing
  * (INV-QT1). [verses] are in order, 1:1 first. Construct with [checkQuran].

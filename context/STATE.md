@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 18:01 +0600
+**Last updated:** 2026-11-28 18:20 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac:
-361 tests (252 `:core`, 74 `:app`, 32 content gate, 3 engine), lint clean, all gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 266 string keys in both languages, 64 real
-districts, the Quran text matching its recorded SHA-256; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 867,257 bytes, unsigned, minified (233,370 before phase 14, 184,738 before phase 10). **Nothing has run on a real phone, and
+382 tests (266 `:core`, 81 `:app`, 32 content gate, 3 engine), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 294 string keys in both languages, 64 real
+districts, the Quran text matching its recorded SHA-256; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 879,473 bytes, unsigned, minified (867,257 before phase 15, 233,370 before phase 14). **Nothing has run on a real phone, and
 nothing changed on 28 Nov has run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
@@ -73,6 +73,18 @@ nothing changed on 28 Nov has run on any device.**
 - KNOWN: build green; the release APK's Quran files have the recorded hashes. UNKNOWN: everything on a device (first-open
   time, FTS4 on SQLite 3.18, rendering), G57 to G59; Q13 (the offline "link" term).
 
+## Phase 15 built (branch `phase-15-16-khatam-packs`)
+
+- **Khatam plan, counted in ayahs** (ADR-24). `core/khatam`: `QuranLayout` from the verified metadata's surahs and its 30 juz
+  starts (`parseJuzStarts`), `khatamToday` recomputed every day from where the day began to the target (rounded up, so the
+  plan ends by the target), sealed `KhatamDay` (`ToRead`, `Read` with an optional next stretch, `Complete`, `NewDateNeeded`).
+  No field holds a day without reading. `khatam` is migration 3 of the backed-up `deed-days.db`; backup rules unchanged.
+- **Screen:** `KhatamActivity` (Home button): finish date, today's surah:ayah range and juz, open in the reader, "I have read
+  it", read on, take back, change date, remove. `KhatamStringsTest` scans the 28 `khatam_` strings for behind, missed, late,
+  counts and digits.
+- **Reminder:** no new notification. An off-by-default switch lets the one daily nudge mention a waiting portion (`nudgeFor`);
+  with the nudge off there is none (G61). KNOWN: build green. UNKNOWN: the screen and the nudge on a device; Q14, G60, G61.
+
 ## What changed on 28 Nov 2026
 
 - **Real districts (Q4).** `content/districts.json`: all 64, Wikidata (CC0) checked against
@@ -109,7 +121,7 @@ nothing changed on 28 Nov has run on any device.**
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
 5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); phases 11 (calculated date; authority open, Q10) and 12 (Zakat on a fake
-   rules file; Q11) 13 (duas and hadith on fake records; Q12) and 14 (Quran Arabic text, reader, search; no translation; Q13) are built; next is phase 15 (khatam planner). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
+   rules file; Q11) 13 (duas and hadith on fake records; Q12) and 14 (Quran Arabic text, reader, search; no translation; Q13) and 15 (khatam plan; Q14) are built; next is phase 16 (packs machinery without `INTERNET`). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
 
 ## Waiting on the founder
 
@@ -124,5 +136,6 @@ nothing changed on 28 Nov has run on any device.**
 | Reviewer signs the Zakat rules | Phase 12 calculates nothing in a release without them | Q11, G55 |
 | Reviewer: books, texts and licences for duas and hadith; the no-nudge decision | Phase 13 shows nothing in a release without them | Q12, G56 |
 | A Bengali Quran translation with written permission; Tanzil's offline "link" term | Phase 14 ships Arabic only | Q13, `PLAN` founder track |
+| Khatam unit (ayah) and the reminder riding on the deed nudge | Phase 15 built that way | Q14, G61 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |
 | Play account, support email, privacy URL | Release | G14, G15 |

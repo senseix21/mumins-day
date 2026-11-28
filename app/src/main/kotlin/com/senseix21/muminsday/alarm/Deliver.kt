@@ -7,7 +7,9 @@ import android.util.Log
 import com.senseix21.muminsday.store.AlarmKind
 import com.senseix21.muminsday.store.LoggedAlarm
 import com.senseix21.muminsday.store.Outcome
+import com.senseix21.muminsday.store.StoredKhatam
 import com.senseix21.muminsday.store.Stores
+import com.senseix21.muminsday.khatam.portionWaits
 import java.time.Instant
 
 /**
@@ -34,12 +36,20 @@ fun deliver(context: Context, trigger: Trigger, now: Instant) {
 private const val TEST_NOTICE_CODE = 60
 
 /**
- * F4: one notification, and none when today's card is already done. Posted once per delivery and never again: nothing
- * schedules a second one, and the next day's nudge is a separate alarm the planner puts there.
+ * F4: one notification, and none when there is nothing to say. Posted once per delivery and never again: nothing
+ * schedules a second one, and the next day's nudge is a separate alarm the planner puts there. ADR-24: if the user
+ * asked, the same notification mentions a khatam portion waiting today.
  */
 private fun nudge(context: Context, now: Instant) {
-    val zone = Stores.settings(context).read().place.zone
-    if (nudgeNeeded(Stores.deedDays(context).get(now.atZone(zone).toLocalDate()))) Notifications.postNudge(context)
+    val store = Stores.settings(context)
+    val today = now.atZone(store.read().place.zone).toLocalDate()
+    val portionWaits = store.readApp().khatamInNudge &&
+        when (val stored = Stores.khatam(context).read()) {
+            is StoredKhatam.Plan -> portionWaits(stored.khatam, today)
+            StoredKhatam.NoPlan -> false
+        }
+    val nudge = nudgeFor(Stores.deedDays(context).get(today), portionWaits)
+    if (nudge != Nudge.Nothing) Notifications.postNudge(context, nudge)
 }
 
 private fun LoggedAlarm.noticeCode(): Int = salah.ordinal * AlarmKind.entries.size + kind.ordinal

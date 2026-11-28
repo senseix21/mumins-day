@@ -529,13 +529,15 @@ with the radio off. Built 2026-11-28 with the real Tanzil Arabic text and no tra
 
 ## Phase 15 · Khatam planner
 
-**Outcome.** A plan to finish the Quran by a date the user picks, with gentle progress.
+**Outcome.** A plan to finish the Quran by a date the user picks, with gentle progress. Built 2026-11-28 18:20 +0600 (ADR-24). Not run on an emulator or phone.
 
-- [ ] Table for the plan and progress (by juz, page or ayah: decide), one migration.
-- [ ] Daily portion computed from today to the target date; recomputed, never "behind" language [INV-C4].
-- [ ] Optional single daily reminder through the existing nudge path, off by default.
-- [ ] Opens the reader at today's portion.
-- [ ] Tests: portions sum to the whole Quran; date changes and travel; finishing early.
+- [x] Table for the plan and progress (by juz, page or ayah: decide), one migration. 2026-11-28: **ayah** (ADR-24: exact from the bundled metadata; juz shown, not used to divide); `khatam` is migration 3 of `deed-days.db`, one row (`CHECK (id = 1)`), backup rules unchanged. `MigrationsTest` (third step, no day or count column); the SQL ran by hand in `sqlite3` 3.54.0 (upgrade from 2, replace keeps one row, a second id refused by the CHECK).
+- [ ] The 2 to 3 upgrade of `deed-days.db` on a device, and a backup/restore with a plan in it.
+- [x] Daily portion computed from today to the target date; recomputed, never "behind" language [INV-C4]. 2026-11-28: `core/khatam/khatamToday`, sealed `KhatamDay` (`ToRead`, `Read`, `Complete`, `NewDateNeeded`); `KhatamTest` (member names) and `KhatamStringsTest` (28 strings, both languages). The screen's look is not checked (item below).
+- [ ] Optional single daily reminder through the existing nudge path, off by default. Built 2026-11-28: no new alarm or notification; `AppPrefs.khatamInNudge` (off) changes the words of the one nudge (`nudgeFor`, `TriggerTest`); shown in Settings only while the nudge has a time. Open: see the nudge's three texts on an emulator.
+- [ ] Opens the reader at today's portion. Built: `KhatamActivity` "Open today's portion" calls `openSurah` at the first unread ayah of the portion. Open: tap it on an emulator.
+- [x] Tests: portions sum to the whole Quran; date changes and travel; finishing early. 2026-11-28, `KhatamTest` (14): 159 plan lengths (0 to 7000 days) cover 6236 ayahs once with no gap or overlap by the target; target today hands out the rest; a past target is `NewDateNeeded`; finishing early stays `Complete` after the target; a zone change that moves the date back joins the marked day; 300 random sequences of reading, not reading, reading on, undo, date changes and travel keep `0 <= dayStart <= position <= 6236`.
+- [ ] Look at the khatam screen on an emulator in both languages at 200 % font; the reviewer's and native speaker's read of the 28 strings [T-UI-2, INV-C4].
 
 ## Phase 16 · Tafsir and recitation audio as downloadable packs
 

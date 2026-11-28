@@ -10,6 +10,7 @@ import com.senseix21.muminsday.MainActivity
 import com.senseix21.muminsday.R
 import com.senseix21.muminsday.planner.Salah
 import com.senseix21.muminsday.ui.DeedActivity
+import com.senseix21.muminsday.ui.KhatamActivity
 import java.time.Instant
 
 /**
@@ -97,20 +98,27 @@ object Notifications {
     }
 
     /**
-     * The daily deed nudge (F4): one quiet notification whose tap opens the deed card. A fixed id, so even a second
-     * call could only replace it, never stack. It carries no count and no word about days missed (INV-C4).
+     * The daily nudge (F4): one quiet notification whose tap opens what it names: the deed card, the khatam plan
+     * (ADR-24), or the home screen when it names both. A fixed id, so even a second call could only replace it, never
+     * stack. It carries no count and no word about days missed (INV-C4).
      */
-    fun postNudge(context: Context) {
+    fun postNudge(context: Context, nudge: Nudge) {
+        val (text, open) = when (nudge) {
+            Nudge.Nothing -> return
+            Nudge.Deed -> R.string.notification_nudge to DeedActivity::class.java
+            Nudge.Portion -> R.string.khatam_nudge_portion to KhatamActivity::class.java
+            Nudge.DeedAndPortion -> R.string.khatam_nudge_both to MainActivity::class.java
+        }
         ensureChannels(context)
         val manager = checkNotNull(context.getSystemService(NotificationManager::class.java))
         manager.notify(
             NUDGE_NOTIFICATION_ID,
             Notification.Builder(context, NOTICE_CHANNEL)
                 .setSmallIcon(R.drawable.ic_placeholder)
-                .setContentTitle(context.getString(R.string.notification_nudge))
+                .setContentTitle(context.getString(text))
                 .setCategory(Notification.CATEGORY_REMINDER)
                 .setAutoCancel(true)
-                .setContentIntent(openDeed(context))
+                .setContentIntent(PendingIntent.getActivity(context, 1, Intent(context, open), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
                 .build(),
         )
     }
@@ -119,13 +127,6 @@ object Notifications {
 
     /** The prayer a notification is about, for its "Prayed" action. [prayerAt] decides which date the mark belongs to. */
     class PrayedTarget(val salah: Salah, val prayerAt: Instant)
-
-    private fun openDeed(context: Context): PendingIntent = PendingIntent.getActivity(
-        context,
-        1,
-        Intent(context, DeedActivity::class.java),
-        PendingIntent.FLAG_IMMUTABLE,
-    )
 
     private fun openApp(context: Context): PendingIntent = PendingIntent.getActivity(
         context,

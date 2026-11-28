@@ -63,6 +63,7 @@
         <activity android:name=".ui.TodayActivity" android:exported="false" />
         <activity android:name=".ui.QuranActivity" android:exported="false" />
         <activity android:name=".ui.SurahActivity" android:exported="false" />
+        <activity android:name=".ui.KhatamActivity" android:exported="false" />
 
         <!--
             Not exported: only the system (protected broadcasts) and the app itself reach these. LOCKED_BOOT_COMPLETED is

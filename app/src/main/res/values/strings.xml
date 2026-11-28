@@ -416,4 +416,34 @@
     <string name="quran_no_translation">এই সংস্করণে কোনো অনুবাদ নেই।</string>
     <string name="quran_fake_translation_banner">পরীক্ষার অনুবাদ: প্রতিটি আয়াতের নিচের লেখা বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এটি অনুবাদ নয়।</string>
 
+    <!-- Phase 15: the khatam plan (ADR-24). Every key starts with khatam_ and is scanned by KhatamStringsTest. -->
+    <string name="khatam_title">খতম পরিকল্পনা</string>
+    <string name="khatam_help">যে তারিখের মধ্যে কুরআন শেষ করতে চান, সেটি বেছে নিন। প্রতিদিন অ্যাপ সেই তারিখ পর্যন্ত দিনগুলোর জন্য আজকের অংশ নতুন করে হিসাব করে।</string>
+    <string name="khatam_none">কোনো পরিকল্পনা নেই।</string>
+    <string name="khatam_start">শেষ করার তারিখ বেছে নিন</string>
+    <string name="khatam_target">শেষ করার তারিখ: %1$s</string>
+    <string name="khatam_today">আজকের অংশ</string>
+    <string name="khatam_range">সূরা %1$s, আয়াত %2$s থেকে সূরা %3$s, আয়াত %4$s পর্যন্ত</string>
+    <string name="khatam_juz">পারা %1$s থেকে শুরু</string>
+    <string name="khatam_open">আজকের অংশ খুলুন</string>
+    <string name="khatam_mark_read">পড়েছি</string>
+    <string name="khatam_today_read">আজকের অংশ পড়া হয়েছে।</string>
+    <string name="khatam_more_help">আরও পড়তে চাইলে, পরের অংশ এখানে। তাহলে কালকের অংশ ছোট হবে।</string>
+    <string name="khatam_open_more">পরের অংশ খুলুন</string>
+    <string name="khatam_mark_more">এটিও পড়েছি</string>
+    <string name="khatam_undo">আজকের চিহ্ন তুলে নিন</string>
+    <string name="khatam_complete">এই পরিকল্পনায় আপনি পুরো কুরআন পড়েছেন।</string>
+    <string name="khatam_start_again">নতুন পরিকল্পনা শুরু করুন</string>
+    <string name="khatam_new_date">আপনার বেছে নেওয়া তারিখ পেরিয়ে গেছে। প্রতিদিনের অংশ দেখতে নতুন তারিখ বেছে নিন।</string>
+    <string name="khatam_open_where">যেখানে থেমেছিলেন সেখানে খুলুন</string>
+    <string name="khatam_change_date">শেষ করার তারিখ বদলান</string>
+    <string name="khatam_end_plan">এই পরিকল্পনা মুছে ফেলুন</string>
+    <string name="khatam_end_confirm">পরিকল্পনাটি মুছে ফেলবেন? কোথা পর্যন্ত পড়েছেন, তা ফোন থেকে মুছে যাবে।</string>
+    <string name="khatam_end_yes">মুছে ফেলুন</string>
+    <string name="khatam_end_no">রেখে দিন</string>
+    <string name="khatam_nudge_portion">আজকের কুরআনের অংশ খোলার জন্য তৈরি।</string>
+    <string name="khatam_nudge_both">আজকের ভালো কাজ আর কুরআনের অংশ দেখার জন্য তৈরি।</string>
+    <string name="khatam_settings_nudge">আজকের কুরআনের অংশের কথাও বলুন</string>
+    <string name="khatam_settings_nudge_help">শুধু যেদিন খতম পরিকল্পনায় আজকের অংশ থাকে। তখনও দিনে একটাই নোটিফিকেশন, একই সময়ে।</string>
+
 </resources>

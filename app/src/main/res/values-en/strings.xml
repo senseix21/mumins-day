@@ -402,4 +402,34 @@
     <string name="quran_no_translation">This version has no translation.</string>
     <string name="quran_fake_translation_banner">TEST TRANSLATION: the line under each ayah is made up, only to try the app. It is not a translation.</string>
 
+    <!-- Phase 15: the khatam plan (ADR-24). Every key starts with khatam_ and is scanned by KhatamStringsTest. -->
+    <string name="khatam_title">Khatam plan</string>
+    <string name="khatam_help">Choose the date you would like to finish the Quran by. Each day the app works out today\'s portion afresh for the days until then.</string>
+    <string name="khatam_none">There is no plan.</string>
+    <string name="khatam_start">Choose a finish date</string>
+    <string name="khatam_target">Finish by: %1$s</string>
+    <string name="khatam_today">Today\'s portion</string>
+    <string name="khatam_range">From surah %1$s, ayah %2$s, to surah %3$s, ayah %4$s</string>
+    <string name="khatam_juz">Starts in juz %1$s</string>
+    <string name="khatam_open">Open today\'s portion</string>
+    <string name="khatam_mark_read">I have read it</string>
+    <string name="khatam_today_read">Today\'s portion is read.</string>
+    <string name="khatam_more_help">If you would like to read on, here is the next stretch. Tomorrow\'s portion will then be shorter.</string>
+    <string name="khatam_open_more">Open the next stretch</string>
+    <string name="khatam_mark_more">I have read this too</string>
+    <string name="khatam_undo">Take back today\'s mark</string>
+    <string name="khatam_complete">You have read the whole Quran in this plan.</string>
+    <string name="khatam_start_again">Start a new plan</string>
+    <string name="khatam_new_date">The date you chose has passed. Choose a new date to see a portion for each day.</string>
+    <string name="khatam_open_where">Open where you stopped</string>
+    <string name="khatam_change_date">Change the finish date</string>
+    <string name="khatam_end_plan">Remove this plan</string>
+    <string name="khatam_end_confirm">Remove this plan? Where you have read to is removed from the phone.</string>
+    <string name="khatam_end_yes">Remove</string>
+    <string name="khatam_end_no">Keep it</string>
+    <string name="khatam_nudge_portion">Today\'s Quran portion is ready to open.</string>
+    <string name="khatam_nudge_both">Today\'s good deed and Quran portion are ready to look at.</string>
+    <string name="khatam_settings_nudge">Also mention today\'s Quran portion</string>
+    <string name="khatam_settings_nudge_help">Only on a day the khatam plan has a portion. It is still one notification a day, at the same time.</string>
+
 </resources>

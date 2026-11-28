@@ -82,12 +82,24 @@ class MigrationsTest {
     // ADR-18: the tracker's table lives in the backed-up file, as a later step of the deed history.
     @Test
     fun `the Salah log is the second step of the deed history and holds only marked prayers`() {
-        assertEquals(2, latestVersion(deedMigrations))
+        assertEquals(2, deedMigrations[1].version)
         val sql = statementsBetween(1, 2, deedMigrations).joinToString("\n")
         assertTrue("CREATE TABLE salah_log" in sql)
         for (column in listOf("local_date", "salah", "prayed_at", "PRIMARY KEY (local_date, salah)")) assertTrue(column in sql, column)
         // INV-C5: nothing in the table can say a prayer was not marked.
         for (word in listOf("missed", "skipped", "count", "streak", "status")) assertFalse(word in sql.lowercase(), word)
+        assertFalse("alarm_log" in sql)
+    }
+
+    // ADR-24: the khatam plan is the third step of the same backed-up history, so the backup rules did not change.
+    @Test
+    fun `the khatam plan is the third step of the deed history and holds one row and no days`() {
+        assertEquals(3, latestVersion(deedMigrations))
+        val sql = statementsBetween(2, 3, deedMigrations).joinToString("\n")
+        assertTrue("CREATE TABLE khatam" in sql)
+        for (column in listOf("started_on", "target_on", "end_ayahs", "position", "marked_on", "day_start", "CHECK (id = 1)")) assertTrue(column in sql, column)
+        // INV-C4: nothing in the table can say a day went by without reading.
+        for (word in listOf("missed", "skipped", "behind", "late", "streak", "count", "local_date")) assertFalse(word in sql.lowercase(), word)
         assertFalse("alarm_log" in sql)
     }
 

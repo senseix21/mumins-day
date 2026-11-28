@@ -34,7 +34,8 @@ val alarmLogMigrations: List<Migration> = listOf(
 )
 
 /**
- * The backed-up user data's history (G5, G34): the deed days, then the Salah log (ADR-18). This file is backed up, so it
+ * The backed-up user data's history (G5, G34): the deed days, then the Salah log (ADR-18), then the khatam plan
+ * (ADR-24), so the backup rules did not change for either. This file is backed up, so it
  * holds nothing about one phone's alarms. Numbered on its own: version 1 here has nothing to do with version 1 of the
  * alarm log.
  */
@@ -66,6 +67,26 @@ val deedMigrations: List<Migration> = listOf(
                 salah TEXT NOT NULL,
                 prayed_at INTEGER NOT NULL,
                 PRIMARY KEY (local_date, salah)
+            )
+            """.trimIndent(),
+        ),
+    ),
+    Migration(
+        version = 3,
+        statements = listOf(
+            // The khatam plan (phase 15, ADR-24): at most one row, where the user has read to, counted in ayahs from 1:1.
+            // It holds no row per day, so nothing here can count a day without reading (INV-C4). end_ayahs is the text's
+            // own ayah count when the plan was made; marked_on and day_start keep today's portion fixed for the day.
+            // Dates are ISO yyyy-MM-dd local dates of the place.
+            """
+            CREATE TABLE khatam (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                started_on TEXT NOT NULL,
+                target_on TEXT NOT NULL,
+                end_ayahs INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                marked_on TEXT NOT NULL,
+                day_start INTEGER NOT NULL
             )
             """.trimIndent(),
         ),

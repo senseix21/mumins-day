@@ -162,6 +162,13 @@ class SettingsActivity : BaseActivity() {
             box.addView(actionButton(getString(R.string.settings_nudge_time, texts.timeOfDay(chosen)), primary = false) {
                 pickNudgeTime(chosen)
             })
+            // ADR-24: the khatam portion rides on this one notification; there is no second one to turn on.
+            box.addView(
+                switchRow(getString(R.string.khatam_settings_nudge), Stores.settings(this).readApp().khatamInNudge) { on ->
+                    saveApp(this, Stores.settings(this).readApp().copy(khatamInNudge = on))
+                },
+            )
+            box.addView(body(getString(R.string.khatam_settings_nudge_help), muted = true))
         }
         return box
     }

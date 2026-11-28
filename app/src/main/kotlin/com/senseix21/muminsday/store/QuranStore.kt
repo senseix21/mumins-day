@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.database.sqlite.SQLiteDatabase
 import com.senseix21.muminsday.BuildConfig
+import com.senseix21.muminsday.khatam.LayoutCheck
+import com.senseix21.muminsday.khatam.QuranLayout
+import com.senseix21.muminsday.khatam.buildLayout
+import com.senseix21.muminsday.quran.JuzParse
 import com.senseix21.muminsday.quran.Line
 import com.senseix21.muminsday.quran.Lookup
 import com.senseix21.muminsday.quran.Quran
@@ -19,6 +23,7 @@ import com.senseix21.muminsday.quran.checkQuran
 import com.senseix21.muminsday.quran.checkTranslation
 import com.senseix21.muminsday.quran.indexWords
 import com.senseix21.muminsday.quran.notice
+import com.senseix21.muminsday.quran.parseJuzStarts
 import com.senseix21.muminsday.quran.parseMetadata
 import com.senseix21.muminsday.quran.parseText
 import java.io.FileNotFoundException
@@ -68,18 +73,32 @@ fun openQuran(context: Context): QuranOpen {
         val problem = rebuild(database, assets, names, key)
         if (problem != null) return QuranOpen.Unverified(problem)
     }
-    return QuranOpen.Ready(QuranReader(database))
+    val surahs = readSurahs(database)
+    // The khatam plan's layout (ADR-24): the surahs as built, the juz from the same verified metadata file.
+    val juzStarts = when (val juz = parseJuzStarts(read(assets, METADATA).toString(Charsets.UTF_8))) {
+        is JuzParse.Parsed -> juz.starts
+        is JuzParse.Refused -> return QuranOpen.Unverified("metadata: ${juz.reason}")
+    }
+    return when (val layout = buildLayout(surahs, juzStarts)) {
+        is LayoutCheck.Built -> QuranOpen.Ready(QuranReader(database, surahs, layout.layout))
+        is LayoutCheck.Refused -> QuranOpen.Unverified("layout: ${layout.reason}")
+    }
 }
 
-/** Reads the built database. [surahs] come from the verified metadata. */
-class QuranReader internal constructor(private val database: SQLiteDatabase) {
-    val surahs: List<SurahInfo> = database.rawQuery("SELECT number, name, ayah_count FROM surah ORDER BY number", null).use { cursor ->
+private fun readSurahs(database: SQLiteDatabase): List<SurahInfo> =
+    database.rawQuery("SELECT number, name, ayah_count FROM surah ORDER BY number", null).use { cursor ->
         buildList {
             while (cursor.moveToNext()) {
                 SurahNumber.of(cursor.getInt(0))?.let { add(SurahInfo(it, cursor.getInt(2), cursor.getString(1))) }
             }
         }
     }
+
+/**
+ * Reads the built database. [surahs] come from the verified metadata; [layout] (ayah positions and juz, for the khatam
+ * plan, ADR-24) from the same metadata.
+ */
+class QuranReader internal constructor(private val database: SQLiteDatabase, val surahs: List<SurahInfo>, val layout: QuranLayout) {
 
     /** True when a translation is bundled; false in every release until one has written permission (INV-QT1). */
     val hasTranslation: Boolean = meta(database, TRANSLATION_KIND) != null

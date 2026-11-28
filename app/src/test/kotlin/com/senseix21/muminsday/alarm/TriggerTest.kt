@@ -59,9 +59,18 @@ class TriggerTest {
     @Test
     fun `the nudge is posted unless today's card is done, and a day with no card is not done`() {
         val card = DayCard(date, DeedId.of("test-1")!!, contentVersion = 1, swapped = false, doneAt = null)
-        assertEquals(true, nudgeNeeded(null))
-        assertEquals(true, nudgeNeeded(card))
-        assertEquals(false, nudgeNeeded(card.copy(doneAt = at)))
+        assertEquals(Nudge.Deed, nudgeFor(null, portionWaits = false))
+        assertEquals(Nudge.Deed, nudgeFor(card, portionWaits = false))
+        assertEquals(Nudge.Nothing, nudgeFor(card.copy(doneAt = at), portionWaits = false))
+    }
+
+    // ADR-24: the khatam portion rides on the same notification; it never adds one.
+    @Test
+    fun `a waiting khatam portion changes the nudge's words and never makes a second nudge`() {
+        val card = DayCard(date, DeedId.of("test-1")!!, contentVersion = 1, swapped = false, doneAt = null)
+        assertEquals(Nudge.DeedAndPortion, nudgeFor(card, portionWaits = true))
+        assertEquals(Nudge.DeedAndPortion, nudgeFor(null, portionWaits = true))
+        assertEquals(Nudge.Portion, nudgeFor(card.copy(doneAt = at), portionWaits = true))
     }
 
     @Test

@@ -30,6 +30,8 @@ data class AppPrefs(
     val hijriAdjustment: HijriAdjustment = HijriAdjustment.None,
     /** Where the Quran reader was left (phase 14). Backed up with the settings, so a new phone opens at the same ayah. */
     val quranPosition: VerseRef? = null,
+    /** The daily nudge also mentions a waiting khatam portion (ADR-24). Off by default; it adds no notification. */
+    val khatamInNudge: Boolean = false,
 )
 
 private const val A = "app."
@@ -46,6 +48,7 @@ fun parseAppPrefs(stored: Map<String, *>): AppPrefs {
         ramadanMode = text("ramadanMode") == "true",
         hijriAdjustment = HijriAdjustment.ofDays(text("hijriAdjustment")?.toIntOrNull() ?: 0),
         quranPosition = text("quranPosition")?.let(::parseVerseRef),
+        khatamInNudge = text("khatamInNudge") == "true",
     )
 }
 
@@ -55,6 +58,7 @@ fun encodeAppPrefs(prefs: AppPrefs): Map<String, String> = buildMap {
     put(A + "onboarded", prefs.onboarded.toString())
     put(A + "ramadanMode", prefs.ramadanMode.toString())
     put(A + "hijriAdjustment", prefs.hijriAdjustment.days.toString())
+    put(A + "khatamInNudge", prefs.khatamInNudge.toString())
     prefs.districtId?.let { put(A + "districtId", it.value) }
     prefs.quranPosition?.let { put(A + "quranPosition", "${it.surah.value}:${it.ayah}") }
 }

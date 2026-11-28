@@ -23,6 +23,9 @@ object Stores {
     /** Shares the deed days' file: one backed-up database for everything the user records (ADR-18). */
     fun salahLog(context: Context): SalahLog = SalahLog(userDataDatabase(context))
 
+    /** The khatam plan, in the same backed-up file (ADR-24). */
+    fun khatam(context: Context): KhatamStore = KhatamStore(userDataDatabase(context))
+
     /** The Quran search database (ADR-23). One instance, so the reader and the search share one connection. */
     fun quranDatabase(context: Context): Database = synchronized(this) {
         quranHelper ?: Database(context.applicationContext, QURAN_FILE, quranMigrations).also { quranHelper = it }
