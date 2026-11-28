@@ -484,4 +484,34 @@
     <string name="hisnul_dua_number">Dua %1$s</string>
     <string name="hisnul_reference">Reference: %1$s</string>
 
+    <!-- Hadith books, unreviewed, debug builds only (ADR-28). -->
+    <string name="hadith_books_title">Hadith books</string>
+    <string name="hadith_books_opening">Opening… The first time, a book can take a few seconds.</string>
+    <string name="hadith_books_unreviewed_banner">Not checked: no reviewer has read these hadiths, their translations or their grades. Source: the hadith-api project on GitHub. Who made the Bengali translation is not known. The text and the grades are shown exactly as the source has them. This is in developer test builds only.</string>
+    <string name="hadith_books_not_in_build">The hadith books are not in this version of the app.</string>
+    <string name="hadith_books_refused">A hadith file has an error, so nothing is shown.</string>
+    <string name="hadith_books_list">Books</string>
+    <string name="hadith_book_bukhari">Sahih al-Bukhari</string>
+    <string name="hadith_book_muslim">Sahih Muslim</string>
+    <string name="hadith_book_abudawud">Sunan Abu Dawud</string>
+    <string name="hadith_book_tirmidhi">Jami at-Tirmidhi</string>
+    <string name="hadith_book_nasai">Sunan an-Nasa\'i</string>
+    <string name="hadith_book_ibnmajah">Sunan Ibn Majah</string>
+    <string name="hadith_book_malik">Muwatta Malik</string>
+    <string name="hadith_book_nawawi">Forty Hadith of an-Nawawi</string>
+    <string name="hadith_source_name">Name in the source: %1$s</string>
+    <string name="hadith_sections">Sections</string>
+    <string name="hadith_section_title">Section %1$s</string>
+    <string name="hadith_section_unnamed">No section name in the source</string>
+    <string name="hadith_count">Hadiths: %1$s</string>
+    <string name="hadith_jump_hint">Hadith number</string>
+    <string name="hadith_jump">Go</string>
+    <string name="hadith_jump_not_number">Type a hadith number.</string>
+    <string name="hadith_jump_not_found">This book has no hadith numbered %1$s.</string>
+    <string name="hadith_number">Hadith %1$s</string>
+    <string name="hadith_arabic_number">Number in the Arabic edition: %1$s</string>
+    <string name="hadith_grade">Grade (%1$s): %2$s</string>
+    <string name="hadith_reference">Reference: section %1$s, hadith %2$s</string>
+    <string name="hadith_no_text">The source has no text for this number.</string>
+
 </resources>

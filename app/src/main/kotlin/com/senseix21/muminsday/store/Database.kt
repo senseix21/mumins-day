@@ -13,6 +13,9 @@ const val DEED_DAYS_FILE: String = "deed-days.db"
 /** The Quran search database (ADR-23): built on the phone from the verified assets, never backed up, rebuildable. */
 const val QURAN_FILE: String = "quran.db"
 
+/** The hadith books' cache (ADR-28): built on the phone from the debug assets, never backed up, rebuildable. */
+const val HADITH_BOOKS_FILE: String = "hadith-books.db"
+
 /** The one file that held both tables before G34. Nothing reads it any more; [Stores] deletes it. */
 const val LEGACY_DATABASE_FILE: String = "mumins-day.db"
 

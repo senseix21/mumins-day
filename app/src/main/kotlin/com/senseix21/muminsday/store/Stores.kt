@@ -10,6 +10,7 @@ object Stores {
     private var alarmLogDatabase: Database? = null
     private var deedDaysDatabase: Database? = null
     private var quranHelper: Database? = null
+    private var hadithBooksHelper: Database? = null
     private var legacyRemoved = false
 
     fun alarmLog(context: Context): AlarmLog = AlarmLog(
@@ -29,6 +30,11 @@ object Stores {
     /** The Quran search database (ADR-23). One instance, so the reader and the search share one connection. */
     fun quranDatabase(context: Context): Database = synchronized(this) {
         quranHelper ?: Database(context.applicationContext, QURAN_FILE, quranMigrations).also { quranHelper = it }
+    }
+
+    /** The hadith books' cache (ADR-28). One instance, so every screen shares one connection. */
+    fun hadithBooksDatabase(context: Context): Database = synchronized(this) {
+        hadithBooksHelper ?: Database(context.applicationContext, HADITH_BOOKS_FILE, hadithBookMigrations).also { hadithBooksHelper = it }
     }
 
     private fun userDataDatabase(context: Context): Database = synchronized(this) {

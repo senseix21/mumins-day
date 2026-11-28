@@ -163,6 +163,60 @@ val quranMigrations: List<Migration> = listOf(
     ),
 )
 
+/**
+ * The hadith books' cache (ADR-28): one book's rows are written the first time it is opened after an install, from the
+ * debug assets core has accepted, so a book of 7,589 hadiths opens by query instead of parsing 24 MB of JSON again. It
+ * holds nothing of the user's and is never backed up; deleting it costs one rebuild per book.
+ */
+val hadithBookMigrations: List<Migration> = listOf(
+    Migration(
+        version = 1,
+        statements = listOf(
+            // stamp: the installed APK's size and time; a new install (and so new assets) rebuilds the book.
+            "CREATE TABLE book (key TEXT PRIMARY KEY, name TEXT NOT NULL, stamp TEXT NOT NULL)",
+            """
+            CREATE TABLE section (
+                book TEXT NOT NULL,
+                id INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                hadith_count INTEGER NOT NULL,
+                PRIMARY KEY (book, id)
+            )
+            """.trimIndent(),
+            // number and arabic_number as the source writes them; arabic and bengali exactly as the source has them,
+            // null where that edition has no record with this number.
+            """
+            CREATE TABLE hadith (
+                book TEXT NOT NULL,
+                position INTEGER NOT NULL,
+                number TEXT NOT NULL,
+                arabic_number TEXT,
+                section INTEGER NOT NULL,
+                arabic TEXT,
+                bengali TEXT,
+                reference_book INTEGER NOT NULL,
+                reference_hadith INTEGER NOT NULL,
+                PRIMARY KEY (book, position),
+                UNIQUE (book, number)
+            )
+            """.trimIndent(),
+            "CREATE INDEX hadith_by_section ON hadith (book, section, position)",
+            // Each grade in the source's order (place), with the grader's name and the grade's words unchanged.
+            """
+            CREATE TABLE grade (
+                book TEXT NOT NULL,
+                position INTEGER NOT NULL,
+                place INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                grade TEXT NOT NULL,
+                PRIMARY KEY (book, position, place)
+            )
+            """.trimIndent(),
+        ),
+    ),
+)
+
 /** The version a fresh database with this [history] is created at. */
 fun latestVersion(history: List<Migration>): Int = history.last().version
 

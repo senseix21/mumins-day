@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 21:24 +0600
+**Last updated:** 2026-11-28 22:18 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac
-(branch `hisnul-muslim`): 458 tests (312 `:core`, 101 `:app`, 42 content gate, 3 engine; 3 skipped where `content/local` is absent), lint clean, all gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 342 string keys in both languages, the release APK free of local content (T-BUILD-7), 64 real
-districts, 120 Quran files matching their recorded SHA-256 including two Bengali translations of 6236 ayahs each; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 5,442,880 bytes, unsigned, minified (900,104 before the translations, 879,473 before phase 16). **Nothing has run on a real phone; the translations have not run on any device.**
+(branch `hadith-books`): 482 tests (328 `:core`, 103 `:app`, 48 content gate, 3 engine; 6 skipped where `content/local` is absent), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 370 string keys in both languages, the release APK free of local content (T-BUILD-7, now Hisnul Muslim and the hadith books), 64 real
+districts, 120 Quran files matching their recorded SHA-256 including two Bengali translations of 6236 ayahs each; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 5,446,960 bytes, unsigned, minified (5,442,880 before the hadith books, 900,104 before the translations). **Nothing has run on a real phone; the translations, Hisnul Muslim and the hadith books have run only on the API 36 emulator.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
 
@@ -98,6 +98,24 @@ districts, 120 Quran files matching their recorded SHA-256 including two Bengali
   exactly as the source); unreviewed banner on both. KNOWN: seen on the API 36 emulator (list, chapter 1), `ui.sh` PASS.
   UNKNOWN: English UI, 200 % font, phones.
 
+## Hadith books, unreviewed, local and debug only (branch `hadith-books`, ADR-28)
+
+- **What:** fawazahmed0's Hadith API (the founder's pick, "https://fawazahmed0.github.io/hadiths/ use it"): 8 books
+  (Bukhari, Muslim, Abu Dawud, Tirmidhi, an-Nasai, Ibn Majah, Malik, an-Nawawi's forty), 36,432 hadiths, each in Bengali and
+  in the Arabic edition with diacritics, byte for byte in git-ignored `content/local/hadith/`. Only hashes, counts, the
+  Unlicense text and the source statements are committed (`content/hadith-books-SOURCES.md`).
+- **Permission and review:** translators UNKNOWN (every Bengali edition says "Unknown"); the founder owns it (Q17); nobody
+  has reviewed texts or grades (G68).
+- **Build:** `checkHadithBooks` (hashes and per-book counts when present, notice when absent); staged into debug assets only;
+  T-BUILD-7 refuses `assets/hadith-books/` in a release. Debug APK 34,992,572 bytes with both local sets, 10,261,399 without
+  (the 16 editions are 101,369,712 bytes, 24,258,609 compressed in the APK).
+- **App:** Home "হাদিস গ্রন্থ" → 8 books → sections (jump box by number) → a ListView of the section's hadiths (Arabic right
+  to left, Bengali, grades, reference); banner on all three. First open per book builds an on-device SQLite cache (0.1 to
+  4.0 s on the emulator), later opens 30 ms. KNOWN: seen on the API 36 emulator, `ui.sh` PASS except T-UNIT-9 where the
+  source's own text has Latin digits (G68). UNKNOWN: English UI, 200 % font, phones.
+- **Also fixed:** the shared JSON reader scanned numbers with a regex at an offset, which on Android is quadratic (Bukhari
+  did not open in two minutes); now a hand scan, tested against the old regex.
+
 ## Phase 15 built (branch `phase-15-16-khatam-packs`)
 
 - **Khatam plan, counted in ayahs** (ADR-24). `core/khatam`: `QuranLayout` from the verified metadata's surahs and its 30 juz
@@ -143,8 +161,8 @@ districts, 120 Quran files matching their recorded SHA-256 including two Bengali
 
 ## Copies and branches
 
-- On the Mac (`~/dev/mumins-day`): branch `hisnul-muslim`, from `quran-footnotes-display` (0221e33), pushed to GitHub;
-  not merged, no PR. `content/local/` exists only on this Mac. Earlier notes said the cloud copy's `main` was ahead of GitHub.
+- On the Mac (`~/dev/mumins-day`): branch `hadith-books`, from `main` (fc7b9e0, PR #2 merged), pushed to GitHub; not
+  merged, no PR. `content/local/` (Hisnul Muslim and the hadith books) exists only on this Mac.
 - The cloud environment `mumins-day` now also allows Wikidata, Wikipedia, Open-Meteo,
   kivabe.com, the Islamic Foundation, dontkillmyapp.com, Android and Play documentation, and
   Wikimedia Commons.
@@ -178,5 +196,6 @@ districts, 120 Quran files matching their recorded SHA-256 including two Bengali
 | Khatam unit (ayah) and the reminder riding on the deed nudge | Phase 15 built that way | Q14, G61 |
 | A pack host, and a tafsir or recitation with written permission | Phase 16 downloads nothing until then; `INTERNET` waits (ADR-25) | ADR-25, G62 |
 | Hisnul Muslim: translator and permission; a reviewer | Nothing of it can reach a release | Q16, G67, ADR-27 |
+| Hadith books: translators and permission; a reviewer for texts and grades | Nothing of it can reach a release | Q17, G68, ADR-28 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |
 | Play account, support email, privacy URL | Release | G14, G15 |

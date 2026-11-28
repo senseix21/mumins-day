@@ -498,4 +498,34 @@
     <string name="hisnul_dua_number">দোয়া %1$s</string>
     <string name="hisnul_reference">সূত্র: %1$s</string>
 
+    <!-- Hadith books, unreviewed, debug builds only (ADR-28). -->
+    <string name="hadith_books_title">হাদিস গ্রন্থ</string>
+    <string name="hadith_books_opening">খোলা হচ্ছে… প্রথমবার একটি গ্রন্থ খুলতে কয়েক সেকেন্ড লাগতে পারে।</string>
+    <string name="hadith_books_unreviewed_banner">যাচাই করা হয়নি: কোনো রিভিউয়ার এই হাদিসগুলো, এদের অনুবাদ বা মান নির্ণয় এখনো পড়ে দেখেননি। উৎস: GitHub-এর hadith-api প্রকল্প। বাংলা অনুবাদ কার, তা জানা নেই। লেখা ও মান উৎসে যেমন আছে তেমনই দেখানো হচ্ছে। এটি শুধু ডেভেলপারের পরীক্ষার সংস্করণে আছে।</string>
+    <string name="hadith_books_not_in_build">অ্যাপের এই সংস্করণে হাদিস গ্রন্থগুলো নেই।</string>
+    <string name="hadith_books_refused">একটি হাদিস ফাইলে ভুল আছে, তাই কিছু দেখানো হচ্ছে না।</string>
+    <string name="hadith_books_list">গ্রন্থসমূহ</string>
+    <string name="hadith_book_bukhari">সহীহ বুখারী</string>
+    <string name="hadith_book_muslim">সহীহ মুসলিম</string>
+    <string name="hadith_book_abudawud">সুনানে আবু দাউদ</string>
+    <string name="hadith_book_tirmidhi">জামে আত-তিরমিযী</string>
+    <string name="hadith_book_nasai">সুনানে নাসাঈ</string>
+    <string name="hadith_book_ibnmajah">সুনানে ইবনে মাজাহ</string>
+    <string name="hadith_book_malik">মুয়াত্তা মালিক</string>
+    <string name="hadith_book_nawawi">ইমাম নববীর চল্লিশ হাদিস</string>
+    <string name="hadith_source_name">উৎসে নাম: %1$s</string>
+    <string name="hadith_sections">অধ্যায়সমূহ</string>
+    <string name="hadith_section_title">অধ্যায় %1$s</string>
+    <string name="hadith_section_unnamed">উৎসে এই অধ্যায়ের নাম নেই</string>
+    <string name="hadith_count">হাদিস: %1$s</string>
+    <string name="hadith_jump_hint">হাদিস নম্বর</string>
+    <string name="hadith_jump">যান</string>
+    <string name="hadith_jump_not_number">একটি হাদিস নম্বর লিখুন।</string>
+    <string name="hadith_jump_not_found">এই গ্রন্থে %1$s নম্বরের কোনো হাদিস নেই।</string>
+    <string name="hadith_number">হাদিস %1$s</string>
+    <string name="hadith_arabic_number">আরবি সংস্করণের নম্বর: %1$s</string>
+    <string name="hadith_grade">মান (%1$s): %2$s</string>
+    <string name="hadith_reference">সূত্র: অধ্যায় %1$s, হাদিস %2$s</string>
+    <string name="hadith_no_text">উৎসে এই নম্বরের কোনো লেখা নেই।</string>
+
 </resources>
