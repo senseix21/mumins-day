@@ -542,15 +542,16 @@ with the radio off. Built 2026-11-28 with the real Tanzil Arabic text and no tra
 ## Phase 16 · Tafsir and recitation audio as downloadable packs
 
 **Outcome.** Optional downloads, verified and stored on the device, without weakening the
-privacy promise for anyone who never downloads.
+privacy promise for anyone who never downloads. Machinery built 2026-11-28 against a TEST PACK only, **without `INTERNET`** (ADR-25): no host exists and no tafsir or recitation has permission. Nothing can be downloaded in any build.
 
-- [ ] ADR reversing ADR-6 for one host only, with the founder's yes; or the separate-app option.
-- [ ] `INTERNET` added; allowlist edit; T-BUILD-1 changed to "no host other than the pack host is ever contacted", tested [INV-P1 replaced by a written new invariant].
-- [ ] Pack manifest bundled in the app (names, sizes, SHA-256); a downloaded pack is used only if its hash matches; no other request is ever made.
-- [ ] No analytics, no identifiers in requests, no request without a user tap.
-- [ ] Downloads resume, can be cancelled, and can be deleted; storage shown in Settings.
-- [ ] Audio player for recitation with verse sync (if the source provides timings).
-- [ ] Privacy page and Data safety form updated before release (`spec/06`).
+- [ ] ADR reversing ADR-6 for one host only, with the founder's yes; or the separate-app option. ADR-25 written 2026-11-28: the founder's yes for the main app is in ADR-17; ADR-25 defers `INTERNET` until a host is named and a pack has permission, and lists the one commit that adds it. Open: the host.
+- [ ] `INTERNET` added; allowlist edit; T-BUILD-1 changed to "no host other than the pack host is ever contacted", tested [INV-P1 replaced by a written new invariant]. **Deliberately not done** (ADR-25); the replacement INV-P1 is written in ADR-25 as proposed, not in `spec/01`. The permission gate still reports "no INTERNET" (2026-11-28).
+- [x] Pack manifest bundled in the app (names, sizes, SHA-256); a downloaded pack is used only if its hash matches; no other request is ever made. 2026-11-28: `assets/packs/manifest.txt` (empty), `core/packs/parseManifest` (`PacksTest`), `PackFiles.accept`/`verified` (`DownloaderTest`: a tampered file is deleted and never named; a checked file changed later deletes the pack); `NetworkSurfaceTest` (only `Downloader.kt` opens a connection; no URL literal; host in one file).
+- [x] No analytics, no identifiers in requests, no request without a user tap. 2026-11-28 on the JVM: `DownloaderTest` checks every request's headers against a fixed list and `User-Agent: packs`; `step` lets only `Tap` start requests (`PacksTest`, 3000 random sequences); `PackDownloads.start` is called only from `PacksActivity` (`NetworkSurfaceTest`). On a device: not run.
+- [ ] Downloads resume, can be cancelled, and can be deleted; storage shown in Settings. JVM part 2026-11-28 (`DownloaderTest`: resume with `Range: bytes=70000-` ends byte for byte; a server ignoring the range still gives the exact file; cancel keeps the bytes; delete leaves 0 bytes; a 416 deletes the partial file; `PacksTest`: 300 random interruption patterns rebuild the file). The Settings line and the screen are built, not seen on a device.
+- [ ] Audio player for recitation with verse sync (if the source provides timings). Built: `RecitationActivity` (`MediaPlayer`, re-hash before play, current ayah from `ayahAt` when the pack has timings, stops when the screen is left). The timing format is data (`parseTimings`, `PacksTest`); the FAKE tone pack and its timings are checked in `DownloaderTest`. Open: play anything on a device; no real pack exists.
+- [ ] Privacy page and Data safety form updated before release (`spec/06`). Drafted 2026-11-28 as `spec/06` F, marked "applies when `INTERNET` lands"; founder and host details open.
+- [ ] `HttpsURLConnection` on Android: the headers it adds, TLS to the real host, the downloads screen with a host (needs ADR-25's commit).
 
 ## Phase 17 · Proof and release of the update
 

@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 18:20 +0600
+**Last updated:** 2026-11-28 18:36 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build --rerun-tasks` is green on the Mac:
-382 tests (266 `:core`, 81 `:app`, 32 content gate, 3 engine), lint clean, all gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 294 string keys in both languages, 64 real
-districts, the Quran text matching its recorded SHA-256; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 879,473 bytes, unsigned, minified (867,257 before phase 15, 233,370 before phase 14). **Nothing has run on a real phone, and
+411 tests (280 `:core`, 96 `:app`, 32 content gate, 3 engine), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 324 string keys in both languages, 64 real
+districts, the Quran text matching its recorded SHA-256; Zakat rules, duas and hadith absent so passed with a notice). The release APK is 900,104 bytes, unsigned, minified (879,473 before phase 16, 867,257 before phase 15). **Nothing has run on a real phone, and
 nothing changed on 28 Nov has run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
@@ -85,6 +85,19 @@ nothing changed on 28 Nov has run on any device.**
 - **Reminder:** no new notification. An off-by-default switch lets the one daily nudge mention a waiting portion (`nudgeFor`);
   with the nudge off there is none (G61). KNOWN: build green. UNKNOWN: the screen and the nudge on a device; Q14, G60, G61.
 
+## Phase 16 built, without `INTERNET` (same branch)
+
+- **Pack machinery on a TEST PACK only** (ADR-25). `core/packs`: manifest parse, host (`packSource`, empty means none), resume
+  (`startFrom`, `readReply`), SHA-256 streaming and check, the download's sealed state machine (only a tap starts requests,
+  only a matched hash makes a pack ready), the verse timings format. `app/.../packs`: `fetchFile` on `HttpsURLConnection` (https
+  only, no redirects, fixed `User-Agent: packs`, `Range` to resume), `PackFiles` (re-hash before use), one worker per tapped
+  download. `PacksActivity` (from Settings, with the space used) and `RecitationActivity` (`MediaPlayer`, ayah from timings).
+- **Nothing can be downloaded:** `PACK_HOST` is empty, the bundled manifest is empty, no `INTERNET`, and the permission gate
+  still fails on it. The one commit that adds it, and the proposed new INV-P1, are written in ADR-25; `spec/01` is unchanged.
+  Privacy and Data safety drafts for that day are `spec/06` F. Cleartext is refused by `network_security_config.xml`.
+- KNOWN: `DownloaderTest` against a local HTTPS server (JDK `SSLServerSocket`, `keytool` certificate) and `NetworkSurfaceTest`
+  pass on the JVM. UNKNOWN: anything on Android (G62); background recitation (G63); free-space check (G64).
+
 ## What changed on 28 Nov 2026
 
 - **Real districts (Q4).** `content/districts.json`: all 64, Wikidata (CC0) checked against
@@ -121,7 +134,7 @@ nothing changed on 28 Nov has run on any device.**
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
 5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); phases 11 (calculated date; authority open, Q10) and 12 (Zakat on a fake
-   rules file; Q11) 13 (duas and hadith on fake records; Q12) and 14 (Quran Arabic text, reader, search; no translation; Q13) and 15 (khatam plan; Q14) are built; next is phase 16 (packs machinery without `INTERNET`). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
+   rules file; Q11) 13 (duas and hadith on fake records; Q12) and 14 (Quran Arabic text, reader, search; no translation; Q13) 15 (khatam plan; Q14) and 16 (pack machinery, no `INTERNET`, ADR-25) are built; next is phase 17 (proof and release), which needs phones. Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
 
 ## Waiting on the founder
 
@@ -137,5 +150,6 @@ nothing changed on 28 Nov has run on any device.**
 | Reviewer: books, texts and licences for duas and hadith; the no-nudge decision | Phase 13 shows nothing in a release without them | Q12, G56 |
 | A Bengali Quran translation with written permission; Tanzil's offline "link" term | Phase 14 ships Arabic only | Q13, `PLAN` founder track |
 | Khatam unit (ayah) and the reminder riding on the deed nudge | Phase 15 built that way | Q14, G61 |
+| A pack host, and a tafsir or recitation with written permission | Phase 16 downloads nothing until then; `INTERNET` waits (ADR-25) | ADR-25, G62 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |
 | Play account, support email, privacy URL | Release | G14, G15 |

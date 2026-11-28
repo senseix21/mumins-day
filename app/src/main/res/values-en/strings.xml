@@ -432,4 +432,36 @@
     <string name="khatam_settings_nudge">Also mention today\'s Quran portion</string>
     <string name="khatam_settings_nudge_help">Only on a day the khatam plan has a portion. It is still one notification a day, at the same time.</string>
 
+    <!-- Phase 16: downloadable packs and the recitation player (ADR-25). No pack exists; the host is empty. -->
+    <string name="packs_title">Downloadable packs</string>
+    <string name="packs_not_available">Packs are not available yet. This version of the app downloads nothing and has no permission to use the internet.</string>
+    <string name="packs_privacy">A download starts only when you tap. The app asks one server for the file and sends nothing about you or your phone.</string>
+    <string name="packs_none">No packs are offered yet.</string>
+    <string name="packs_manifest_refused">The list of packs has an error, so nothing is offered.</string>
+    <string name="packs_kind_tafsir">Tafsir</string>
+    <string name="packs_kind_audio">Recitation</string>
+    <string name="packs_size">Size: %1$s MB</string>
+    <string name="packs_download">Download</string>
+    <string name="packs_resume">Continue the download</string>
+    <string name="packs_cancel">Stop</string>
+    <string name="packs_delete">Delete from the phone</string>
+    <string name="packs_listen">Listen</string>
+    <string name="packs_downloading">Downloading: %1$s of %2$s MB</string>
+    <string name="packs_stopped">Stopped at %1$s of %2$s MB. You can continue it.</string>
+    <string name="packs_verifying">Checking the file.</string>
+    <string name="packs_ready">Downloaded and checked.</string>
+    <string name="packs_failed_network">The download stopped because the connection was lost. You can continue it.</string>
+    <string name="packs_failed_refused">The server did not send the pack. You can try again.</string>
+    <string name="packs_failed_large">The server sent more than the pack\'s size, so the file was deleted.</string>
+    <string name="packs_failed_hash">The file did not match its check, so it was deleted. You can download it again.</string>
+    <string name="packs_settings_heading">Downloaded packs</string>
+    <string name="packs_settings_used">Space used: %1$s MB</string>
+    <string name="recitation_title">Recitation</string>
+    <string name="recitation_play">Play</string>
+    <string name="recitation_pause">Pause</string>
+    <string name="recitation_ayah">Now: surah %1$s, ayah %2$s</string>
+    <string name="recitation_no_timings">This pack has no verse timings, so the ayah is not followed.</string>
+    <string name="recitation_unverified">The file did not match its check, so the pack was deleted.</string>
+    <string name="recitation_cannot_play">This recitation cannot be played.</string>
+
 </resources>

@@ -446,4 +446,36 @@
     <string name="khatam_settings_nudge">আজকের কুরআনের অংশের কথাও বলুন</string>
     <string name="khatam_settings_nudge_help">শুধু যেদিন খতম পরিকল্পনায় আজকের অংশ থাকে। তখনও দিনে একটাই নোটিফিকেশন, একই সময়ে।</string>
 
+    <!-- Phase 16: downloadable packs and the recitation player (ADR-25). No pack exists; the host is empty. -->
+    <string name="packs_title">ডাউনলোড করার প্যাক</string>
+    <string name="packs_not_available">প্যাক এখনো পাওয়া যায় না। অ্যাপের এই সংস্করণ কিছুই ডাউনলোড করে না, আর এর ইন্টারনেট ব্যবহারের অনুমতি নেই।</string>
+    <string name="packs_privacy">আপনি ট্যাপ করলে তবেই ডাউনলোড শুরু হয়। অ্যাপ একটি সার্ভার থেকে ফাইলটি চায়, আপনার বা আপনার ফোনের কোনো তথ্য পাঠায় না।</string>
+    <string name="packs_none">এখনো কোনো প্যাক দেওয়া হয়নি।</string>
+    <string name="packs_manifest_refused">প্যাকের তালিকায় ভুল আছে, তাই কিছুই দেওয়া হচ্ছে না।</string>
+    <string name="packs_kind_tafsir">তাফসির</string>
+    <string name="packs_kind_audio">তিলাওয়াত</string>
+    <string name="packs_size">আকার: %1$s মেগাবাইট</string>
+    <string name="packs_download">ডাউনলোড করুন</string>
+    <string name="packs_resume">ডাউনলোড চালিয়ে যান</string>
+    <string name="packs_cancel">থামান</string>
+    <string name="packs_delete">ফোন থেকে মুছে ফেলুন</string>
+    <string name="packs_listen">শুনুন</string>
+    <string name="packs_downloading">ডাউনলোড হচ্ছে: %2$s মেগাবাইটের মধ্যে %1$s</string>
+    <string name="packs_stopped">%2$s মেগাবাইটের মধ্যে %1$s এ থেমেছে। চালিয়ে যেতে পারেন।</string>
+    <string name="packs_verifying">ফাইলটি যাচাই করা হচ্ছে।</string>
+    <string name="packs_ready">ডাউনলোড ও যাচাই হয়েছে।</string>
+    <string name="packs_failed_network">সংযোগ চলে যাওয়ায় ডাউনলোড থেমে গেছে। চালিয়ে যেতে পারেন।</string>
+    <string name="packs_failed_refused">সার্ভার প্যাকটি পাঠায়নি। আবার চেষ্টা করতে পারেন।</string>
+    <string name="packs_failed_large">সার্ভার প্যাকের আকারের চেয়ে বেশি পাঠিয়েছে, তাই ফাইলটি মুছে ফেলা হয়েছে।</string>
+    <string name="packs_failed_hash">ফাইলটি যাচাইয়ে মেলেনি, তাই মুছে ফেলা হয়েছে। আবার ডাউনলোড করতে পারেন।</string>
+    <string name="packs_settings_heading">ডাউনলোড করা প্যাক</string>
+    <string name="packs_settings_used">ব্যবহৃত জায়গা: %1$s মেগাবাইট</string>
+    <string name="recitation_title">তিলাওয়াত</string>
+    <string name="recitation_play">চালান</string>
+    <string name="recitation_pause">থামান</string>
+    <string name="recitation_ayah">এখন: সূরা %1$s, আয়াত %2$s</string>
+    <string name="recitation_no_timings">এই প্যাকে আয়াতের সময় নেই, তাই কোন আয়াত চলছে তা দেখানো হয় না।</string>
+    <string name="recitation_unverified">ফাইলটি যাচাইয়ে মেলেনি, তাই প্যাকটি মুছে ফেলা হয়েছে।</string>
+    <string name="recitation_cannot_play">এই তিলাওয়াত চালানো যাচ্ছে না।</string>
+
 </resources>

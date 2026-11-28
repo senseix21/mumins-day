@@ -1,0 +1,9 @@
+# Mu'mins DAY pack manifest (ADR-25). Read by core/packs/parseManifest; NetworkSurfaceTest checks that it is empty.
+#
+# One pack per line, fields separated by |:
+#   id|tafsir|name|size|sha256|path
+#   id|audio|name|size|sha256|path|timings_size|timings_sha256|timings_path
+# Sizes in bytes; sha256 as 64 lowercase hex digits; paths relative to the pack host's root.
+#
+# Empty on purpose: no pack host is named and no tafsir or recitation has written permission (PLAN founder track).
+# A pack line is added only with its permission recorded in content/ and the host in packs/PackHost.kt.

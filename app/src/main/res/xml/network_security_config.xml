@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ADR-25: no plain http, ever, for any host. The app has no INTERNET permission today (INV-P1), so this changes nothing
+    yet; it is here so the day a pack host is added, cleartext is already refused by the platform as well as by the
+    downloader's own https-only check. No user-added certificate authorities either: only the base config's system ones.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

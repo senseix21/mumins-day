@@ -155,3 +155,47 @@ Searched Wikimedia Commons by its API (`list=search` in the File namespace for a
 
 No short notification tone was searched for; the app's tone can be a synthesised beep made for it.
 
+## F. When `INTERNET` lands for packs (ADR-25): drafts that do not apply yet
+
+**Not in force.** Today the app has no `INTERNET` permission, `PACK_HOST` is empty and the pack manifest is empty
+(KNOWN: `app/src/main/AndroidManifest.xml`, `app/.../packs/PackHost.kt`, `app/src/main/assets/packs/manifest.txt`,
+`NetworkSurfaceTest`, 2026-11-28). Sections A to C above stay true until the one commit ADR-25 describes. Then these
+replace the matching parts. `[HOST]` is the founder's to fill; nothing here names a host.
+
+**F1. Facts the drafts would rest on** (KNOWN from the code as built 2026-11-28; on a phone: not run)
+
+| Fact | Where |
+|---|---|
+| A request is made only after a tap on Download or Continue on the "Downloadable packs" screen; nothing downloads in the background or on a schedule | `PacksActivity` is the only caller of `PackDownloads.start` (`NetworkSurfaceTest`) |
+| Requests go only to `[HOST]`, over https, for files listed in the manifest bundled in the app; redirects are not followed; plain http is refused by the code and by the network security config | `fetchFile`, `packUrl`, `network_security_config.xml` |
+| A request carries the file's path, `User-Agent: packs`, `Accept-Encoding: identity`, and `Range` when continuing; no identifier, cookie, account or query string | `fetchFile`, `DownloaderTest` |
+| The server necessarily sees the phone's IP address and the time of the request (ASSUMED: true of any internet request; what `[HOST]` logs and keeps is the host's policy, UNKNOWN) | — |
+| Downloaded packs are stored in the app's private files, are not backed up, are deleted by "Delete from the phone", by "Clear data" or by uninstalling | `PackFiles`, backup rules exclude the `file` domain |
+| A pack is used only if every file's SHA-256 matches the manifest; otherwise it is deleted and the screen says so | `PackFiles.accept`, `PackFiles.verified` |
+
+**F2. Privacy page, replacing "The short version" and adding a section (draft)**
+
+> **The short version.** Mu'mins DAY does not collect your information. It does not need an account, does not show ads,
+> and does not use analytics or crash-reporting services. Everything works without the internet. The app uses the
+> internet for one thing only: if you tap Download on the "Downloadable packs" screen, it downloads that pack from
+> [HOST].
+>
+> **Downloadable packs.** A download starts only when you tap. The app asks [HOST] for the pack's files and sends
+> nothing about you: no name, no account, no identifier of your phone. Like any server, [HOST] can see your internet
+> address and when you downloaded. [REVIEW: what [HOST] logs and how long it keeps it, from the host's own terms.] Packs
+> stay on your phone, are not backed up, and are removed when you delete them in the app, clear its data or uninstall
+> it. If you never tap Download, the app never connects to the internet.
+
+The Permissions paragraph gains: "internet, only to download a pack you chose".
+
+**F3. Data safety form (draft; Play's live form not read, G14)**
+
+| Question (as ASSUMED) | Draft answer | Reasoning |
+|---|---|---|
+| Does the app collect or share user data? | **No** (draft) | Requests carry no user data; the IP address reaching a server is a property of any connection. UNKNOWN whether Play counts a download server's access logs as collection by the developer; read the live form's definitions |
+| Is data encrypted in transit? | Yes | https only, cleartext refused (ADR-25) |
+| Does the app use the internet? | Yes, for optional downloads the user starts | |
+
+**F4. Open before that commit:** the host and who runs it (`[HOST]`); its logging policy; the pack's written permission
+in `content/`; the founder's yes recorded in the ADR; Play's live form re-read; the Bengali page by a native speaker.
+
