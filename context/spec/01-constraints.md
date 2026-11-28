@@ -11,7 +11,7 @@ Each one is written so a test can fail it. Test ids refer to `04-verification.md
 | Id | Invariant | Test |
 |---|---|---|
 | INV-T1 | For any date and any point inside Bangladesh's bounding box, `imsak ≤ fajr < sunrise < dhuhr < asrShafi < asrHanafi < maghrib < isha`, all within the same civil day. | T-PROP-1 |
-| INV-T2 | `iftar == maghrib` and `sehriEnd == fajr − sehriMargin`, where `sehriMargin ≥ 0` is a single named constant (default 0, see Q3). | T-UNIT-2 |
+| INV-T2 | `iftar == maghrib` and `sehriEnd == fajr − sehriMargin`, where `sehriMargin ≥ 0` is a single named constant (default 0, see Q3). **Since 2026-11-28 (ADR-16)** the app adds the Islamic Foundation calibration on top: Sehri end is 6 minutes before the calculated Fajr before the user's own margin. The invariant is tested on the raw clock; the calibration has its own test. | T-UNIT-2 |
 | INV-T3 | The engine is a pure function: no clock, no locale, no I/O. Same input, same output, on any phone in any time zone. | T-PROP-3 |
 | INV-T4 | For Dhaka and seven other divisional cities, on every day of the reference year, each displayed time differs from the agreed reference timetable by at most 1 minute after default offsets **(target; reference source is Q2)**. | T-FIX-4 |
 | INV-T5 | Rounding never tells anyone to act early or late in the unsafe direction: "stop eating" rounds down, "may break fast" and every "prayer may begin" time rounds up. The current engine rounds imsak **and Fajr** down and everything from Dhuhr onward up (KNOWN, `E/DoubleTimes.kt`). So Fajr-as-prayer-start can show up to a minute early. Mu'mins DAY shows two values: Sehri end (rounded down) and Fajr begins (rounded up). Reviewer to confirm (Q3). | T-UNIT-5 |

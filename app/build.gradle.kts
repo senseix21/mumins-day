@@ -39,6 +39,15 @@ android {
         buildConfig = true
     }
 
+    buildTypes {
+        release {
+            // ADR-15. Manifest components are kept by the plugin's generated rules; the app uses only platform APIs and
+            // org.json, so no rules file is needed. Signing happens outside the repository.
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+    }
+
     lint {
         warningsAsErrors = true
         abortOnError = true

@@ -7,6 +7,7 @@ import com.senseix21.muminsday.clock.Latitude
 import com.senseix21.muminsday.clock.Longitude
 import com.senseix21.muminsday.clock.Meters
 import com.senseix21.muminsday.clock.Minutes
+import com.senseix21.muminsday.clock.Calibration
 import com.senseix21.muminsday.clock.Offsets
 import com.senseix21.muminsday.clock.Place
 import com.senseix21.muminsday.clock.Prayer
@@ -47,7 +48,8 @@ val defaultSettings: PlannerSettings = PlannerSettings(
         elevation = checkNotNull(Meters.of(0.0)),
         zone = ZoneId.of("Asia/Dhaka"),
     ),
-    clock = ClockSettings(),
+    // The Foundation's timetable is what mosques in Bangladesh follow (ADR-16); the user's offsets start from it.
+    clock = ClockSettings(calibration = Calibration.islamicFoundation),
     reminders = Reminders.allOff,
 )
 
@@ -82,7 +84,7 @@ fun parseSettings(stored: Map<String, *>): PlannerSettings {
 
     return PlannerSettings(
         place = parsePlace(::text) ?: defaults.place,
-        clock = ClockSettings(asr, offsets, sehriMargin),
+        clock = ClockSettings(asr, offsets, sehriMargin, defaults.clock.calibration),
         reminders = reminders,
         deedNudge = parseNudgeTime(text("deedNudge")),
     )

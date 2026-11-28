@@ -1,6 +1,7 @@
 package com.senseix21.muminsday.store
 
 import com.senseix21.muminsday.clock.AsrConvention
+import com.senseix21.muminsday.clock.Calibration
 import com.senseix21.muminsday.clock.ClockSettings
 import com.senseix21.muminsday.clock.Minutes
 import com.senseix21.muminsday.clock.Offsets
@@ -21,6 +22,8 @@ class SettingsTest {
             asr = AsrConvention.Shafi,
             offsets = Offsets.none.with(Prayer.Fajr, Minutes(-4)).with(Prayer.Isha, Minutes(30)),
             sehriMargin = Minutes(5),
+            // Not stored: the calibration is fixed by the app (ADR-16), so a round trip must keep the default one.
+            calibration = defaultSettings.clock.calibration,
         ),
         reminders = Reminders.allOff
             .with(Salah.Fajr, Reminder(ReminderMode.Adhan, PreReminder.of(15)))
@@ -109,5 +112,12 @@ class SettingsTest {
             parseSettings(keys.associateWith { junk })
         }
         parseSettings(keys.associateWith { null })
+    }
+
+    @Test
+    fun `the app starts from the Islamic Foundation calibration and storage cannot change it`() {
+        assertEquals(Calibration.islamicFoundation, defaultSettings.clock.calibration)
+        assertEquals(Calibration.islamicFoundation, parseSettings(emptyMap<String, Any>()).clock.calibration)
+        assertEquals(Calibration.islamicFoundation, parseSettings(mapOf("v1.calibration" to "none")).clock.calibration)
     }
 }

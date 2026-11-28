@@ -19,3 +19,6 @@ keystore.properties
 # Claude Code, personal
 .claude/settings.local.json
 .kotlin/
+
+# Agent worktrees
+.claude/worktrees/

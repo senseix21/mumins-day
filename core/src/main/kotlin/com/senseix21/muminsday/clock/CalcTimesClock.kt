@@ -23,10 +23,14 @@ import kotlinx.datetime.TimeZone as EngineZone
 public class CalcTimesClock : PrayerClock {
 
     override fun dayTimes(date: LocalDate, place: Place, settings: ClockSettings): ClockResult {
-        val offsets = settings.offsets
+        val calibration = settings.calibration
+        // One offset per prayer: the calibration's plus the user's. Both are whole minutes through the same engine field.
+        fun offset(prayer: Prayer): Minutes = Minutes(calibration.offsets[prayer].value + settings.offsets[prayer].value)
+        val offsets = Prayer.entries.fold(Offsets.none) { acc, prayer -> acc.with(prayer, offset(prayer)) }
+        val margin = calibration.sehriMargin.value + settings.sehriMargin.value
         val method = Method.Karachi.copy(
             imsakAngle = 18.0,
-            imsakMinute = offsets[Prayer.SehriEnd].value - settings.sehriMargin.value,
+            imsakMinute = offsets[Prayer.SehriEnd].value - margin,
             fajrAngle = 18.0,
             fajrMinute = offsets[Prayer.Fajr].value,
             sunriseMinute = offsets[Prayer.Sunrise].value,
