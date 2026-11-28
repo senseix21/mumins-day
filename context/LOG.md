@@ -520,3 +520,9 @@ with a 3 GB heap and 1 GB metaspace.
 CI result: see the next entry.
 
 **Not done / follow-up.** None.
+
+## 2026-11-28 15:27 +0600 · CI green again
+
+**Verified.** GitHub Actions run 46130286929 on `a24be0a`: completed, success. `main` builds and passes every test and gate on JDK 17 with R8 on.
+
+**Not done / follow-up.** None.
