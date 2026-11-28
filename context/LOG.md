@@ -508,3 +508,15 @@ Mac. Nothing was changed on the Mac.
 - The district snapshot data and parsing scripts live only in this container's scratchpad;
   the numbers are recorded in ADR-16 and G50.
 - Open-Meteo's licence was not read (open-meteo.com is not an allowed host).
+
+## 2026-11-28 15:23 +0600 · CI out of memory after R8; Gradle memory set
+
+**Did.** CI run 46129895522 on `8c31f49` failed in `:app:lintAnalyzeDebug`: "Gradle build daemon
+disappeared unexpectedly", after "running out of JVM Metaspace" with Gradle's defaults (512 MiB
+heap, 384 MiB metaspace; the repository had no `gradle.properties`). Added `gradle.properties`
+with a 3 GB heap and 1 GB metaspace.
+
+**Verified.** `./gradlew build --rerun-tasks --no-daemon` locally: success, no memory warning.
+CI result: see the next entry.
+
+**Not done / follow-up.** None.
