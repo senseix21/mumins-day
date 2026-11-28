@@ -1,14 +1,14 @@
 # State
 
-**Last updated:** 2026-11-28 17:16 +0600
+**Last updated:** 2026-11-28 17:24 +0600
 
 ## In one paragraph
 
 Every phase has been coded as far as it can go without phones, without the reviewer's deeds,
 without a native speaker and without a Play account. `./gradlew build` is green in the cloud:
-283 tests (198 `:core`, 70 `:app`, 12 content gate, 3 engine), lint clean, all five gates
-passing (no `INTERNET`, 8 permissions, 4 libraries, 203 string keys in both languages, 64 real
-districts). The release APK is 208,490 bytes, minified (184,738 before phase 10). **Nothing has run on a real phone, and
+311 tests (219 `:core`, 70 `:app`, 19 content gate, 3 engine), lint clean, all gates
+passing (no `INTERNET`, 8 permissions, 4 libraries, 239 string keys in both languages, 64 real
+districts, Zakat rules absent so passed with a notice). The release APK is 224,726 bytes, minified (184,738 before phase 10). **Nothing has run on a real phone, and
 nothing changed on 28 Nov has run on any device.**
 
 ## Phase 10 in progress (branch `phase-10-widgets-tracker-location`)
@@ -36,6 +36,16 @@ nothing changed on 28 Nov has run on any device.**
 - **Not decided:** whose announcement decides the month (Q10, G54). Measured: the calculated first of Ramadan 1447 is one day
   before the announced one (2026-02-18 against 2026-02-19), and the rule is up to 2 days from Umm al-Qura. No published
   table of Bangladesh month starts was found. KNOWN: build green; UNKNOWN: how it looks on a device.
+
+## Phase 12 built (same branch)
+
+- **Zakat calculator on a fake rules file** (ADR-21). `core/zakat` holds no rule: a test reads its source and fails on any number
+  but 0, 1, 2, 30, 100. The rules are `content/zakat-rules.json`, signed by the reviewer, which does not exist yet; the gate
+  `checkZakatRules` passes with a notice while it is absent, refuses an unsigned, incomplete or `test_fixture` file. Debug
+  builds ship a FAKE fixture (banner on screen); a release says "no signed rules" and calculates nothing. The screen shows every
+  step, takes prices the user types with a date, never fetches, saves nothing. Amounts round up, the nisab's value down.
+- **Open:** Q11 (reviewer signs every rule), G55 (conversions have only a secondary, unattributed lead: 11.664 g, 16 ana,
+  6 ratti; in no file or code). KNOWN: build green; UNKNOWN: how it looks on a device.
 
 ## What changed on 28 Nov 2026
 
@@ -72,8 +82,8 @@ nothing changed on 28 Nov has run on any device.**
    G51 (`USE_EXACT_ALARM`); G52 (`mediaPlayback`); G33 and G35 rulings; an Adhan recording (Q5).
 3. **People:** the reviewer's 30 deeds; the native speaker for 169 keys and 64 district names.
 4. **Phones** for phase 7.
-5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); phase 11 is built (calculated date;
-   authority open, Q10); next is phase 12 (Zakat). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
+5. **Part 2** (phases 9 to 17 in `PLAN.md`): phases 9 and 10 are built (10 unverified on a device); phases 11 (calculated date; authority open, Q10) and 12 (Zakat on a fake
+   rules file; Q11) are built; next is phase 13 (duas and hadith). Phases 9 to 13 need no new permission beyond location and can be built while v1 waits.
 
 ## Waiting on the founder
 
@@ -85,5 +95,6 @@ nothing changed on 28 Nov has run on any device.**
 | Playback service type | Play says media playback "must be user-initiated" | G52 |
 | An Adhan recording | Release | Q5 |
 | Which authority decides the Hijri month; the Maghrib day change | Phase 11 shows a calculated date only | Q10, G54 |
+| Reviewer signs the Zakat rules | Phase 12 calculates nothing in a release without them | Q11, G55 |
 | Phones | Phase 7, the reliability claim | Q8, G13 |
 | Play account, support email, privacy URL | Release | G14, G15 |

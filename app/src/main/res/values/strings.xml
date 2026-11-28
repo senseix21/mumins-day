@@ -347,4 +347,42 @@
     <string name="ramadan_suggest">হিসাব অনুযায়ী এখন রমজান মাস। রমজান মোড চালু করবেন?</string>
     <string name="ramadan_suggest_on">রমজান মোড চালু করুন</string>
 
+    <!-- Zakat calculator (phase 12, INV-Z1). Every rule comes from the reviewer's signed file; these are labels only and rule nothing. Bengali drafted by Claude, native review pending. -->
+    <string name="zakat_title">যাকাতের হিসাব</string>
+    <string name="zakat_help">রিভিউয়ার যে নিয়ম সই করেছেন সেই নিয়মে নিসাব ও পরিমাণ হিসাব করে, প্রতিটি ধাপ দেখায়। আপনি যা লেখেন তা সংরক্ষিত বা কোথাও পাঠানো হয় না।</string>
+    <string name="zakat_no_rules">এখনো কোনো সই করা নিয়ম নেই, তাই হিসাব করা যাচ্ছে না।</string>
+    <string name="zakat_rules_rejected">নিয়মের ফাইলটি অসম্পূর্ণ, তাই হিসাব করা যাচ্ছে না।</string>
+    <string name="zakat_fixture_banner">পরীক্ষার নিয়ম: এখানকার সংখ্যাগুলো বানানো, শুধু অ্যাপ চালিয়ে দেখার জন্য। এই ফলাফল ব্যবহার করবেন না।</string>
+    <string name="zakat_cash">নগদ টাকা (টাকা)</string>
+    <string name="zakat_other">অন্যান্য সম্পদ (টাকা)</string>
+    <string name="zakat_debts">ঋণ (টাকা)</string>
+    <string name="zakat_gold">সোনা</string>
+    <string name="zakat_silver">রুপা</string>
+    <string name="zakat_unit_bhori">ভরি</string>
+    <string name="zakat_unit_ana">আনা</string>
+    <string name="zakat_unit_ratti">রতি</string>
+    <string name="zakat_unit_grams">গ্রাম</string>
+    <string name="zakat_price_note">দাম আপনি নিজে লিখবেন। অ্যাপ কখনো দাম আনে না, কারণ এতে ইন্টারনেট নেই।</string>
+    <string name="zakat_price_gold">সোনার দাম, প্রতি ভরি (টাকা)</string>
+    <string name="zakat_price_silver">রুপার দাম, প্রতি ভরি (টাকা)</string>
+    <string name="zakat_price_date">দামের তারিখ: %1$s</string>
+    <string name="zakat_hawl">সম্পদ পূর্ণ এক বছর আমার কাছে আছে</string>
+    <string name="zakat_calculate">হিসাব করুন</string>
+    <string name="zakat_bad_number">%1$s: সংখ্যা নয়</string>
+    <string name="zakat_missing_price">%1$s-র দাম লিখুন, দাম ছাড়া হিসাব করা যায় না।</string>
+    <string name="zakat_working_title">হিসাবের ধাপ</string>
+    <string name="zakat_step_weight">%1$s গ্রামে: %2$s</string>
+    <string name="zakat_step_line">%1$s: %2$s টাকা</string>
+    <string name="zakat_step_not_counted">(নিয়মে ধরা হয়নি)</string>
+    <string name="zakat_step_debts">বাদ গেছে ঋণ: %1$s টাকা</string>
+    <string name="zakat_step_net">ধরা সম্পদ: %1$s টাকা</string>
+    <string name="zakat_step_nisab">নিসাব: %2$s %1$s গ্রাম, %4$s তারিখের দামে %3$s টাকা</string>
+    <string name="zakat_step_rate">হার: %1$s শতাংশ</string>
+    <string name="zakat_reached_yes">সম্পদ নিসাবে পৌঁছেছে।</string>
+    <string name="zakat_reached_no">সম্পদ নিসাবে পৌঁছায়নি।</string>
+    <string name="zakat_below_nisab">নিসাবের কম, কোনো পরিমাণ নেই।</string>
+    <string name="zakat_hawl_pending">নিয়ম অনুযায়ী পূর্ণ এক বছর লাগে, আপনি বলেছেন এখনো হয়নি।</string>
+    <string name="zakat_amount">পরিমাণ: %1$s টাকা</string>
+    <string name="zakat_rounding_note">পরিমাণ পয়সা পর্যন্ত ওপরের দিকে পূর্ণ করা হয়েছে; নিসাবের মূল্য নিচের দিকে।</string>
+
 </resources>

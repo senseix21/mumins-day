@@ -15,6 +15,12 @@ import com.senseix21.muminsday.hijri.HijriAdjustment
 import com.senseix21.muminsday.hijri.HijriReading
 import com.senseix21.muminsday.hijri.HijriRule
 import com.senseix21.muminsday.l10n.dateText
+import com.senseix21.muminsday.l10n.decimalText
+import com.senseix21.muminsday.l10n.localDateText
+import com.senseix21.muminsday.zakat.Metal
+import com.senseix21.muminsday.zakat.WealthKind
+import java.math.BigDecimal
+import java.math.RoundingMode
 import com.senseix21.muminsday.l10n.hijriDateText
 import com.senseix21.muminsday.l10n.numberText
 import com.senseix21.muminsday.l10n.timeOfDayText
@@ -64,6 +70,27 @@ class Texts(private val context: Context, val language: Language) {
                 HijriAdjustment.DayEarlier -> R.string.hijri_rule_earlier
                 HijriAdjustment.DayLater -> R.string.hijri_rule_later
             }
+        },
+    )
+
+    /** A number rounded the way the caller says (an amount owed rounds up), in the language's digits. */
+    fun decimal(value: BigDecimal, scale: Int, mode: RoundingMode): String = decimalText(value, scale, mode, language)
+
+    fun localDate(date: LocalDate): String = localDateText(date, words)
+
+    fun metal(metal: Metal): String = context.getString(
+        when (metal) {
+            Metal.Gold -> R.string.zakat_gold
+            Metal.Silver -> R.string.zakat_silver
+        },
+    )
+
+    fun wealthKind(kind: WealthKind): String = context.getString(
+        when (kind) {
+            WealthKind.Cash -> R.string.zakat_cash
+            WealthKind.Gold -> R.string.zakat_gold
+            WealthKind.Silver -> R.string.zakat_silver
+            WealthKind.Other -> R.string.zakat_other
         },
     )
 

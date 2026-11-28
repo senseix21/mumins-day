@@ -333,4 +333,42 @@
     <string name="ramadan_suggest">By the calculated date this is the month of Ramadan. Turn on Ramadan mode?</string>
     <string name="ramadan_suggest_on">Turn on Ramadan mode</string>
 
+    <!-- Zakat calculator (phase 12, INV-Z1). -->
+    <string name="zakat_title">Zakat calculator</string>
+    <string name="zakat_help">Works out the nisab and the amount by the rules the reviewer signed, and shows every step. What you type is not saved or sent anywhere.</string>
+    <string name="zakat_no_rules">There are no signed rules yet, so nothing can be calculated.</string>
+    <string name="zakat_rules_rejected">The rules file is incomplete, so nothing can be calculated.</string>
+    <string name="zakat_fixture_banner">TEST RULES: the numbers here are made up, only to try the app. Do not use this result.</string>
+    <string name="zakat_cash">Cash (taka)</string>
+    <string name="zakat_other">Other assets (taka)</string>
+    <string name="zakat_debts">Debts (taka)</string>
+    <string name="zakat_gold">Gold</string>
+    <string name="zakat_silver">Silver</string>
+    <string name="zakat_unit_bhori">Bhori</string>
+    <string name="zakat_unit_ana">Ana</string>
+    <string name="zakat_unit_ratti">Ratti</string>
+    <string name="zakat_unit_grams">Grams</string>
+    <string name="zakat_price_note">You type the price. The app never fetches prices; it has no internet.</string>
+    <string name="zakat_price_gold">Gold price per bhori (taka)</string>
+    <string name="zakat_price_silver">Silver price per bhori (taka)</string>
+    <string name="zakat_price_date">Price date: %1$s</string>
+    <string name="zakat_hawl">I have held this wealth for a full year</string>
+    <string name="zakat_calculate">Calculate</string>
+    <string name="zakat_bad_number">%1$s: not a number</string>
+    <string name="zakat_missing_price">Type the %1$s price; nothing can be calculated without it.</string>
+    <string name="zakat_working_title">The working</string>
+    <string name="zakat_step_weight">%1$s in grams: %2$s</string>
+    <string name="zakat_step_line">%1$s: %2$s taka</string>
+    <string name="zakat_step_not_counted">(not counted by the rules)</string>
+    <string name="zakat_step_debts">Debts taken off: %1$s taka</string>
+    <string name="zakat_step_net">Wealth counted: %1$s taka</string>
+    <string name="zakat_step_nisab">Nisab: %2$s grams of %1$s, worth %3$s taka at the price dated %4$s</string>
+    <string name="zakat_step_rate">Rate: %1$s percent</string>
+    <string name="zakat_reached_yes">The wealth has reached the nisab.</string>
+    <string name="zakat_reached_no">The wealth has not reached the nisab.</string>
+    <string name="zakat_below_nisab">Below the nisab: no amount.</string>
+    <string name="zakat_hawl_pending">The rules ask for a full year; you said it has not been a year.</string>
+    <string name="zakat_amount">Amount: %1$s taka</string>
+    <string name="zakat_rounding_note">The amount is rounded up to the paisa; the nisab\'s value is rounded down.</string>
+
 </resources>

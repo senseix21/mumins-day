@@ -416,7 +416,7 @@ decisions, and nothing here may break a v1 rule without an ADR and the founder's
 - [x] Decide: is network ever allowed in the main app (phase 16)? Yes, one host, packs only (founder, 2026-11-28, ADR-17).
 - [x] Decide: bring back "find my district" with coarse location: yes (founder, 2026-11-28, ADR-17). The manifest changes in phase 10, not before.
 - [ ] Hijri authority: whose announcement decides the month (KNOWN from one press report: the National Moon Sighting Committee at the Islamic Foundation announced Ramadan 1447; confirm it is the app's source) [Q10, G54]. Phase 11 shipped calculated-only meanwhile.
-- [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [F-Zakat].
+- [ ] Zakat: reviewer signs the rules (nisab basis gold or silver, rate, what counts as wealth, the hawl), and the bhori and ana conversions [Q11, G55]. The file format and gate are built (ADR-21); only the reviewer's file is missing.
 - [ ] Duas: the source text (Hisnul Muslim, Arabic) and a Bengali translation, each with a written licence; the reviewer for selection and wording.
 - [ ] Hadith: a source collection whose terms allow offline redistribution, a Bengali translation with a licence, and the reviewer for selection and grading.
 - [ ] Quran: an Arabic text source with its terms (ASSUMED: Tanzil Uthmani, which permits verbatim redistribution with credit; fetch and confirm) and a **Bengali translation with written permission** (KNOWN from earlier research: Tanzil's Bengali texts are non-commercial only; QuranEnc requires unmodified text with credit).
@@ -486,14 +486,17 @@ prayers; an optional "find my district" button.
 
 ## Phase 12 · Zakat calculator
 
-**Outcome.** A pure, offline calculator in local units that shows its working.
+**Outcome.** A pure, offline calculator in local units that shows its working. Built 2026-11-28 17:24 +0600 on a FAKE rules file only; no real rule exists until the reviewer signs `content/zakat-rules.json` (Q11, ADR-21). Not run on an emulator or phone.
 
-- [ ] Pure `zakat` package in core: inputs in taka, bhori, ana, ratti and grams; outputs nisab, whether it is reached, and the amount.
-- [ ] Conversions fetched from a source and recorded (ASSUMED until then: 1 bhori = 11.664 g, 1 bhori = 16 ana, 1 ana = 6 ratti) [data rule].
-- [ ] Gold and silver prices typed by the user, with the date; the app never fetches them (no network) and says so.
-- [ ] Rules exactly as the reviewer signs them; the reviewer's note committed beside the rules, like deeds [INV-C1 pattern].
-- [ ] Shows every step of the working; no rounding against the payer's obligation.
-- [ ] Property tests: unit round trips, monotonicity, nisab boundary.
+- [x] Pure `zakat` package in core: inputs in taka, bhori, ana, ratti and grams; outputs nisab, whether it is reached, and the amount, as a sealed outcome (`Due`, `BelowNisab`, `HawlNotComplete`, `MissingPrice`) (`CalculatorTest`, 12 tests, 2026-11-28).
+- [ ] Conversions fetched from a source and recorded. One secondary, unattributed source found and recorded as a lead in G55 (11.664 g, 16 ana, 6 ratti); **not** put in any file or code. Stays open for the reviewer's primary source.
+- [x] Gold and silver prices typed by the user, with a date picked by the user; the screen says the app never fetches them and has no internet (`zakat_price_note`). Built; not seen on a device.
+- [ ] Rules exactly as the reviewer signs them; the reviewer's note committed beside the rules [INV-C1 pattern]. The file format, the gate (`checkZakatRules`, absent passes with a notice, a test fixture refused) and a FAKE debug fixture are built; the real file does not exist. Open until the reviewer delivers it.
+- [x] Shows every step of the working (weights in grams, each line and whether it counts, debts, net wealth, nisab with its price date, reached or not, rate, amount) and says the rounding directions on screen; amounts round up to the paisa, the nisab's value down, weights up (ADR-21).
+- [x] Property tests: unit round trips (bhori, ana, ratti and grams worth the same, 100 random), monotonicity in cash, debts and price (200, 200, 100 random), the nisab boundary (at it reached, one paisa below not), amount never below the exact share (200 random), no rule number in the source (checked by mutation: a planted 16 failed the test).
+- [x] Tests for the gate (`ZakatGateTest`, 7) and for number parsing and rounding text (`DecimalTest`, 2).
+- [ ] Reviewer: signs the rules; confirms the "at least the nisab" boundary and the Bengali labels [Q11].
+- [ ] Look at the Zakat screen on an emulator in both languages (debug build, fixture banner), at 200 % font, with Bengali digits typed [T-UI-2].
 
 ## Phase 13 · Daily duas and daily hadith
 

@@ -57,7 +57,7 @@ Each one is written so a test can fail it. Test ids refer to `04-verification.md
 |---|---|---|
 | INV-QT1 | The Quran text, Arabic and any translation, is shipped byte for byte as its source published it. No code edits, normalises, truncates or reorders it. The build checks a hash of each bundled text file against the hash recorded with its licence, and fails on a mismatch. A translation is bundled only with its permission in writing recorded in `content/`. | T-BUILD-6 (new) |
 | INV-H1 | Every Hijri date shown names the rule that produced it (for example "calculated" or "announced by X") and can be moved one day either way by the user. The app never presents a calculated date as an announcement. | T-UNIT (Hijri), T-UI-2 |
-| INV-Z1 | The Zakat calculator takes every rule (nisab basis, rate, unit conversions) from a file the reviewer signed. Claude's code contains none of those numbers except in test fixtures marked fake. It stores no amount the user typed unless the user taps save. | T-BUILD-4 (rules file), T-UNIT |
+| INV-Z1 | The Zakat calculator takes every rule (nisab basis, rate, unit conversions) from a file the reviewer signed. Claude's code contains none of those numbers except in test fixtures marked fake. It stores no amount the user typed unless the user taps save (built: there is no save, so nothing typed is stored). A rules file marked `test_fixture` cannot ship: the gate refuses it for `content/zakat-rules.json`. Amounts owed round up and the nisab's value rounds down (ADR-21). | T-BUILD-4 (rules file), T-UNIT |
 
 ### Localization
 
